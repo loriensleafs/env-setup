@@ -152,11 +152,21 @@ export const HANDLERS: Record<string, CeremonyHandler> = {
   "accessibility-grant": {
     async run(ctx) {
       p.note(
-        "envsetup automates Chrome (web apps) and the Finder sidebar via macOS\nAccessibility. Grant it to your terminal now so those steps run unattended.\n(macOS won't let ANY tool pre-grant this — it's SIP-protected.)",
-        "Accessibility",
+        [
+          "macOS won't let any tool flip these (SIP-protected) — but here they are",
+          "in ONE place. Opening Accessibility now; enable ALL of these together:",
+          "  \u2022 your terminal (Ghostty)  \u2014 envsetup's Chrome + Finder automation",
+          "  \u2022 superwhisper             \u2014 dictation",
+          "  \u2022 BetterDisplay            \u2014 display control",
+          "Then Screen Recording (opens next) for CleanShot + Zoom.",
+        ].join("\n"),
+        "Permissions \u2014 one pass",
       );
       await ctx.run(["open", "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"]);
-      return confirmDone("Accessibility granted to the terminal?");
+      const acc = await confirmDone("Accessibility enabled for all of the above?");
+      await ctx.run(["open", "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture"]);
+      const rec = await confirmDone("Screen Recording enabled for CleanShot + Zoom?");
+      return acc && rec;
     },
   },
 
