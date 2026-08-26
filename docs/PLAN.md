@@ -527,3 +527,14 @@ Every script this project writes or installs — Automator Quick Action payloads
 is PURE BUN, always. No Node, no Python, and shell only as unavoidable glue: the Automator
 .workflow wrapper may exec `bun <script>`, and install.sh is necessarily POSIX sh because it
 runs before bun exists (the single sanctioned exception; it does nothing but fetch + exec).
+
+## Repo structure — DECIDED 2026-08-26 (research-backed; Peter approved)
+Single package, NO monorepo (community: workspaces only earn complexity with interdependent
+packages; Bun workspaces make a later split cheap — documented migration path). Feature-first
+layout (2026 consensus, over type-first): src/index.ts (citty entry), src/commands/ (one file
+per subcommand — citty-ecosystem convention), src/items/<item>/ (one module per installable
+thing = the feature dirs, each holding its detect/install/configure/verify + Zod schema +
+assets/), src/ui/ (custom clack prompts), named shared homes (src/manifest/, src/secrets/) as
+built — no lib/ junk drawer. kebab-case filenames. Peter's calls: spikes/ → test/spikes/
+(PTY-harness seeds, delete when real tests supersede); templates/ dissolved into per-item
+assets/ dirs (they're item payloads, not scaffolding templates).
