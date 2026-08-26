@@ -18,7 +18,6 @@ import type { SelectGroups } from "../ui/group-multi-select.ts";
 export const EMAIL_PENDING = "pending-noreply-resolution";
 
 export interface BootstrapOptions {
-  dryRun?: boolean;
   /** Show installed items as toggleable options (cascade inspection). */
   showInstalled?: boolean;
   /** Skip per-app config screens, accepting each item's defaults. */
@@ -57,7 +56,7 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
     });
     if (p.isCancel(resume)) bail("cancelled");
     if (resume) {
-      await executePlan(priorManifest, { resume: true, dryRun: opts.dryRun });
+      await executePlan(priorManifest, { resume: true });
       return;
     }
   }
@@ -192,7 +191,6 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
       `${color.bold(String(toInstall.length))} items will be installed`,
       `${alreadyThere} already installed (untouched)`,
       `Dev directory: ${devDir}`,
-      opts.dryRun ? color.yellow("DRY RUN — nothing will be installed") : "",
     ]
       .filter(Boolean)
       .join("\n"),
@@ -232,7 +230,7 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
   }
   p.log.success("manifest written");
 
-  await executePlan(manifest, { dryRun: opts.dryRun, selection: toInstall });
+  await executePlan(manifest, { selection: toInstall });
 }
 
 function emptyManifest(): Manifest {
@@ -247,7 +245,7 @@ function emptyManifest(): Manifest {
 
 export async function executePlan(
   manifest: Manifest,
-  opts: { resume?: boolean; dryRun?: boolean; selection?: string[] },
+  opts: { resume?: boolean; selection?: string[] } = {},
 ): Promise<void> {
   const registry = buildRegistry();
   const selection =
@@ -256,12 +254,6 @@ export async function executePlan(
       .filter(([, s]) => s.selected)
       .map(([id]) => id);
 
-  if (opts.dryRun) {
-    const order = registry.executionOrder(selection);
-    p.note(order.join("\n"), "execution order (dry run)");
-    p.outro("dry run complete — manifest saved, nothing installed");
-    return;
-  }
 
   const order = registry.executionOrder(selection);
   const runStart = Date.now();

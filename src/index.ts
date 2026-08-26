@@ -14,7 +14,6 @@ const main = defineCommand({
     secrets: () => import("./commands/secrets.ts").then((m) => m.default),
   },
   args: {
-    "dry-run": { type: "boolean", description: "Plan and write the manifest, install nothing" },
     "show-installed": {
       type: "boolean",
       description: "Show already-installed items as toggleable options (for inspecting the dependency cascade)",
@@ -31,7 +30,6 @@ const main = defineCommand({
     if (sub !== undefined) return;
     const { bootstrap } = await import("./commands/bootstrap.ts");
     await bootstrap({
-      dryRun: args["dry-run"] === true,
       showInstalled: args["show-installed"] === true,
       acceptDefaults: args.defaults === true,
     });

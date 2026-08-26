@@ -906,3 +906,11 @@ Requires: Accessibility permission (like superwhisper) — Stage C.
   deprecated-but-works API, embedded in item for compiled builds) rewrites the sidebar to the
   decided order: Applications · Home · Desktop · Documents · Downloads · Dev · .claude.
 Registry now larger; 96 tests green.
+
+## Cleanup round — 2026-08-26
+- DRY-RUN removed entirely (index/bootstrap/sync). Bare `envsetup` = full one-shot install
+  (always was). `--show-installed` and `--defaults` kept. Scratch test/spikes/ deleted (no
+  references; real tests live in src/**/__tests__ per convention).
+- VENDOR kept (tab-complete needs clack main; npm still 1.7.0/1.4.3) but now documented:
+  vendor/README.md gives the exact convert-to-npm steps + the release signal to watch
+  (@clack/core > 1.4.3 with completeOnTab).
