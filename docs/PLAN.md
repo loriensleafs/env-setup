@@ -570,3 +570,16 @@ ancestry). jq dependency gone. settings.template.json statusLine.command → `bu
 install.sh clarified for Peter: the shim exists ONLY to arch-detect/fetch/exec the compiled
 binary (which itself needs no bun); it never installs bun — bun is installed later BY envsetup
 as a regular item (Claude hooks need it).
+
+## Stage A UI — BUILT 2026-08-26 (36 tests green + PTY smoke pass)
+- src/ui/unified-select-state.ts — PURE state machine (unit-tested): sectioned rows, locked
+  "on"/"installed" states, hint annotations, LIVE dependency filtering (requires: [] — an
+  option is visible iff every requirement is selected/locked/installed; hidden dependents keep
+  selection MEMORY and return in their previous state; result() excludes hidden), cursor that
+  skips headers/locked rows, wraps, and recovers when its row disappears.
+- src/ui/unified-select.ts — thin @clack/core Prompt shell over the state machine.
+- src/ui/horizontal-radio.ts — 2-4 option inline radio (left/right cycle, clack-styled).
+- src/ui/theme.ts — clack-language symbols shared by custom prompts.
+- src/ui/demo.ts — runnable interactive demo: `bun src/ui/demo.ts` (Peter can try it).
+- test/spikes/ui-demo.exp — PTY smoke test proving live dep-filtering + radio end-to-end
+  (toggles Ghostty off/on, verifies ghostty-config vanishes/returns, radio picks medium).
