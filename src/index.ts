@@ -11,7 +11,11 @@ const main = defineCommand({
     sync: () => import("./commands/sync.ts").then((m) => m.default),
     secrets: () => import("./commands/secrets.ts").then((m) => m.default),
   },
-  async run() {
+  async run({ rawArgs }) {
+    // citty invokes the root run() even when a subcommand matched — only
+    // bootstrap when the invocation is bare.
+    const sub = rawArgs.find((a) => !a.startsWith("-"));
+    if (sub !== undefined) return;
     const { bootstrap } = await import("./commands/bootstrap.ts");
     await bootstrap();
   },

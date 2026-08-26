@@ -583,3 +583,18 @@ as a regular item (Claude hooks need it).
 - src/ui/demo.ts — runnable interactive demo: `bun src/ui/demo.ts` (Peter can try it).
 - test/spikes/ui-demo.exp — PTY smoke test proving live dep-filtering + radio end-to-end
   (toggles Ghostty off/on, verifies ghostty-config vanishes/returns, radio picks medium).
+
+## First items + real doctor — BUILT 2026-08-26 (48 tests green)
+- src/exec/run.ts — injectable Runner (Bun.spawn wrapper); ItemContext now carries `run` so
+  every item is unit-testable with mocked commands.
+- src/items/factories/brew.ts — brewFormula/brewCask factories (auto homebrew dep, version
+  parsing, custom brew names e.g. delta→git-delta).
+- src/items/defs/ — xcode-clt (marker-file + softwareupdate headless install technique),
+  homebrew (NONINTERACTIVE official installer; orchestrator owns sudo keep-alive), bun + uv
+  (official installers with PATH-edit suppression — dotfiles own PATH lines), node-lts (via
+  fnm: install --lts + default lts-latest).
+- src/items/all.ts — buildRegistry(): required spine (clt, brew, bun, uv, gh, go, fnm, node)
+  + Peter's CLI picks (jq, delta, lazygit, dust). Apps/casks arrive next.
+- `envsetup doctor` is REAL: live detection over the registry with versions. Verified on this
+  machine (correctly found CLT/brew/bun/gh, correctly flagged missing uv/go/fnm/node/jq/...).
+- Fixed citty quirk: root run() fires even after a subcommand — guarded by rawArgs check.

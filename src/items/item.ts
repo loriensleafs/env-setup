@@ -1,4 +1,5 @@
 import type { z } from "zod";
+import type { Runner } from "../exec/run.ts";
 import type { Manifest } from "../manifest/schema.ts";
 
 export type ItemKind =
@@ -21,6 +22,7 @@ export interface DetectResult {
 export interface ItemContext {
   manifest: Manifest;
   log: (message: string) => void;
+  run: Runner;
 }
 
 /** A ceremony is an attended step (sign-in, permission dialog) surfaced in Stage C. */
