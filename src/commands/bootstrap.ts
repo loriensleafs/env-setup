@@ -73,26 +73,24 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
     list.push(item);
     sections.set(section, list);
   }
-  // Single task-log group: transient "Evaluating …" messages as sections
-  // finish (detections all run in parallel), collapsing to one success line —
-  // the per-section numbers don't matter this early and just go away.
-  const scanLog = p.taskLog({ title: "Initializing", limit: 4 });
-  const scanGroup = scanLog.group("Evaluating environment");
-  await Promise.all(
-    [...sections.entries()].map(async ([section, items]) => {
-      const results = await Promise.all(
-        items.map(async (item) => {
-          const d = await item.detect(scanCtx).catch(() => ({ installed: false as const }));
-          detection.set(item.id, d);
-          return d;
-        }),
-      );
-      const installed = results.filter((d) => d.installed && d.satisfies !== false).length;
-      scanGroup.message(`Evaluated ${section.toLowerCase()} (${installed}/${items.length} installed)`);
-    }),
-  );
+  // Single task-log group: each message announces the section about to be
+  // evaluated (work runs right after, parallel within the section); no counts,
+  // no group.success — taskLog.success collapses everything to one line.
+  const scanLog = p.taskLog({ title: "Initializing", spacing: 0 });
+  const scanGroup = scanLog.group("");
+  for (const [section, items] of sections) {
+    scanGroup.message(`Evaluating ${section.toLowerCase()}`);
+    await Promise.all(
+      items.map(async (item) => {
+        detection.set(
+          item.id,
+          await item.detect(scanCtx).catch(() => ({ installed: false as const })),
+        );
+      }),
+    );
+  }
   const elapsed = ((Date.now() - scanStart) / 1000).toFixed(1);
-  scanGroup.success(`Environment evaluated in ${elapsed}s`);
+  scanLog.success(`Ready in ${elapsed}s`);
 
   // --- Identity + locations (Group 6) ------------------------------------
   // Zod schemas double as prompt validators (Standard Schema bridge).

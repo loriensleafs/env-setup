@@ -718,7 +718,13 @@ PTY note: the vendored stock path prompt sometimes consumes the first Enter (sug
 navigation) — harness sends a resilient second Enter; watch for it in real usage.
 
 ## Progress-UX rework (Peter, 2026-08-26)
-- SCAN (final form, Peter, after stream + custom-renderer iterations): **taskLog with a single
+- SCAN (FINAL final form, Peter): taskLog({spacing:0}) + single unnamed group; message announces
+  each section BEFORE its (internally parallel) evaluation — no counts; no group.success;
+  taskLog.success collapses everything to "Ready in Xs".
+- Path-prompt footer mixed dim/white styling: verified STOCK (autocomplete.ts:232 dims key
+  names only) — left as-is per fidelity principle; Peter may opt into all-dim as a conscious
+  customization later.
+- (superseded iteration) SCAN: **taskLog with a single
   group** — title "Initializing", group "Evaluating environment", transient .message lines
   ("Evaluated apps (5/11 installed)") appearing as sections complete out of order (detections
   fully parallel), all collapsing on group.success("Environment evaluated in Xs") — the
