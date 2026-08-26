@@ -382,7 +382,9 @@ GUI-only (1 click per shortcut). Same right-click Quick Actions menu either way.
   + the 3 Chrome PWAs (Gmail, Google Calendar, Google Drive).
 - **Ghostty in Dock must use the native macOS Terminal.app icon** — the Icon\r/NSWorkspace
   technique from this session (2026-08-25) is now a REQUIRED setup step. Note: cask upgrades
-  wipe it; sync/doctor should re-detect+reapply.
+  wipe it; sync/doctor should re-detect+reapply. The icon is READ FROM THE TARGET MACHINE at
+  runtime (/System/Applications/Utilities/Terminal.app/.../Terminal.icns) — nothing bundled;
+  Peter's old custom icns was removed from the repo 2026-08-26 (recoverable from git history).
 - PWAs now FOUR: Gmail (Dock label "Mail"), Google Calendar, Google Drive, Google Keep (label
   "Notes") — custom labels require renaming the installed PWA .app bundle (research at build).
 - Claude desktop ADDED to Dock.
