@@ -71,12 +71,22 @@ incl. signing key; 422-tolerant re-runs). git-email item (noreply → git user.e
 public-safe); passphrase in his password manager; .secrets.local.json stays untracked until
 first `secrets show` verification, then deletable.
 
-PENDING (build order): fonts from Peter's fonts repo + Google Sans · Stage C ceremony runner
-(app sign-ins, permissions checklist, default browser, license entry via clipboard, Cursor
-model gating, Raycast onboarding — auth/email/keys now handled by items) · per-app config
-SCREENS in bootstrap (schema-driven; podman/ghostty/typora have configSchemas ready) ·
-dotfiles item (PATH lines: bun/uv/fnm hook, docker=podman alias) · release pipeline test ·
-doctor/sync diffing UI
+BUILT (cont. 4, 2026-08-26): personal-fonts (DankMono/Hack/LigaHack straight from
+loriensleafs/fonts via API, family-filtered) · dotfiles item (idempotent marker block in
+~/.zshrc: bun+local PATH, brew shellenv, fnm --use-on-cd hook, docker=podman alias — all
+guarded so missing tools can't break shell startup) · **`envsetup connect`** — Stage C ceremony
+runner: gathers ceremonies from selected+installed items; handlers for clipboard-assisted
+license entry (Typora/CleanShot/superwhisper via secret store), superwhisper permission panes
+(deep-links), Chrome sign-in + default-browser (--make-default-browser + system dialog),
+claude-login, Cursor model gating note, Raycast onboarding, CleanShot settings checklist;
+skipped steps re-runnable · **doctor DIFFS the manifest** (missing = selected-but-absent;
+untracked = present-but-unselected; live on this machine: 9 in sync/22 missing/4 untracked)
+· **`envsetup sync`** applies the manifest via the orchestrator (shares executePlan). 90 tests.
+
+PENDING: Google Sans (proper) font source research · per-app config SCREENS in bootstrap
+(schema-driven; podman/ghostty/typora configSchemas ready) · release pipeline test (tag v0.0.1)
+· fresh-machine full-run validation · .secrets.local.json deletion after Peter verifies
+`secrets show` · swap vendored clack → npm when released
 
 # ─── Product & process decisions ───
 ## What this is

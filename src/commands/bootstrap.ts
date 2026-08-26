@@ -225,7 +225,7 @@ function emptyManifest(): Manifest {
   };
 }
 
-async function executePlan(
+export async function executePlan(
   manifest: Manifest,
   opts: { resume?: boolean; dryRun?: boolean; selection?: string[] },
 ): Promise<void> {

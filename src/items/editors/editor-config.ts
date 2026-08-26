@@ -62,6 +62,9 @@ export function editorConfigItem(spec: EditorSpec): Item {
     title: spec.title,
     kind: "config-only",
     deps: [spec.appItemId, "font-jetbrains-nf"],
+    ceremonies: spec.id === "cursor-config"
+      ? [{ id: "cursor-models", title: "Gate Cursor models (Haiku/Sonnet/Opus/Fable, default Opus)" }]
+      : undefined,
     detect: async (ctx) => {
       const file = Bun.file(settingsPath);
       if (!(await file.exists())) return { installed: false };

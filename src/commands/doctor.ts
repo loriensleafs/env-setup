@@ -18,24 +18,49 @@ function emptyManifest(): Manifest {
 }
 
 export default defineCommand({
-  meta: { name: "doctor", description: "Detect what's installed vs. the manifest" },
+  meta: { name: "doctor", description: "Diff this machine against its manifest" },
   async run() {
     p.intro("envsetup doctor");
-    const manifest = (await loadManifest()) ?? emptyManifest();
-    const ctx: ItemContext = { manifest, log: (m) => p.log.info(m), run };
+    const manifest = await loadManifest();
+    const hasManifest = manifest !== null;
+    const effective = manifest ?? emptyManifest();
+    const ctx: ItemContext = { manifest: effective, log: (m) => p.log.info(m), run };
     const registry = buildRegistry();
     const s = p.spinner();
     s.start("scanning");
-    const rows: string[] = [];
-    for (const item of registry.all()) {
-      const d = await item.detect(ctx).catch(() => ({ installed: false as const }));
-      const mark = d.installed ? color.green("✓") : color.red("✗");
-      const ver = d.installed && d.version ? color.dim(` ${d.version}`) : "";
-      const req = item.required ? color.dim(" (required)") : "";
-      rows.push(`${mark} ${item.title}${ver}${req}`);
+    const detections = new Map<string, { installed: boolean; version?: string }>();
+    await Promise.all(
+      registry.all().map(async (item) => {
+        detections.set(item.id, await item.detect(ctx).catch(() => ({ installed: false as const })));
+      }),
+    );
+    s.stop(`scanned ${detections.size} items`);
+
+    if (!hasManifest) {
+      const rows = registry.all().map((item) => {
+        const d = detections.get(item.id) ?? { installed: false };
+        const mark = d.installed ? color.green("✓") : color.dim("·");
+        return `${mark} ${item.title}${d.version ? color.dim(` ${d.version}`) : ""}`;
+      });
+      p.note(rows.join("\n"), "no manifest yet — raw detection");
+      p.outro("run envsetup (bootstrap) to define this machine");
+      return;
     }
-    s.stop("scan complete");
-    p.note(rows.join("\n"), "detection");
-    p.outro(`${registry.all().length} items known — full diffing arrives with the manifest flow`);
+
+    // Manifest diff: drift = selected-but-missing; extras = present-but-unselected.
+    const drift: string[] = [];
+    const extras: string[] = [];
+    let ok = 0;
+    for (const item of registry.all()) {
+      const selected = effective.items[item.id]?.selected ?? false;
+      const d = detections.get(item.id) ?? { installed: false };
+      if (selected && !d.installed) drift.push(`${color.red("✗")} ${item.title}`);
+      else if (!selected && d.installed) extras.push(`${color.yellow("+")} ${item.title}${d.version ? color.dim(` ${d.version}`) : ""}`);
+      else if (selected && d.installed) ok++;
+    }
+    if (drift.length > 0) p.note(drift.join("\n"), "missing (manifest wants these)");
+    if (extras.length > 0) p.note(extras.join("\n"), "untracked (installed but not in the manifest)");
+    if (drift.length === 0 && extras.length === 0) p.log.success("machine matches its manifest");
+    p.outro(`${ok} in sync · ${drift.length} missing · ${extras.length} untracked — \`envsetup sync\` applies the manifest`);
   },
 });

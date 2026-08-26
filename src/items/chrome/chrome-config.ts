@@ -40,6 +40,10 @@ export const chromeConfig = defineItem({
   title: "Chrome customization (flags, toolbar)",
   kind: "config-only",
   deps: ["chrome"],
+  ceremonies: [
+    { id: "chrome-signin", title: "Sign in to Chrome (sync)" },
+    { id: "chrome-default-browser", title: "Make Chrome the default browser" },
+  ],
   detect: async () => {
     const ls = await readJson(LOCAL_STATE);
     const prefs = await readJson(PREFERENCES);
