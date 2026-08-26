@@ -864,3 +864,23 @@ alternative if Peter ever accepts the managed badge.
 ## Final open-items status
 - clack npm swap: still blocked upstream (checked today: 1.7.0/1.4.3 unchanged).
 - Fresh-machine validation: awaits hardware. Everything else from the open list: CLOSED.
+
+## Web apps SOLVED — 2026-08-26 (AX automation, no policy)
+Full breakthrough after extended AX spelunking (Gemini session cracked the two hard parts):
+- Install driver: src/items/chrome/assets/install-web-app.swift drives ⋮ → Cast, Save, and
+  Share → Install… via accessibility. Key techniques: SPATIAL ⋮-button detection (rightmost
+  button in the Reload button's toolbar row — beats desc-matching), DELTA submenu scraping
+  (snapshot menu items before/after opening Cast submenu; new items = submenu contents —
+  sidesteps the 293-AXMenu bookmark-tree ambiguity), skip AXWebArea + menu bar for speed,
+  dialog buttons searched from mainWindow (not app) unlimited-depth BFS, two-step wizard
+  (Next → Install). Verified live on Drive (real PWA), Calendar, etc.
+- Naming: FILENAME-ONLY rename after install. Editing Info.plist/InfoPlist.strings trips
+  Chrome's web-app SELF-REPAIR (regenerates bundle, reverts name, Peter saw the relaunch
+  flicker) — so we rename only the .app filename, which Chrome leaves alone and which drives
+  the Dock label. Uniform for real PWAs AND shortcut apps (dropped the dialog-name-field path).
+- WebAppInstallForceList policy DROPPED (no "managed by your organization" badge).
+- Wiring: chrome-pwas item embeds the Swift source as a TS constant (survives bun compile);
+  the chrome-pwas-install ceremony writes it to ~/.config/envsetup and runs `swift … <url>
+  <name>` per app (Mail/Calendar/Drive/Notes). One-time Accessibility grant for the runner is
+  the only manual bit. 93 tests; embedded swift verified byte-identical to the tested file.
+Requires: Accessibility permission (like superwhisper) — Stage C.

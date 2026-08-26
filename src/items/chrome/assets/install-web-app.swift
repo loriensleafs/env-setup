@@ -1,35 +1,4 @@
-import { homedir } from "node:os";
-import { join } from "node:path";
-import { mkdir, writeFile } from "node:fs/promises";
-import { defineItem } from "../item.ts";
-
-export interface PwaSpec {
-  url: string;
-  /** Dock name + bundle filename. */
-  name: string;
-  /** URL substring identifying the created bundle (CrAppModeShortcutURL). */
-  host: string;
-}
-
-/** Decided Google web apps (docs/PLAN.md). */
-export const PWAS: PwaSpec[] = [
-  { url: "https://mail.google.com/mail/", name: "Mail", host: "mail.google.com" },
-  { url: "https://calendar.google.com/calendar/", name: "Calendar", host: "calendar.google.com" },
-  { url: "https://drive.google.com/drive/", name: "Drive", host: "drive.google.com" },
-  { url: "https://keep.google.com/", name: "Notes", host: "keep.google.com" },
-];
-
-export const CHROME_APPS_DIR = join(homedir(), "Applications", "Chrome Apps.localized");
-
-/**
- * Installs the four Google web apps as real Chrome apps by driving
- * ⋮ → Cast, Save, and Share → Install… through the accessibility API, then
- * renaming each bundle's filename to the decided Dock label. No enterprise
- * policy (no "managed by your organization" badge), real profile.
- * Requires a one-time Accessibility grant for the runner (Stage C ceremony).
- * The AX-driver Swift source is embedded so the compiled binary carries it.
- */
-export const INSTALL_SWIFT = `import Cocoa
+import Cocoa
 import ApplicationServices
 
 // Installs a URL as a Chrome web app via ⋮ → Cast, Save, and Share → Install…,
@@ -115,7 +84,7 @@ func findDialogButton(startingAt element: AXUIElement, targetTitle: String) -> A
 
 import Foundation
 
-// After install, rename the freshly-created bundle to \`name\` in ALL the places
+// After install, rename the freshly-created bundle to `name` in ALL the places
 // Chrome writes the app name: the .app filename, Info.plist (CFBundleName,
 // CrAppModeShortcutName) and every InfoPlist.strings (CFBundleDisplayName,
 // CFBundleName). The Dock hover label follows these.
@@ -124,8 +93,8 @@ func renameInstalledBundle(matchingURLHost host: String, to name: String) {
     let fm = FileManager.default
     guard let entries = try? fm.contentsOfDirectory(atPath: dir) else { return }
     for entry in entries where entry.hasSuffix(".app") {
-        let appPath = "\\(dir)/\\(entry)"
-        let infoPath = "\\(appPath)/Contents/Info.plist"
+        let appPath = "\(dir)/\(entry)"
+        let infoPath = "\(appPath)/Contents/Info.plist"
         guard let info = NSDictionary(contentsOfFile: infoPath),
               let shortcutURL = info["CrAppModeShortcutURL"] as? String,
               shortcutURL.contains(host) else { continue }
@@ -134,12 +103,12 @@ func renameInstalledBundle(matchingURLHost host: String, to name: String) {
         // reverts the name on next launch (Peter observed the flicker/revert).
         // The filename alone controls the Dock label and is left untouched by
         // Chrome's repair.
-        let target = "\\(dir)/\\(name).app"
+        let target = "\(dir)/\(name).app"
         if appPath != target {
             try? fm.removeItem(atPath: target)
             try? fm.moveItem(atPath: appPath, toPath: target)
         }
-        print("Renamed bundle to '\\(name).app'.")
+        print("Renamed bundle to '\(name).app'.")
         return
     }
 }
@@ -172,9 +141,9 @@ func run() {
     let originalMenuItems = getChromeMenuItems(startingAt: appElement)
     let targetMenuName = "Cast, Save, and Share"
     guard let submenuParent = originalMenuItems.first(where: { $0.title.contains(targetMenuName) }) else {
-        print("Error: Could not find '\\(targetMenuName)'."); exit(1)
+        print("Error: Could not find '\(targetMenuName)'."); exit(1)
     }
-    print("Found '\\(targetMenuName)'. Opening submenu...")
+    print("Found '\(targetMenuName)'. Opening submenu...")
     AXUIElementPerformAction(submenuParent.element, kAXPressAction as CFString)
     Thread.sleep(forTimeInterval: 1.0)
 
@@ -190,7 +159,7 @@ func run() {
     guard let install = installElement else {
         print("Notice: no 'Install…' option — the page may not be installable."); exit(0)
     }
-    print("Clicking '\\(installTitle)'...")
+    print("Clicking '\(installTitle)'...")
     AXUIElementPerformAction(install, kAXPressAction as CFString)
     Thread.sleep(forTimeInterval: 1.5)
 
@@ -206,36 +175,10 @@ func run() {
         if !appName.isEmpty, let host = URL(string: url)?.host {
             renameInstalledBundle(matchingURLHost: host, to: appName)
         }
-        print("OK installed: \\(installTitle)")
+        print("OK installed: \(installTitle)")
     } else {
         print("Error: final 'Install' button not found."); exit(1)
     }
 }
 
 run()
-`;
-
-const SWIFT_PATH = join(homedir(), ".config", "envsetup", "install-web-app.swift");
-
-export async function writeSwiftHelper(): Promise<string> {
-  await mkdir(join(SWIFT_PATH, ".."), { recursive: true });
-  await writeFile(SWIFT_PATH, INSTALL_SWIFT);
-  return SWIFT_PATH;
-}
-
-export const chromePwas = defineItem({
-  id: "chrome-pwas",
-  title: "Google web apps (Mail, Calendar, Drive, Notes)",
-  kind: "config-only",
-  deps: ["chrome"],
-  ceremonies: [{ id: "chrome-pwas-install", title: "Install the 4 Google web apps (drives Chrome)" }],
-  detect: async () => {
-    for (const p of PWAS) {
-      if (!(await Bun.file(join(CHROME_APPS_DIR, `${p.name}.app`, "Contents", "Info.plist")).exists())) {
-        return { installed: false };
-      }
-    }
-    return { installed: true };
-  },
-  // Install happens in the ceremony (needs Chrome + Accessibility + real profile).
-});
