@@ -5,7 +5,9 @@
  * read:org (org repo access), user:email (noreply resolution).
  */
 export const CLIENT_ID = "Ov23liQUd4gIaj3ejiNo";
-export const SCOPES = "repo admin:public_key read:org user:email";
+// `workflow` included so pushes touching .github/workflows work from dev machines
+// (GitHub gates workflow-file changes behind it even with `repo`).
+export const SCOPES = "repo workflow admin:public_key read:org user:email";
 
 export interface DeviceCode {
   device_code: string;

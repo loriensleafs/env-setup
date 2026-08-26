@@ -5,10 +5,13 @@ import { run } from "../exec/run.ts";
 
 export default defineCommand({
   meta: { name: "auth", description: "Sign in to GitHub (device flow under envsetup's app identity)" },
-  async run() {
+  args: {
+    force: { type: "boolean", description: "Re-authenticate even if a stored token works" },
+  },
+  async run({ args }) {
     p.intro("envsetup auth");
     try {
-      const result = await githubAuthCeremony(run);
+      const result = await githubAuthCeremony(run, { force: args.force === true });
       p.log.info(`commit email will be ${result.email}`);
       p.outro(`connected as ${result.user.login}`);
     } catch (err) {

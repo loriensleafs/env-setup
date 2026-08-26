@@ -27,8 +27,8 @@ export async function storedToken(run: Runner): Promise<string | null> {
  * Device flow under envsetup's app id → token into macOS Keychain → handed to
  * gh (so clones/API work) → gh becomes git's credential helper.
  */
-export async function githubAuthCeremony(run: Runner): Promise<AuthResult> {
-  const existing = await storedToken(run);
+export async function githubAuthCeremony(run: Runner, opts: { force?: boolean } = {}): Promise<AuthResult> {
+  const existing = opts.force ? null : await storedToken(run);
   if (existing !== null) {
     try {
       const user = await fetchUser(existing);
