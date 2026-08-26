@@ -1,7 +1,7 @@
 {
   "name": "envsetup",
   "version": "0.0.1",
-  "description": "One-command interactive Mac environment setup — bootstrap, doctor, sync",
+  "description": "One-command interactive Mac environment setup \u2014 bootstrap, doctor, sync",
   "type": "module",
   "private": true,
   "scripts": {
@@ -11,8 +11,8 @@
     "compile": "bun build --compile src/index.ts --outfile dist/envsetup"
   },
   "dependencies": {
-    "@clack/core": "^1.4.3",
-    "@clack/prompts": "^1.7.0",
+    "@clack/core": "./vendor/clack-core-1.4.3-main-20260815.tgz",
+    "@clack/prompts": "./vendor/clack-prompts-1.7.0-main-20260815.tgz",
     "age-encryption": "^0.3.0",
     "citty": "^0.2.2",
     "picocolors": "^1.1.1",
@@ -21,5 +21,8 @@
   "devDependencies": {
     "@types/bun": "^1.4.0",
     "typescript": "^7.0.2"
+  },
+  "overrides": {
+    "@clack/core": "./vendor/clack-core-1.4.3-main-20260815.tgz"
   }
 }

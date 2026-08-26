@@ -5,8 +5,8 @@
     "": {
       "name": "envsetup",
       "dependencies": {
-        "@clack/core": "^1.4.3",
-        "@clack/prompts": "^1.7.0",
+        "@clack/core": "./vendor/clack-core-1.4.3-main-20260815.tgz",
+        "@clack/prompts": "./vendor/clack-prompts-1.7.0-main-20260815.tgz",
         "age-encryption": "^0.3.0",
         "citty": "^0.2.2",
         "picocolors": "^1.1.1",
@@ -18,10 +18,13 @@
       },
     },
   },
+  "overrides": {
+    "@clack/core": "./vendor/clack-core-1.4.3-main-20260815.tgz",
+  },
   "packages": {
-    "@clack/core": ["@clack/core@1.4.3", "", { "dependencies": { "fast-wrap-ansi": "^0.2.0", "sisteransi": "^1.0.5" } }, "sha512-/kr3UWNtdJfxZtPgDqUOmG2pvwlmcLGheex5yiZKdwbzZJxhV+HMNR9QNmyY5cGwTNV6LrR7Jtp+KjhUAP1qBQ=="],
+    "@clack/core": ["@clack/core@./vendor/clack-core-1.4.3-main-20260815.tgz", { "dependencies": { "fast-wrap-ansi": "^0.2.0", "sisteransi": "^1.0.5" } }, "sha512-3yYqTrEcYbsaYJysNoASVr20j/M49jt5HVm3/WEWkR16tPMXmhAb9Cx+RHWUMjq7Y5vmbPXHAYGVnhpoWK64BA=="],
 
-    "@clack/prompts": ["@clack/prompts@1.7.0", "", { "dependencies": { "@clack/core": "1.4.3", "fast-string-width": "^3.0.2", "fast-wrap-ansi": "^0.2.0", "sisteransi": "^1.0.5" } }, "sha512-y7/yvZ2TPAnR9+jnc00klvNNLkJiXFFrQA/hlLCcxA9a2A4zQIOimyFQ9XfwYKiGD1fb5GY8vbKIIgO8d5Tb2A=="],
+    "@clack/prompts": ["@clack/prompts@./vendor/clack-prompts-1.7.0-main-20260815.tgz", { "dependencies": { "@clack/core": "1.4.3", "fast-string-width": "^3.0.2", "fast-wrap-ansi": "^0.2.0", "sisteransi": "^1.0.5" } }, "sha512-62AaugW+bJP3uc2cXmIqW6/VexHDIC3xjA2Pj+TIMpcK0WEISlxhle654PHLgfYu1Ct+jWG5L0WjIOtAOGXidw=="],
 
     "@noble/ciphers": ["@noble/ciphers@2.3.0", "", {}, "sha512-Clu/xdfgVTf9o7ngLOURaxePwR0j8sjclKEtVij10/jGulwFsPWCvvRgG/XjUVf8Nei+jLG6uwyXzUTGY1DQrw=="],
 

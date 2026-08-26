@@ -684,3 +684,21 @@ building further UI.
 3. Label styling drifted from stock (the docs example itself deviates): stock clack renders an
    option label WHITE ONLY WHEN FOCUSED — selection is shown by the checkbox alone. Verified
    against packages/prompts/src/group-multi-select.ts state table; fixed.
+
+## Third UI feedback round — FIXED 2026-08-26 (vendored clack from main)
+Root cause of the styling drift (Peter's screenshots): my prompts were full custom renders
+instead of extensions retaining stock look. Fix at the root:
+- **Vendored clack built from Peter's clone (main @ 2026-08-15)**: vendor/clack-{core,prompts}-
+  *-main-20260815.tgz committed; package.json `overrides` pins @clack/core to the tarball
+  (bun otherwise nests published 1.4.3 under prompts — types break). SWAP to npm when clack
+  releases >1.7.0/>1.4.3.
+- Custom path-prompt.ts DELETED — stock p.path() from the vendored build has completeOnTab AND
+  full stock styling (Search: label, radio icons, styled footer). Verified tab-completes in E2E.
+- Selection prompt renamed + merged per Peter: src/ui/group-multi-select.ts (enhanced
+  GroupMultiSelect; single module incl. pure helpers) — now a FAITHFUL adaptation of the
+  reference example (same render structure/states/footer), deltas limited to: ALL-of requires
+  w/ cascade + multi-missing labels, locked-on rows, plain headings for zero-togglable groups,
+  viewport windowing.
+- Scanning spinner now narrates per-item: "Checking <title> (i/31)" + found-count summary;
+  orchestrator steps show "(i/n)". Richer taskLog-style install output (per Peter's task-log
+  example screenshots) planned when installs stream real output.

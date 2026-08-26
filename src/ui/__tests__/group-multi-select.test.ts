@@ -3,10 +3,10 @@ import {
   computeDisabled,
   initialSelection,
   selectionResult,
-  type UnifiedGroups,
-} from "../unified-select-state.ts";
+  type SelectGroups,
+} from "../group-multi-select.ts";
 
-const groups: UnifiedGroups = {
+const groups: SelectGroups = {
   Required: [
     { id: "xcode-clt", label: "Xcode CLT", locked: "on" },
     { id: "homebrew", label: "Homebrew", locked: "installed", hint: "installed 4.6" },
@@ -57,7 +57,7 @@ describe("computeDisabled", () => {
   });
 
   test("locked requirements always satisfy (installed homebrew)", () => {
-    const g: UnifiedGroups = {
+    const g: SelectGroups = {
       A: [
         { id: "homebrew", label: "Homebrew", locked: "installed" },
         { id: "jq", label: "jq", requires: ["homebrew"] },

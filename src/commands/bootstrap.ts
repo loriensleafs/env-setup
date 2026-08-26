@@ -10,9 +10,8 @@ import { MANIFEST_VERSION, type Manifest } from "../manifest/schema.ts";
 import { loadManifest, saveManifest } from "../manifest/store.ts";
 import { orchestrate, type StepOutcome } from "../orchestrator/orchestrator.ts";
 import { journalPath } from "../paths/paths.ts";
-import { pathPrompt } from "../ui/path-prompt.ts";
-import { unifiedSelect } from "../ui/unified-select.ts";
-import type { UnifiedGroups, UnifiedOption } from "../ui/unified-select-state.ts";
+import { groupMultiselect } from "../ui/group-multi-select.ts";
+import type { SelectGroups, SelectOption } from "../ui/group-multi-select.ts";
 
 /** Placeholder until Stage C auth resolves the real GitHub noreply address. */
 export const EMAIL_PENDING = "pending-noreply-resolution";
@@ -66,10 +65,14 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
   const s = p.spinner();
   s.start("Scanning this machine");
   const detection = new Map<string, DetectResult>();
-  for (const item of registry.all()) {
+  const all = registry.all();
+  for (let i = 0; i < all.length; i++) {
+    const item = all[i] as (typeof all)[number];
+    s.message(`Checking ${item.title} (${i + 1}/${all.length})`);
     detection.set(item.id, await item.detect(scanCtx).catch(() => ({ installed: false })));
   }
-  s.stop(`Scanned ${detection.size} items`);
+  const found = [...detection.values()].filter((d) => d.installed).length;
+  s.stop(`Scanned ${detection.size} items — ${found} already installed`);
 
   // --- Identity + locations (Group 6) ------------------------------------
   // Zod schemas double as prompt validators (Standard Schema bridge).
@@ -92,7 +95,7 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
             .regex(/^[a-zA-Z0-9-]+$/, "GitHub usernames are letters, digits, and dashes"),
         }),
       devDir: () =>
-        pathPrompt({
+        p.path({
           message: "Dev directory (repos clone here — may not exist yet)",
           directory: true,
           initialValue: `${homedir()}/Dev`,
@@ -110,11 +113,11 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
   // --- Unified selection --------------------------------------------------
   // Already-installed-and-current items don't appear at all (Peter's call):
   // they're part of the machine and go straight into the manifest.
-  const groups: UnifiedGroups = { Required: [], Apps: [], "CLI tools": [], Fonts: [] };
+  const groups: SelectGroups = { Required: [], Apps: [], "CLI tools": [], Fonts: [] };
   for (const item of registry.all()) {
     const d = detection.get(item.id) ?? { installed: false };
     if (d.installed && d.satisfies !== false) continue;
-    const locked: UnifiedOption["locked"] = item.required ? "on" : undefined;
+    const locked: SelectOption["locked"] = item.required ? "on" : undefined;
     const hint = d.installed ? `installed${d.version ? ` ${d.version}` : ""} — needs update` : undefined;
     groups[sectionFor(item)]?.push({ id: item.id, label: item.title, locked, hint });
   }
@@ -122,7 +125,7 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
     if (items.length === 0) delete groups[section];
   }
 
-  const picks = await unifiedSelect({ message: "What should this machine get?", groups });
+  const picks = await groupMultiselect({ message: "What should this machine get?", groups });
   if (p.isCancel(picks)) bail("cancelled");
   const selection = picks as string[];
 
@@ -202,6 +205,8 @@ async function executePlan(
   }
 
   const s = p.spinner();
+  const order = registry.executionOrder(selection);
+  let stepIndex = 0;
   const report = await orchestrate({
     registry,
     manifest,
@@ -210,7 +215,10 @@ async function executePlan(
     runner: run,
     resume: opts.resume,
     events: {
-      onStepStart: (_id, title) => s.start(title),
+      onStepStart: (_id, title) => {
+        stepIndex++;
+        s.start(`${title} (${stepIndex}/${order.length})`);
+      },
       onStepLog: (_id, message) => s.message(message),
       onStepEnd: (id, outcome: StepOutcome) => {
         if (outcome.kind === "succeeded") s.stop(`${color.green("✓")} ${id}`);

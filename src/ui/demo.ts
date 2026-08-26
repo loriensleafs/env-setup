@@ -2,11 +2,11 @@
 // Interactive demo of the Stage A UI pieces. Run: bun src/ui/demo.ts
 import * as p from "@clack/prompts";
 import { horizontalRadio } from "./horizontal-radio.ts";
-import { unifiedSelect } from "./unified-select.ts";
+import { groupMultiselect } from "./group-multi-select.ts";
 
 p.intro("envsetup UI demo");
 
-const picks = await unifiedSelect({
+const picks = await groupMultiselect({
   message: "What should this machine get?",
   groups: {
     Required: [
