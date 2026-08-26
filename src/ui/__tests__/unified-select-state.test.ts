@@ -1,121 +1,97 @@
 import { describe, expect, test } from "bun:test";
 import {
-  createState,
-  isVisible,
-  moveCursor,
-  result,
-  toggleAtCursor,
-  visibleRows,
-  type UnifiedOption,
+  computeDisabled,
+  initialSelection,
+  selectionResult,
+  type UnifiedGroups,
 } from "../unified-select-state.ts";
 
-const options: UnifiedOption[] = [
-  { id: "xcode-clt", label: "Xcode CLT", section: "Required", locked: "on" },
-  { id: "homebrew", label: "Homebrew", section: "Required", locked: "installed", hint: "installed 4.6.20" },
-  { id: "raycast", label: "Raycast", section: "Apps" },
-  { id: "ghostty", label: "Ghostty", section: "Apps" },
-  { id: "jetbrains-font", label: "JetBrains Mono NF", section: "Fonts" },
-  { id: "ghostty-config", label: "Ghostty config", section: "Apps", requires: ["ghostty", "jetbrains-font"] },
-];
+const groups: UnifiedGroups = {
+  Required: [
+    { id: "xcode-clt", label: "Xcode CLT", locked: "on" },
+    { id: "homebrew", label: "Homebrew", locked: "installed", hint: "installed 4.6" },
+  ],
+  Apps: [
+    { id: "raycast", label: "Raycast" },
+    { id: "ghostty", label: "Ghostty" },
+    { id: "ghostty-config", label: "Ghostty config", requires: ["ghostty", "jetbrains-font"] },
+    { id: "pwa", label: "Web apps", requires: ["ghostty-config"] },
+  ],
+  Fonts: [{ id: "jetbrains-font", label: "JetBrains Mono NF" }],
+};
 
-describe("createState", () => {
-  test("locked-on and default options start selected; cursor lands on first option row", () => {
-    const s = createState(options);
-    expect(s.selected.has("xcode-clt")).toBe(true);
-    expect(s.selected.has("raycast")).toBe(true);
-    const rows = visibleRows(s);
-    const row = rows[s.cursor];
-    expect(row?.kind).toBe("option");
-    expect(row?.kind === "option" && row.option.id).toBe("xcode-clt");
+describe("initialSelection", () => {
+  test("locked-on and defaults selected; installed rows not in selection", () => {
+    const s = initialSelection(groups);
+    expect(s.has("xcode-clt")).toBe(true);
+    expect(s.has("raycast")).toBe(true);
+    expect(s.has("homebrew")).toBe(false);
   });
 
-  test("initialSelected false starts unselected", () => {
-    const s = createState([{ id: "a", label: "A", section: "S", initialSelected: false }]);
-    expect(s.selected.has("a")).toBe(false);
-  });
-});
-
-describe("visibility / live dependency filtering", () => {
-  test("dependent visible when requirements met (installed and selected both satisfy)", () => {
-    const s = createState(options);
-    const dep = options[5] as UnifiedOption;
-    expect(isVisible(s, dep)).toBe(true);
-  });
-
-  test("unselecting a requirement hides the dependent; reselecting restores it", () => {
-    const s = createState(options);
-    // navigate to ghostty (4th navigable row: clt, brew, raycast, ghostty) and toggle it off
-    moveCursor(s, 1);
-    moveCursor(s, 1);
-    moveCursor(s, 1);
-    toggleAtCursor(s);
-    expect(s.selected.has("ghostty")).toBe(false);
-    expect(visibleRows(s).some((r) => r.kind === "option" && r.option.id === "ghostty-config")).toBe(false);
-    // toggle back on
-    toggleAtCursor(s);
-    expect(visibleRows(s).some((r) => r.kind === "option" && r.option.id === "ghostty-config")).toBe(true);
-    // memory: dependent came back SELECTED (default state preserved)
-    expect(result(s)).toContain("ghostty-config");
-  });
-
-  test("hidden dependents drop out of result but keep memory", () => {
-    const s = createState(options);
-    moveCursor(s, 1);
-    moveCursor(s, 1);
-    moveCursor(s, 1); // ghostty
-    toggleAtCursor(s); // off → ghostty-config hidden
-    expect(result(s)).not.toContain("ghostty-config");
-    expect(s.selected.has("ghostty-config")).toBe(true); // memory intact
-  });
-
-  test("chained requirements: dependent needs ALL", () => {
-    const s = createState(options);
-    // unselect the font (5th navigable: clt → brew → raycast → ghostty → jetbrains-font)
-    for (let i = 0; i < 4; i++) moveCursor(s, 1);
-    toggleAtCursor(s);
-    expect(s.selected.has("jetbrains-font")).toBe(false);
-    expect(result(s)).not.toContain("ghostty-config");
+  test("initialSelected false respected", () => {
+    const s = initialSelection({ G: [{ id: "a", label: "A", initialSelected: false }] });
+    expect(s.has("a")).toBe(false);
   });
 });
 
-describe("cursor", () => {
-  test("visits every option row incl. locked, skips headers, wraps around", () => {
-    const s = createState(options);
-    const ids: string[] = [];
-    for (let i = 0; i < 6; i++) {
-      const row = visibleRows(s)[s.cursor];
-      if (row?.kind === "option") ids.push(row.option.id);
-      moveCursor(s, 1);
-    }
-    expect(ids).toEqual(["xcode-clt", "homebrew", "raycast", "ghostty", "jetbrains-font", "ghostty-config"]);
-    const wrapped = visibleRows(s)[s.cursor];
-    expect(wrapped?.kind === "option" && wrapped.option.id).toBe("xcode-clt");
+describe("computeDisabled", () => {
+  test("everything enabled when requirements are met", () => {
+    const { disabled } = computeDisabled(groups, initialSelection(groups));
+    expect(disabled.size).toBe(0);
   });
 
-  test("cursor lands on a valid row after its own row disappears", () => {
-    const s = createState(options);
-    // move to ghostty-config (6th navigable), then unselect ghostty via direct memory edit
-    for (let i = 0; i < 5; i++) moveCursor(s, 1);
-    s.selected.delete("ghostty");
-    // simulate a toggle elsewhere forcing recompute: move cursor
-    moveCursor(s, 1);
-    const row = visibleRows(s)[s.cursor];
-    expect(row?.kind).toBe("option");
+  test("unselecting a requirement disables the dependent with a labeled hint and strips it", () => {
+    const sel = initialSelection(groups);
+    sel.delete("jetbrains-font");
+    const { disabled, selection } = computeDisabled(groups, sel);
+    expect(disabled.get("ghostty-config")).toBe("needs JetBrains Mono NF");
+    expect(selection.has("ghostty-config")).toBe(false);
   });
 
-  test("toggle is a no-op on non-interactive states", () => {
-    const s = createState([{ id: "x", label: "X", section: "S", locked: "on" }]);
-    toggleAtCursor(s);
-    expect(result(s)).toEqual(["x"]);
+  test("cascades down chains (pwa needs ghostty-config needs ghostty)", () => {
+    const sel = initialSelection(groups);
+    sel.delete("ghostty");
+    const { disabled } = computeDisabled(groups, sel);
+    expect(disabled.get("ghostty-config")).toBe("needs Ghostty");
+    expect(disabled.get("pwa")).toBe("needs Ghostty config");
+  });
+
+  test("locked requirements always satisfy (installed homebrew)", () => {
+    const g: UnifiedGroups = {
+      A: [
+        { id: "homebrew", label: "Homebrew", locked: "installed" },
+        { id: "jq", label: "jq", requires: ["homebrew"] },
+      ],
+    };
+    const { disabled } = computeDisabled(g, initialSelection(g));
+    expect(disabled.size).toBe(0);
+  });
+
+  test("multiple missing requirements listed together", () => {
+    const sel = initialSelection(groups);
+    sel.delete("ghostty");
+    sel.delete("jetbrains-font");
+    const { disabled } = computeDisabled(groups, sel);
+    expect(disabled.get("ghostty-config")).toBe("needs Ghostty + JetBrains Mono NF");
   });
 });
 
-describe("result", () => {
-  test("includes locked-on, excludes installed-info rows, respects visibility", () => {
-    const s = createState(options);
-    const r = result(s);
+describe("selectionResult", () => {
+  test("locked-on included, installed excluded, disabled excluded", () => {
+    const sel = initialSelection(groups);
+    sel.delete("jetbrains-font");
+    const r = selectionResult(groups, sel);
     expect(r).toContain("xcode-clt");
-    expect(r).not.toContain("homebrew"); // installed row is informational
-    expect(r).toContain("ghostty-config");
+    expect(r).not.toContain("homebrew");
+    expect(r).not.toContain("ghostty-config");
+    expect(r).toContain("raycast");
+  });
+
+  test("reselecting a requirement restores the dependent (memory preserved)", () => {
+    const sel = initialSelection(groups);
+    sel.delete("ghostty"); // ghostty-config disabled + stripped from live view
+    expect(selectionResult(groups, sel)).not.toContain("ghostty-config");
+    sel.add("ghostty"); // memory in `sel` still has ghostty-config
+    expect(selectionResult(groups, sel)).toContain("ghostty-config");
   });
 });

@@ -1,6 +1,6 @@
 import { Prompt, isCancel } from "@clack/core";
+import { S_BAR, S_BAR_END, symbol } from "@clack/prompts";
 import color from "picocolors";
-import { S_BAR, S_BAR_END, symbolFor } from "./theme.ts";
 
 export interface RadioOption<V extends string> {
   value: V;
@@ -36,8 +36,7 @@ export async function horizontalRadio<V extends string>(
             return `(${dot}) ${i === cursor ? label : color.dim(label)}`;
           })
           .join("   ");
-        const symbol = symbolFor(this.state);
-        return `${color.gray(S_BAR)}\n${symbol}  ${opts.message}\n${color.cyan(S_BAR)}  ${row}\n${color.cyan(S_BAR_END)}\n`;
+        return `${color.gray(S_BAR)}\n${symbol(this.state)}  ${opts.message}\n${color.cyan(S_BAR)}  ${row}\n${color.cyan(S_BAR_END)}\n`;
       },
     },
     false,

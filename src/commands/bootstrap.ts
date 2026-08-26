@@ -11,7 +11,7 @@ import { loadManifest, saveManifest } from "../manifest/store.ts";
 import { orchestrate, type StepOutcome } from "../orchestrator/orchestrator.ts";
 import { journalPath } from "../paths/paths.ts";
 import { unifiedSelect } from "../ui/unified-select.ts";
-import type { UnifiedOption } from "../ui/unified-select-state.ts";
+import type { UnifiedGroups, UnifiedOption } from "../ui/unified-select-state.ts";
 
 /** Placeholder until Stage C auth resolves the real GitHub noreply address. */
 export const EMAIL_PENDING = "pending-noreply-resolution";
@@ -107,21 +107,17 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
   const { name, githubUser, devDir } = answers;
 
   // --- Unified selection --------------------------------------------------
-  const options: UnifiedOption[] = registry.all().map((item) => {
+  const groups: UnifiedGroups = { Required: [], Apps: [], "CLI tools": [], Fonts: [] };
+  for (const item of registry.all()) {
     const d = detection.get(item.id) ?? { installed: false };
     let locked: UnifiedOption["locked"];
     if (d.installed && d.satisfies !== false) locked = "installed";
     else if (item.required) locked = "on";
-    const hint = d.installed
-      ? `installed${d.version ? ` ${d.version}` : ""}`
-      : undefined;
-    return { id: item.id, label: item.title, section: sectionFor(item), locked, hint };
-  });
-  // Stable section order: Required, Apps, CLI tools, Fonts
-  const sectionRank: Record<string, number> = { Required: 0, Apps: 1, "CLI tools": 2, Fonts: 3 };
-  options.sort((a, b) => (sectionRank[a.section] ?? 9) - (sectionRank[b.section] ?? 9));
+    const hint = d.installed ? `installed${d.version ? ` ${d.version}` : ""}` : undefined;
+    groups[sectionFor(item)]?.push({ id: item.id, label: item.title, locked, hint });
+  }
 
-  const picks = await unifiedSelect({ message: "What should this machine get?", options });
+  const picks = await unifiedSelect({ message: "What should this machine get?", groups });
   if (p.isCancel(picks)) bail("cancelled");
   const selection = picks as string[];
 
@@ -130,7 +126,7 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
 
   // --- Summary + confirm --------------------------------------------------
   const toInstall = selection.filter((id) => !(detection.get(id)?.installed ?? false));
-  const alreadyThere = options.filter((o) => o.locked === "installed").length;
+  const alreadyThere = [...detection.values()].filter((d) => d.installed).length;
   p.note(
     [
       `${color.bold(String(toInstall.length))} items will be installed`,

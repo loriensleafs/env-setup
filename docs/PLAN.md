@@ -649,3 +649,22 @@ Config-prompt hook point marked in bootstrap for per-app screens (arrive with ap
    as researched) — name nonempty, GitHub username charset, devDir absolute-or-~ path.
    Empty-input probe verified the error renders in-prompt.
 5. Raw ZodError escape at saveManifest → caught, friendly message, clean cancel.
+
+## Unified prompt REBUILT on clack docs pattern — 2026-08-26
+Peter pointed at ~/Dev/clack/examples/docs (his local clack clone with worked examples, incl.
+custom/dynamic-group-multiselect.ts). Rebuilt accordingly:
+- Now extends stock GroupMultiSelectPrompt (not raw Prompt) + event listeners — reuses built-in
+  navigation/group logic per the example.
+- **Downstream options DISABLE in place** (strikethrough + "needs X + Y" reason hint, auto-
+  stripped from selection, cascading down chains) instead of hiding — better UX, per example.
+  Selection MEMORY still preserved: re-enabling restores prior state.
+- Group headers are selectable and toggle their ENABLED+unlocked items only.
+- Uses @clack/prompts' own exported symbols/footer helpers (S_BAR, S_CHECKBOX_*, symbol,
+  formatInstructionFooter, MULTISELECT_INSTRUCTIONS) — src/ui/theme.ts deleted.
+- Viewport windowing kept (the example lacks it; our 31-row list needs it).
+- Locked rows: installed = ✓ dim non-toggleable; required-missing = ◉ always-selected.
+- Pure logic module rewritten (computeDisabled/selectionResult) with cascade + multi-missing
+  labels; 9 unit tests. PTY probes verify the live "needs Ghostty" hint renders and the full
+  bootstrap E2E stays green. Horizontal radio also switched to clack's exported symbols.
+Resource noted: ~/Dev/clack/examples/docs (basic/advanced/new-features/custom) — consult before
+building further UI.

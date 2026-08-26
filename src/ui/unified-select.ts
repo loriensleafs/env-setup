@@ -1,92 +1,193 @@
-import { Prompt, isCancel } from "@clack/core";
+import { GroupMultiSelectPrompt } from "@clack/core";
+import {
+  formatInstructionFooter,
+  isCancel,
+  MULTISELECT_INSTRUCTIONS,
+  S_BAR,
+  S_CHECKBOX_ACTIVE,
+  S_CHECKBOX_INACTIVE,
+  S_CHECKBOX_SELECTED,
+  symbol,
+} from "@clack/prompts";
 import color from "picocolors";
 import {
-  createState,
-  moveCursor,
-  result,
-  toggleAtCursor,
-  visibleRows,
+  computeDisabled,
+  initialSelection,
+  flatOptions as flatten,
+  type UnifiedGroups,
   type UnifiedOption,
+  selectionResult,
 } from "./unified-select-state.ts";
-import {
-  S_BAR,
-  S_BAR_END,
-  S_CHECKBOX_SELECTED,
-  S_CHECKBOX_UNSELECTED,
-  S_INSTALLED,
-  S_LOCKED_ON,
-  symbolFor,
-} from "./theme.ts";
+
+const S_LOCKED_ON = "◉";
+const S_INSTALLED = "✓";
 
 export interface UnifiedSelectOptions {
   message: string;
-  options: UnifiedOption[];
+  groups: UnifiedGroups;
 }
 
+type FlatOption = UnifiedOption & { group: string | boolean; value?: string };
+
 /**
- * The Stage A selection screen: sectioned multiselect with locked rows,
- * detection annotations, and LIVE dependency filtering (unselecting an item
- * hides its dependents immediately; reselecting restores them with their
- * previous state). Space toggles, ↑/↓ move, Enter submits.
+ * The Stage A selection screen, following clack's dynamic-group-multiselect
+ * docs pattern: stock GroupMultiSelectPrompt + listeners layering in
+ * disabled-with-reason downstream options, locked rows (required/installed),
+ * group-header toggling over unlockable items only, and viewport windowing.
  */
 export async function unifiedSelect(opts: UnifiedSelectOptions): Promise<string[] | symbol> {
-  const state = createState(opts.options);
+  const coreGroups: Record<string, { value: string; label: string }[]> = {};
+  for (const [section, items] of Object.entries(opts.groups)) {
+    coreGroups[section] = items.map((o) => ({ value: o.id, label: o.label }));
+  }
+  const meta = new Map(flatten(opts.groups).map((o) => [o.id, o]));
+  const memory = initialSelection(opts.groups);
+  let disabled = computeDisabled(opts.groups, memory).disabled;
 
-  const prompt = new Prompt<string[]>(
-    {
-      render() {
-        const lines: string[] = [];
-        const rows = visibleRows(state);
-        // Viewport: window the list to the terminal height so long lists
-        // scroll with the cursor instead of overflowing.
-        const maxRows = Math.max(8, (process.stdout.rows ?? 24) - 7);
-        let start = 0;
-        if (rows.length > maxRows) {
-          start = Math.min(Math.max(0, state.cursor - Math.floor(maxRows / 2)), rows.length - maxRows);
+  const isLocked = (id: string) => meta.get(id)?.locked !== undefined;
+  const isTogglable = (id: string) => !isLocked(id) && !disabled.has(id);
+
+  const prompt = new GroupMultiSelectPrompt<{ value: string; label: string }>({
+    options: coreGroups,
+    initialValues: [...memory],
+    selectableGroups: true,
+    render() {
+      const title = `${color.gray(S_BAR)}\n${symbol(this.state)}  ${opts.message}\n`;
+      const flat = this.options as FlatOption[];
+      const value: string[] = (this.value as string[] | undefined) ?? [];
+
+      if (this.state === "submit" || this.state === "cancel") {
+        const labels = flat
+          .filter((o) => typeof o.group === "string" && value.includes(o.value as string))
+          .map((o) => (this.state === "cancel" ? color.strikethrough(color.dim(o.label)) : color.dim(o.label)))
+          .join(", ");
+        return `${title}${color.gray(S_BAR)}  ${labels || color.dim("none")}`;
+      }
+
+      const prefix = `${color.cyan(S_BAR)}  `;
+      const lines = flat.map((o, i) => {
+        const active = i === this.cursor;
+        if (o.group === true) {
+          const items = flat.filter(
+            (x) => x.group === o.value && isTogglable(x.value as string),
+          );
+          const allSelected = items.length > 0 && items.every((x) => value.includes(x.value as string));
+          const checkbox = allSelected
+            ? color.green(S_CHECKBOX_SELECTED)
+            : active
+              ? color.cyan(S_CHECKBOX_ACTIVE)
+              : color.dim(S_CHECKBOX_INACTIVE);
+          return `${checkbox} ${color.bold(active ? (o.label as string) : color.dim(o.label as string))}`;
         }
-        const end = Math.min(rows.length, start + maxRows);
-        if (start > 0) lines.push(`${color.cyan(S_BAR)}  ${color.dim(`↑ ${start} more`)}`);
-        for (let i = start; i < end; i++) {
-          const row = rows[i];
-          if (!row) continue;
-          if (row.kind === "header") {
-            lines.push(`${color.cyan(S_BAR)}`);
-            lines.push(`${color.cyan(S_BAR)}  ${color.bold(color.underline(row.section))}`);
-            continue;
-          }
-          const o = row.option;
-          const active = i === state.cursor;
-          const hint = o.hint ? ` ${color.dim(o.hint)}` : "";
-          let line: string;
-          if (o.locked === "installed") {
-            line = `${color.green(S_INSTALLED)} ${color.dim(o.label)}${hint}`;
-          } else if (o.locked === "on") {
-            line = `${color.green(S_LOCKED_ON)} ${o.label}${hint}`;
-          } else {
-            const box = state.selected.has(o.id)
-              ? color.green(S_CHECKBOX_SELECTED)
-              : color.dim(S_CHECKBOX_UNSELECTED);
-            const label = active ? color.cyan(o.label) : o.label;
-            line = `${box} ${label}${hint}`;
-          }
-          lines.push(`${color.cyan(S_BAR)}  ${active ? color.cyan("❯") : " "} ${line}`);
+        const id = o.value as string;
+        const m = meta.get(id);
+        const next = flat[i + 1];
+        const isLast = next === undefined || next.group === true;
+        const tree = color.dim(isLast ? "└ " : "│ ");
+        const baseHint = m?.hint;
+        if (m?.locked === "installed") {
+          return `${tree}${color.green(S_INSTALLED)} ${color.dim(o.label)}${baseHint ? ` ${color.dim(baseHint)}` : ""}`;
         }
-        if (end < rows.length) lines.push(`${color.cyan(S_BAR)}  ${color.dim(`↓ ${rows.length - end} more`)}`);
-        const header = `${symbolFor(this.state)}  ${opts.message} ${color.dim("(space to toggle, enter to confirm)")}`;
-        return `${color.gray(S_BAR)}\n${header}\n${lines.join("\n")}\n${color.cyan(S_BAR_END)}\n`;
-      },
+        if (m?.locked === "on") {
+          return `${tree}${color.green(S_LOCKED_ON)} ${active ? o.label : color.dim(o.label)}${baseHint ? ` ${color.dim(baseHint)}` : ""}`;
+        }
+        const reason = disabled.get(id);
+        if (reason !== undefined) {
+          return `${tree}${color.gray(S_CHECKBOX_INACTIVE)} ${color.strikethrough(color.gray(o.label))} ${color.dim(`(${reason})`)}`;
+        }
+        const selected = value.includes(id);
+        const checkbox = selected
+          ? color.green(S_CHECKBOX_SELECTED)
+          : active
+            ? color.cyan(S_CHECKBOX_ACTIVE)
+            : color.dim(S_CHECKBOX_INACTIVE);
+        const label = active || selected ? o.label : color.dim(o.label);
+        const hint = active && baseHint ? ` ${color.dim(baseHint)}` : "";
+        return `${tree}${checkbox} ${label}${hint}`;
+      });
+
+      // Viewport: window to terminal height, following the cursor.
+      const maxRows = Math.max(8, (process.stdout.rows ?? 24) - 8);
+      let start = 0;
+      if (lines.length > maxRows) {
+        start = Math.min(Math.max(0, this.cursor - Math.floor(maxRows / 2)), lines.length - maxRows);
+      }
+      const end = Math.min(lines.length, start + maxRows);
+      const windowed = [
+        ...(start > 0 ? [color.dim(`↑ ${start} more`)] : []),
+        ...lines.slice(start, end),
+        ...(end < lines.length ? [color.dim(`↓ ${lines.length - end} more`)] : []),
+      ];
+      const footer = formatInstructionFooter(MULTISELECT_INSTRUCTIONS, true);
+      return `${title}${prefix}${windowed.join(`\n${prefix}`)}\n${footer.join("\n")}\n`;
     },
-    false,
-  );
-
-  prompt.value = result(state);
-  prompt.on("cursor", (key) => {
-    if (key === "up" || key === "left") moveCursor(state, -1);
-    if (key === "down" || key === "right") moveCursor(state, 1);
-    if (key === "space") toggleAtCursor(state);
-    prompt.value = result(state);
   });
 
+  const flat = prompt.options as FlatOption[];
+  const itemsOf = (group: string) => flat.filter((o) => o.group === group);
+  let previousValue: string[] = [...((prompt.value as string[] | undefined) ?? [])];
+
+  const recompute = () => {
+    const current = new Set<string>((prompt.value as string[] | undefined) ?? []);
+    // Locked-on ids are always in the selection; installed never are.
+    for (const o of flatten(opts.groups)) {
+      if (o.locked === "on") current.add(o.id);
+      if (o.locked === "installed") current.delete(o.id);
+    }
+    const result = computeDisabled(opts.groups, current);
+    disabled = result.disabled;
+    prompt.value = [...result.selection];
+    // Keep the cursor off locked/disabled/uninteractive rows.
+    const cursorRow = flat[prompt.cursor];
+    const rowBlocked = (row: FlatOption | undefined) =>
+      row !== undefined && row.group !== true && !isTogglable(row.value as string);
+    if (rowBlocked(cursorRow)) {
+      const total = flat.length;
+      for (let i = 1; i < total; i++) {
+        const idx = (prompt.cursor + i) % total;
+        if (!rowBlocked(flat[idx])) {
+          prompt.cursor = idx;
+          break;
+        }
+      }
+    }
+  };
+
+  prompt.on("cursor", (action) => {
+    if (action !== "up" && action !== "down" && action !== "left" && action !== "right") return;
+    const direction = action === "up" || action === "left" ? -1 : 1;
+    const total = flat.length;
+    const blocked = (idx: number) => {
+      const row = flat[idx];
+      return row !== undefined && row.group !== true && !isTogglable(row.value as string);
+    };
+    for (let i = 0; i < total && blocked(prompt.cursor); i++) {
+      prompt.cursor = (prompt.cursor + direction + total) % total;
+    }
+  });
+
+  prompt.on("key", (_char, key) => {
+    if (key?.name === "space") {
+      const current = flat[prompt.cursor];
+      if (current?.group === true) {
+        // Re-derive group toggle over togglable items only.
+        const togglable = itemsOf(current.value as string).filter((o) => isTogglable(o.value as string));
+        const values = togglable.map((o) => o.value as string);
+        const wasAll = togglable.length > 0 && values.every((v) => previousValue.includes(v));
+        const groupIds = new Set(itemsOf(current.value as string).map((o) => o.value as string));
+        const rest = previousValue.filter((v) => !groupIds.has(v));
+        prompt.value = wasAll ? rest : [...rest, ...values];
+      }
+    }
+    recompute();
+    previousValue = [...((prompt.value as string[] | undefined) ?? [])];
+  });
+
+  recompute();
+
   const answer = await prompt.prompt();
-  return isCancel(answer) ? answer : (answer as string[]);
+  if (isCancel(answer) || answer === undefined) return answer as symbol;
+  // Recompute the final result from memory semantics (locked-on included).
+  const final = new Set(answer as string[]);
+  return selectionResult(opts.groups, final);
 }
