@@ -26,6 +26,7 @@ function sectionFor(item: Item): string {
   if (item.required) return "Required";
   if (item.kind === "font") return "Fonts";
   if (item.kind === "brew-cask" && item.id.startsWith("font-")) return "Fonts";
+  if (item.kind === "repo") return "Repos";
   if (item.kind === "system" || item.kind === "config-only") return "System & config";
   if (item.kind === "brew-formula") return "CLI tools";
   return "Apps";
@@ -144,7 +145,7 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
       })
       .map((item) => item.id),
   );
-  const groups: SelectGroups = { Required: [], Apps: [], "CLI tools": [], Fonts: [], "System & config": [] };
+  const groups: SelectGroups = { Required: [], Apps: [], "CLI tools": [], Fonts: [], Repos: [], "System & config": [] };
   for (const item of registry.all()) {
     if (!shown.has(item.id)) continue;
     const d = detection.get(item.id) ?? { installed: false };

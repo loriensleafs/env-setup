@@ -18,10 +18,21 @@ describe("secrets", () => {
     expect(await getSecret("missing")).toBeNull();
   });
 
-  test("invalid JSON falls through to empty", async () => {
-    const path = join(tmpdir(), `envsetup-bad-${Date.now()}.json`);
-    await Bun.write(path, "{nope");
-    process.env.ENVSETUP_SECRETS_FILE = path;
-    expect(await loadSecrets()).toEqual({});
+  test("invalid JSON falls through the chain (empty when no other source)", async () => {
+    const dir = join(tmpdir(), `envsetup-iso-${Date.now()}`);
+    const bad = join(dir, "bad.json");
+    await Bun.write(bad, "{nope");
+    process.env.ENVSETUP_SECRETS_FILE = bad;
+    const prevCwd = process.cwd();
+    const prevXdg = process.env.XDG_CONFIG_HOME;
+    process.env.XDG_CONFIG_HOME = dir; // no config-dir secrets
+    process.chdir(dir); // no repo .secrets.local.json
+    try {
+      expect(await loadSecrets()).toEqual({});
+    } finally {
+      process.chdir(prevCwd);
+      if (prevXdg === undefined) delete process.env.XDG_CONFIG_HOME;
+      else process.env.XDG_CONFIG_HOME = prevXdg;
+    }
   });
 });

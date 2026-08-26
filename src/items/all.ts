@@ -15,6 +15,10 @@ import { cleanshotConfig } from "./defs/cleanshot-config.ts";
 import { cursorConfig, vscodeConfig } from "./editors/editor-config.ts";
 import { podmanMachine } from "./defs/podman-machine.ts";
 import { raycastConfig } from "./defs/raycast-config.ts";
+import { githubAuth } from "./defs/github-auth.ts";
+import { ACMELABS_REPOS, REFERENCE_REPOS, repoItem } from "./repos/repo-factory.ts";
+import { acmelabsMarketplace } from "./repos/acmelabs-marketplace.ts";
+import { claudeSettings } from "./claude-code/claude-settings.ts";
 import { superwhisperConfig } from "./defs/superwhisper-config.ts";
 import { typoraConfig } from "./typora/typora-config.ts";
 import { chromePwas } from "./chrome/chrome-pwas.ts";
@@ -103,5 +107,11 @@ export function buildRegistry(): ItemRegistry {
   r.register(vscodeConfig);
   r.register(podmanMachine);
   r.register(raycastConfig);
+  // Repos + Claude Code flagship
+  r.register(githubAuth);
+  for (const spec of ACMELABS_REPOS) r.register(repoItem(spec));
+  for (const spec of REFERENCE_REPOS) r.register(repoItem(spec));
+  r.register(acmelabsMarketplace);
+  r.register(claudeSettings);
   return r;
 }

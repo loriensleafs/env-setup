@@ -42,16 +42,29 @@ format-on-save/project-config-first — + 12 extensions via --install-extension;
 anthropic.claude-code id VERIFIED via marketplace gallery API) · podman-machine (init 4CPU/
 8GB/100GB, Zod-clamped, existing machine untouched, on-demand start) · raycast-config
 (Spotlight symbolic-hotkey 64 off via PlistBuddy, raycastGlobalHotkey Command-49,
-activateSettings reload; onboarding/extensions = ceremony). Registry: 45 items, 76 tests.
+activateSettings reload; onboarding/extensions = ceremony). Registry: 47 items at that point.
 NOTE: Cursor model gating (only Haiku/Opus/Sonnet/Fable, default Opus) is app-state, not
 settings.json → guided ceremony at Stage C (research finding).
 
-PENDING (build order): repos + generated ACMElabs marketplace + reference clones · fonts from
-Peter's repo + Google Sans · auth (device flow, NEEDS PETER: OAuth app registration) · secrets
-age store (NEEDS PETER: passphrase) · Stage C ceremonies (sign-ins, permissions, default
-browser, noreply email, SSH keys, Typora/CleanShot/superwhisper license entry, Cursor models)
-· per-app config SCREENS in bootstrap · dotfiles item (PATH lines, docker alias) · release
-pipeline test · doctor/sync diffing
+BUILT (cont. 2): github-auth gate (detect gh auth status; device flow replaces it in the auth
+round) · repo factory (private → gh clone behind github-auth; public → plain git) · 5 ACMElabs
+repo items + 4 owner-prefixed reference clones · acmelabs-marketplace (generates
+{devDir}/ACMElabs/.claude-plugin/marketplace.json over ACTUALLY-CLONED repos — selection-aware
+by construction; schema verified against real marketplaces: relative ./dir sources, metadata
+from each repo's plugin.json) · **claude-settings FLAGSHIP** (buildSettings: authoritative
+template → devDir-templated marketplace path fixing the peter.kloss artifact, ACMElabs plugins
+filtered by selected repo items per Peter's rule, statusline → bun port, all else verbatim;
+backs up existing settings; installs hooks/notify.ts + hooks/subagent-statusline.ts +
+statusline.ts) · new "Repos" section in selection UI. Registry: 59 items, 81 tests green.
+Doctor on this machine correctly shows github-auth ✓ and repos/marketplace/settings ✗.
+
+PENDING (build order): fonts from Peter's fonts repo + Google Sans · auth (device flow, NEEDS
+PETER: OAuth app registration) · secrets age store (NEEDS PETER: passphrase) · Stage C ceremony
+runner (sign-ins, permissions, default browser, noreply email + git user.email, SSH keys,
+Typora/CleanShot/superwhisper license entry via clipboard, Cursor model gating, Raycast
+onboarding) · per-app config SCREENS in bootstrap (schema-driven; podman/ghostty/typora have
+configSchemas ready) · dotfiles item (PATH lines: bun/uv/fnm hook, docker=podman alias) ·
+release pipeline test · doctor/sync diffing UI
 
 # ─── Product & process decisions ───
 ## What this is
