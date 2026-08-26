@@ -2,7 +2,7 @@
 set stty_init "rows 45 columns 120"
 set timeout 30
 
-spawn bun src/index.ts --dry-run
+spawn bun src/index.ts --dry-run --defaults
 expect { -re "Scanned \\d+ items" { puts stderr "SCAN-OK" } timeout { puts stderr "NO-SCAN"; exit 1 } }
 expect { "Your name" { puts stderr "NAME-OK" } timeout { puts stderr "NO-NAME"; exit 1 } }
 after 300; send "\r"

@@ -818,3 +818,11 @@ Known from this machine so far:
 - 2026-08-25/26: Ghostty icon fix (NSWorkspace.setIcon), installed cursor+superwhisper casks,
   distribution options discussed, Option B chosen, full workflow spec from Peter captured above.
   Earlier ~/mac-setup Brewfile scaffolding (pre-dating this plan) is superseded.
+
+## Config screens + release — 2026-08-26
+Schema-driven per-app config screens in bootstrap: prompts derive from each item's Zod schema
+via z.toJSONSchema (boolean → radio-group, bounded number → validated text, small enum →
+radio, string → text; humanized labels); answers land in manifest.items[id].config after
+schema parse (invalid → defaults + warning). `--defaults` flag skips screens (automation/E2E).
+PTY-verified: podman cpus edited 4→6 through the real screen. Release: v0.0.1 tag fired the
+GH Actions pipeline (bun compile darwin-arm64+x64, ad-hoc codesign, release assets).

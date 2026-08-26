@@ -11,6 +11,7 @@ import { loadManifest, saveManifest } from "../manifest/store.ts";
 import { orchestrate, type StepOutcome } from "../orchestrator/orchestrator.ts";
 import { journalPath } from "../paths/paths.ts";
 import { groupMultiselect } from "../ui/group-multi-select.ts";
+import { promptItemConfig } from "../ui/config-screens.ts";
 import type { SelectGroups } from "../ui/group-multi-select.ts";
 
 /** Placeholder until Stage C auth resolves the real GitHub noreply address. */
@@ -20,6 +21,8 @@ export interface BootstrapOptions {
   dryRun?: boolean;
   /** Show installed items as toggleable options (cascade inspection). */
   showInstalled?: boolean;
+  /** Skip per-app config screens, accepting each item's defaults. */
+  acceptDefaults?: boolean;
 }
 
 function sectionFor(item: Item): string {
@@ -169,7 +172,17 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
   const selection = picks as string[];
 
   // --- Per-item config screens -------------------------------------------
-  // (Items with config prompts plug in here as they're built — none yet.)
+  const itemConfigs = new Map<string, unknown>();
+  if (!opts.acceptDefaults) {
+    const configurable = registry
+      .all()
+      .filter((item) => selection.includes(item.id) && item.configSchema !== undefined);
+    for (const item of configurable) {
+      const config = await promptItemConfig(item, undefined);
+      if (p.isCancel(config as never)) bail("cancelled");
+      itemConfigs.set(item.id, config);
+    }
+  }
 
   // --- Summary + confirm --------------------------------------------------
   const toInstall = selection.filter((id) => !(detection.get(id)?.installed ?? false));
@@ -200,7 +213,14 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
         // they're not in today's install selection — doctor/sync treat the
         // manifest as "what this machine should have".
         const installed = detection.get(item.id)?.installed ?? false;
-        return [item.id, { selected: selection.includes(item.id) || installed }];
+        const config = itemConfigs.get(item.id) ?? item.defaultConfig;
+        return [
+          item.id,
+          {
+            selected: selection.includes(item.id) || installed,
+            ...(config !== undefined ? { config } : {}),
+          },
+        ];
       }),
     ),
   };

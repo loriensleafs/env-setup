@@ -19,6 +19,10 @@ const main = defineCommand({
       type: "boolean",
       description: "Show already-installed items as toggleable options (for inspecting the dependency cascade)",
     },
+    defaults: {
+      type: "boolean",
+      description: "Skip per-app config screens, accepting defaults",
+    },
   },
   async run({ rawArgs, args }) {
     // citty invokes the root run() even when a subcommand matched — only
@@ -26,7 +30,11 @@ const main = defineCommand({
     const sub = rawArgs.find((a) => !a.startsWith("-"));
     if (sub !== undefined) return;
     const { bootstrap } = await import("./commands/bootstrap.ts");
-    await bootstrap({ dryRun: args["dry-run"] === true, showInstalled: args["show-installed"] === true });
+    await bootstrap({
+      dryRun: args["dry-run"] === true,
+      showInstalled: args["show-installed"] === true,
+      acceptDefaults: args.defaults === true,
+    });
   },
 });
 
