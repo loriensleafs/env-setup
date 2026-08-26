@@ -716,3 +716,15 @@ labels render white ONLY when focused; selection is the checkbox's job — other
 invisible in a mostly-selected list.
 PTY note: the vendored stock path prompt sometimes consumes the first Enter (suggestion
 navigation) — harness sends a resilient second Enter; watch for it in real usage.
+
+## Progress-UX rework (Peter, 2026-08-26)
+- SCAN: spinner PER SECTION ("Evaluating apps…" + "Checking Ghostty (3/12)" messages), each
+  collapsing to "Apps: 7 installed, 5 to install"; ends with "Initialization complete in Xs".
+  (Chosen over taskLog for scan because taskLog headers are static diamonds — a real spinner
+  per group gives the animation Peter wanted without forking clack.)
+- EXECUTION: taskLog with a GROUP PER STEP ("Ghostty (4/22)") — streamed messages collapse on
+  success ("ghostty installed"), are RETAINED on failure (taskLog's forte); ends with
+  "Installed N items in Xs". Failure triage = concise log.error lines (big notes removed).
+  Skipped-dependency steps surface as log.warn.
+- NEW FLAG `--show-installed`: installed items appear as toggleable options for cascade
+  inspection — verified: unchecking Homebrew live-disables 23 dependent rows ("needs Homebrew").

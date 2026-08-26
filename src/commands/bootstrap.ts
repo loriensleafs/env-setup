@@ -18,6 +18,8 @@ export const EMAIL_PENDING = "pending-noreply-resolution";
 
 export interface BootstrapOptions {
   dryRun?: boolean;
+  /** Show installed items as toggleable options (cascade inspection). */
+  showInstalled?: boolean;
 }
 
 function sectionFor(item: Item): string {
@@ -62,17 +64,33 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
     log: () => {},
     run,
   };
-  const s = p.spinner();
-  s.start("Scanning this machine");
   const detection = new Map<string, DetectResult>();
-  const all = registry.all();
-  for (let i = 0; i < all.length; i++) {
-    const item = all[i] as (typeof all)[number];
-    s.message(`Checking ${item.title} (${i + 1}/${all.length})`);
-    detection.set(item.id, await item.detect(scanCtx).catch(() => ({ installed: false })));
+  const scanStart = Date.now();
+  const sections = new Map<string, Item[]>();
+  for (const item of registry.all()) {
+    const section = sectionFor(item);
+    const list = sections.get(section) ?? [];
+    list.push(item);
+    sections.set(section, list);
   }
-  const found = [...detection.values()].filter((d) => d.installed).length;
-  s.stop(`Scanned ${detection.size} items — ${found} already installed`);
+  for (const [section, items] of sections) {
+    const s = p.spinner();
+    s.start(`Evaluating ${section.toLowerCase()}`);
+    let installed = 0;
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i] as (typeof items)[number];
+      s.message(`Checking ${item.title} (${i + 1}/${items.length})`);
+      const d = await item.detect(scanCtx).catch(() => ({ installed: false as const }));
+      detection.set(item.id, d);
+      if (d.installed && d.satisfies !== false) installed++;
+    }
+    const toInstall = items.length - installed;
+    s.stop(
+      `${section}: ${installed} installed, ${toInstall} to install`,
+    );
+  }
+  const elapsed = ((Date.now() - scanStart) / 1000).toFixed(1);
+  p.log.success(`Initialization complete in ${elapsed}s`);
 
   // --- Identity + locations (Group 6) ------------------------------------
   // Zod schemas double as prompt validators (Standard Schema bridge).
@@ -119,6 +137,7 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
   const shown = new Set(
     registry.all()
       .filter((item) => {
+        if (opts.showInstalled) return true;
         const d = detection.get(item.id) ?? { installed: false };
         return !(d.installed && d.satisfies !== false);
       })
@@ -222,9 +241,11 @@ async function executePlan(
     return;
   }
 
-  const s = p.spinner();
   const order = registry.executionOrder(selection);
+  const runStart = Date.now();
+  const installLog = p.taskLog({ title: `Installing ${order.length} items`, limit: 6 });
   let stepIndex = 0;
+  let group: ReturnType<typeof installLog.group> | null = null;
   const report = await orchestrate({
     registry,
     manifest,
@@ -235,36 +256,35 @@ async function executePlan(
     events: {
       onStepStart: (_id, title) => {
         stepIndex++;
-        s.start(`${title} (${stepIndex}/${order.length})`);
+        group = installLog.group(`${title} (${stepIndex}/${order.length})`);
       },
-      onStepLog: (_id, message) => s.message(message),
+      onStepLog: (_id, message) => group?.message(message),
       onStepEnd: (id, outcome: StepOutcome) => {
-        if (outcome.kind === "succeeded") s.stop(`${color.green("✓")} ${id}`);
-        else if (outcome.kind === "skipped-installed")
-          s.stop(`${color.dim("✓")} ${id} ${color.dim("already installed")}`);
-        else if (outcome.kind === "skipped-completed")
-          s.stop(`${color.dim("↷")} ${id} ${color.dim("done in previous run")}`);
-        else if (outcome.kind === "skipped-dependency")
-          s.stop(`${color.yellow("↷")} ${id} ${color.dim(`skipped: ${outcome.because} failed`)}`);
-        else s.stop(`${color.red("✗")} ${id} ${color.dim(outcome.error)}`);
+        if (outcome.kind === "succeeded") group?.success(`${id} installed`);
+        else if (outcome.kind === "skipped-installed") group?.success(`${id} already installed`);
+        else if (outcome.kind === "skipped-completed") group?.success(`${id} done in previous run`);
+        else if (outcome.kind === "skipped-dependency") {
+          // No group was opened for skipped steps — surface as a log line.
+          p.log.warn(`${id} skipped: ${outcome.because} failed`);
+        } else group?.error(`${id} failed: ${outcome.error}`);
+        group = null;
       },
     },
   });
+  const runElapsed = ((Date.now() - runStart) / 1000).toFixed(1);
 
   // --- Triage summary -----------------------------------------------------
   if (report.aborted) {
-    p.log.error(`required item ${report.aborted.id} failed: ${report.aborted.error}`);
+    installLog.error(`required item ${report.aborted.id} failed: ${report.aborted.error}`);
     p.outro(color.red("run aborted — re-run the same command to resume after fixing the issue"));
     return;
   }
   if (report.failed.length > 0) {
-    const lines = report.failed.map((f) => `${color.red("✗")} ${f.id}: ${f.error}`);
-    for (const skip of report.skippedDependents) {
-      lines.push(`${color.yellow("↷")} ${skip.id} (needs ${skip.because})`);
-    }
-    p.note(lines.join("\n"), "needs attention");
+    installLog.error(`${report.failed.length} of ${order.length} items failed (${runElapsed}s)`);
+    for (const f of report.failed) p.log.error(`${f.id}: ${f.error}`);
     p.outro(`${report.succeeded.length} installed, ${report.failed.length} failed — re-run to retry failures`);
   } else {
-    p.outro(color.green(`all done — ${report.succeeded.length} installed, ${report.skippedInstalled.length + report.skippedCompleted.length} skipped`));
+    installLog.success(`Installed ${report.succeeded.length} items in ${runElapsed}s`);
+    p.outro(color.green("all done"));
   }
 }
