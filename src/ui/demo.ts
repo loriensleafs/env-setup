@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 // Interactive demo of the Stage A UI pieces. Run: bun src/ui/demo.ts
 import * as p from "@clack/prompts";
-import { horizontalRadio } from "./horizontal-radio.ts";
+import { radioGroup } from "./radio-group.ts";
 import { groupMultiselect } from "./group-multi-select.ts";
 
 p.intro("envsetup UI demo");
@@ -41,7 +41,7 @@ if (p.isCancel(picks)) {
 }
 p.log.info(`selected: ${(picks as string[]).join(", ")}`);
 
-const effort = await horizontalRadio({
+const effort = await radioGroup({
   message: "Claude Code effort level",
   options: [{ value: "low" }, { value: "medium" }, { value: "high" }],
   initialValue: "high",

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { cycle } from "../horizontal-radio.ts";
+import { cycle } from "../radio-group.ts";
 
 describe("cycle", () => {
   test("wraps both directions", () => {

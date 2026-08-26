@@ -11,15 +11,15 @@ export function cycle(length: number, index: number, direction: 1 | -1): number 
   return (index + direction + length) % length;
 }
 
-export interface HorizontalRadioOptions<V extends string> {
+export interface RadioGroupOptions<V extends string> {
   message: string;
   options: RadioOption<V>[];
   initialValue?: V;
 }
 
-/** Inline radio row for 2–4 options: (●) low   ( ) medium   ( ) high */
-export async function horizontalRadio<V extends string>(
-  opts: HorizontalRadioOptions<V>,
+/** Inline radio group for 2–4 options: (●) low   ( ) medium   ( ) high */
+export async function radioGroup<V extends string>(
+  opts: RadioGroupOptions<V>,
 ): Promise<V | symbol> {
   let cursor = Math.max(
     0,
