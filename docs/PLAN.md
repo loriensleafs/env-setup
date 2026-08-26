@@ -560,3 +560,11 @@ it dies when real tests supersede it.)
   deps outside the run.
 - Tests follow Peter's sibling-__tests__/<name>.test.ts convention.
 - Claude hook assets excluded from project typecheck (they're payloads, not source).
+
+## statusline — CONVERTED to pure Bun 2026-08-26
+src/items/claude-code/assets/statusline.ts replaces statusline.sh (deleted). Port verified
+byte-identical modulo runtime terminal-width detection (each process probes its own TTY
+ancestry). jq dependency gone. settings.template.json statusLine.command → `bun ~/.claude/statusline.ts`.
+install.sh clarified for Peter: the shim exists ONLY to arch-detect/fetch/exec the compiled
+binary (which itself needs no bun); it never installs bun — bun is installed later BY envsetup
+as a regular item (Claude hooks need it).

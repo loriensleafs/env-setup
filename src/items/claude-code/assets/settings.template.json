@@ -50,8 +50,8 @@
   "autoMode": {
     "environment": [
       "$defaults",
-      "Trusted GitHub account: github.com/loriensleafs — personal repositories",
-      "Trusted GitHub organization: github.com/acmelabs-15 — my own org"
+      "Trusted GitHub account: github.com/loriensleafs \u2014 personal repositories",
+      "Trusted GitHub organization: github.com/acmelabs-15 \u2014 my own org"
     ]
   },
   "env": {
@@ -124,8 +124,8 @@
     }
   },
   "attribution": {
-    "commit": "Are you pondering what I am pondering? — 🧠",
-    "pr": "\n---\n\n> Are you pondering what I am pondering? —🧠"
+    "commit": "Are you pondering what I am pondering? \u2014 \ud83e\udde0",
+    "pr": "\n---\n\n> Are you pondering what I am pondering? \u2014\ud83e\udde0"
   },
   "worktree": {
     "symlinkDirectories": [
@@ -134,7 +134,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "~/.claude/statusline.sh",
+    "command": "bun ~/.claude/statusline.ts",
     "refreshInterval": 5
   },
   "subagentStatusLine": {
