@@ -58,13 +58,25 @@ backs up existing settings; installs hooks/notify.ts + hooks/subagent-statusline
 statusline.ts) · new "Repos" section in selection UI. Registry: 59 items, 81 tests green.
 Doctor on this machine correctly shows github-auth ✓ and repos/marketplace/settings ✗.
 
-PENDING (build order): fonts from Peter's fonts repo + Google Sans · auth (device flow, NEEDS
-PETER: OAuth app registration) · secrets age store (NEEDS PETER: passphrase) · Stage C ceremony
-runner (sign-ins, permissions, default browser, noreply email + git user.email, SSH keys,
-Typora/CleanShot/superwhisper license entry via clipboard, Cursor model gating, Raycast
-onboarding) · per-app config SCREENS in bootstrap (schema-driven; podman/ghostty/typora have
-configSchemas ready) · dotfiles item (PATH lines: bun/uv/fnm hook, docker=podman alias) ·
-release pipeline test · doctor/sync diffing UI
+BUILT (cont. 3, 2026-08-26): **AUTH LIVE** — device flow under envsetup's own OAuth app
+(client_id Ov23liQUd4gIaj3ejiNo, registered by Peter; token-expiry OFF by choice; scopes
+repo/admin:public_key/read:org/user:email); tested poll semantics (pending/slow_down/denied/
+expired); ceremony → Keychain (service envsetup-github) → gh --with-token handoff → gh
+setup-git; VALIDATED END-TO-END by Peter (token verified against API; noreply =
+315385+loriensleafs@users.noreply.github.com; gh keyring active). ssh-keys item (two
+per-machine ed25519 keys, ~/.ssh/config agent+keychain block, API upload of public halves
+incl. signing key; 422-tolerant re-runs). git-email item (noreply → git user.email).
+`envsetup auth` subcommand. **SECRETS LIVE** — age-encryption (typage) store;
+`envsetup secrets init/show/unlock`; Peter created secrets.json.age (age/scrypt, committed —
+public-safe); passphrase in his password manager; .secrets.local.json stays untracked until
+first `secrets show` verification, then deletable.
+
+PENDING (build order): fonts from Peter's fonts repo + Google Sans · Stage C ceremony runner
+(app sign-ins, permissions checklist, default browser, license entry via clipboard, Cursor
+model gating, Raycast onboarding — auth/email/keys now handled by items) · per-app config
+SCREENS in bootstrap (schema-driven; podman/ghostty/typora have configSchemas ready) ·
+dotfiles item (PATH lines: bun/uv/fnm hook, docker=podman alias) · release pipeline test ·
+doctor/sync diffing UI
 
 # ─── Product & process decisions ───
 ## What this is
