@@ -29,6 +29,7 @@ export const betterDisplay = defineItem<BetterDisplayConfig>({
   ceremonies: [
     { id: "better-display-license", title: "Activate BetterDisplay license (key on clipboard)" },
     { id: "better-display-settings", title: "Tune BetterDisplay per-display settings (guided)" },
+    { id: "accessibility-grant", title: "Grant Accessibility (batched with other apps)" },
   ],
   detect: async (ctx) => {
     const r = await ctx.run(["/opt/homebrew/bin/brew", "list", "--cask", "--versions", "betterdisplay"]);
