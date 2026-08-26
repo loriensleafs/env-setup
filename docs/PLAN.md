@@ -907,6 +907,19 @@ Requires: Accessibility permission (like superwhisper) — Stage C.
   decided order: Applications · Home · Desktop · Documents · Downloads · Dev · .claude.
 Registry now larger; 96 tests green.
 
+## Finder favorites SOLVED — 2026-08-26 (corrected after a wrong "it's dead" call)
+Prematurely declared LSSharedFileList dead on macOS 26 after our Swift helper segfaulted.
+Peter pushed for real web research, which found cause + fix (maintained mysides-swift,
+7onnie/mysides): the crash was OUR binding, not the API. LSSharedFileListInsertItemURL's
+position param is a SENTINEL INTEGER (kLSSharedFileListItemLast = 0x2), not a CF object —
+passing it as CFTypeRef makes Swift call swift_unknownObjectRetain(0x2) → segfault. Fix:
+dlopen/dlsym CoreServices, type the insert fn position param as OpaquePointer?, append each
+item with the Last sentinel (order preserved). State lives in sharedfilelistd (XPC) → no Full
+Disk Access. Item COMPILES set-favorites.swift (swiftc) then runs it — `swift <file>`
+interpreter segfaults even when the code is correct. Verified live by Peter (decided order,
+no crash). sfltool add-item is GONE on macOS 26; mysides brew formula disabled; .sfl4 format.
+LESSON: don't declare an approach impossible from one failed attempt — research first.
+
 ## Cleanup round — 2026-08-26
 - DRY-RUN removed entirely (index/bootstrap/sync). Bare `envsetup` = full one-shot install
   (always was). `--show-installed` and `--defaults` kept. Scratch test/spikes/ deleted (no
