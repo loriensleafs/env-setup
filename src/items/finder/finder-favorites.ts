@@ -18,39 +18,69 @@ export const FAVORITES: string[] = [
 ];
 
 export const SET_FAVORITES_SWIFT = `import Foundation
-import CoreServices
+import Darwin
 
-// Rewrites the Finder sidebar Favorites list to exactly the given paths, in
-// order. Uses LSSharedFileList (deprecated since 10.11 but still functional on
-// macOS 26 — same deprecated-but-works bet as our Ghostty icon swap). mysides
-// was Apple-disabled Oct 2025, so this is the reliable route.
+// Rewrites Finder's sidebar Favorites to exactly the given paths, in order.
+//
+// LSSharedFileList was pulled from Apple's public headers in macOS 12, so we
+// dlopen/dlsym it at runtime — CRUCIALLY typing the insert function's position
+// param as OpaquePointer?, not CFTypeRef?. The kLSSharedFileListItemLast
+// sentinel is the integer 0x2, not a real object; passing it as CFTypeRef makes
+// Swift call swift_unknownObjectRetain(0x2) → segfault (the crash we hit).
+// Technique verified against the maintained mysides-swift (7onnie/mysides).
+// The list state lives in the sharedfilelistd daemon (XPC), so no Full Disk
+// Access / TCC prompt is needed.
 //
 // usage: swift set-favorites.swift <path1> <path2> ...
+
+typealias SFLCreateFn   = @convention(c) (CFAllocator?, CFString, CFTypeRef?) -> CFTypeRef?
+typealias SFLSnapshotFn = @convention(c) (CFTypeRef, UnsafeMutablePointer<UInt32>) -> CFArray?
+typealias SFLInsertFn   = @convention(c) (CFTypeRef, OpaquePointer?, CFString?, CFTypeRef?, CFURL, CFDictionary?, CFArray?) -> CFTypeRef?
+typealias SFLRemoveFn   = @convention(c) (CFTypeRef, CFTypeRef) -> OSStatus
 
 let paths = Array(CommandLine.arguments.dropFirst())
 if paths.isEmpty { print("no paths"); exit(1) }
 
-guard let list = LSSharedFileListCreate(nil, kLSSharedFileListFavoriteItems.takeUnretainedValue(), nil)?.takeRetainedValue() else {
-    print("could not open Favorites list"); exit(1)
+guard let handle = dlopen("/System/Library/Frameworks/CoreServices.framework/CoreServices", RTLD_LAZY) else {
+    print("FAIL dlopen CoreServices"); exit(1)
+}
+func sym<T>(_ name: String) -> T? {
+    guard let p = dlsym(handle, name) else { return nil }
+    return unsafeBitCast(p, to: T.self)
+}
+guard let create: SFLCreateFn = sym("LSSharedFileListCreate"),
+      let snapshot: SFLSnapshotFn = sym("LSSharedFileListCopySnapshot"),
+      let insert: SFLInsertFn = sym("LSSharedFileListInsertItemURL"),
+      let remove: SFLRemoveFn = sym("LSSharedFileListItemRemove"),
+      let kFavPtr = dlsym(handle, "kLSSharedFileListFavoriteItems"),
+      let kLastPtr = dlsym(handle, "kLSSharedFileListItemLast") else {
+    print("FAIL dlsym symbols"); exit(1)
+}
+let kFav = kFavPtr.assumingMemoryBound(to: CFString.self).pointee
+let kLastRaw = kLastPtr.assumingMemoryBound(to: UInt.self).pointee
+guard let kLast = OpaquePointer(bitPattern: kLastRaw) else { print("FAIL sentinel"); exit(1) }
+
+guard let list = create(nil, kFav, nil) else { print("FAIL create list"); exit(1) }
+
+// Clear existing favorites.
+var count: UInt32 = 0
+if let snap = snapshot(list, &count) as? [CFTypeRef] {
+    for item in snap { _ = remove(list, item) }
 }
 
-// Clear existing items.
-if let existing = LSSharedFileListCopySnapshot(list, nil)?.takeRetainedValue() as? [LSSharedFileListItem] {
-    for item in existing { LSSharedFileListItemRemove(list, item) }
-}
-
-// Insert in order (each after the previous → preserves top-to-bottom order).
-var after = kLSSharedFileListItemBeforeFirst.takeUnretainedValue()
+// Append each path with the Last sentinel → final order matches input order.
+var ok = 0
 for path in paths {
     let expanded = (path as NSString).expandingTildeInPath
+    let name = (expanded as NSString).lastPathComponent
     let url = URL(fileURLWithPath: expanded) as CFURL
-    if let inserted = LSSharedFileListInsertItemURL(list, after, nil, nil, url, nil, nil)?.takeRetainedValue() {
-        after = inserted
+    if insert(list, kLast, name as CFString, nil, url, nil, nil) != nil {
+        ok += 1
     } else {
         FileHandle.standardError.write("warn: could not add \\(expanded)\\n".data(using: .utf8)!)
     }
 }
-print("OK favorites set (\\(paths.count))")
+if ok == paths.count { print("OK favorites set (\\(ok))") } else { print("PARTIAL \\(ok)/\\(paths.count)"); exit(1) }
 `;
 
 const SWIFT_PATH = join(homedir(), ".config", "envsetup", "set-favorites.swift");
@@ -67,9 +97,12 @@ export const finderFavorites = defineItem({
   title: "Finder sidebar favorites",
   kind: "system",
   configure: async (ctx) => {
-    const helper = await writeHelper();
+    const src = await writeHelper();
+    const bin = src.replace(/\.swift$/, "");
+    const build = await ctx.run(["swiftc", src, "-o", bin]);
+    if (build.exitCode !== 0) throw new Error(`compiling favorites helper failed: ${build.stderr.trim()}`);
     const paths = FAVORITES.map((p) => p.replace(/^~/, homedir()));
-    const r = await ctx.run(["swift", helper, ...paths]);
+    const r = await ctx.run([bin, ...paths]);
     if (r.exitCode !== 0 || !/OK favorites set/.test(r.stdout)) {
       throw new Error(`set favorites failed: ${(r.stdout + r.stderr).trim()}`);
     }

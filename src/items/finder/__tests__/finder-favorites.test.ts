@@ -7,8 +7,10 @@ describe("finder favorites", () => {
       "/Applications", "~", "~/Desktop", "~/Documents", "~/Downloads", "~/Dev", "~/.claude",
     ]);
   });
-  test("embedded swift uses LSSharedFileList favorites API", () => {
+  test("embedded swift uses dlsym LSSharedFileList with OpaquePointer sentinel", () => {
     expect(SET_FAVORITES_SWIFT).toContain("kLSSharedFileListFavoriteItems");
     expect(SET_FAVORITES_SWIFT).toContain("LSSharedFileListInsertItemURL");
+    expect(SET_FAVORITES_SWIFT).toContain("OpaquePointer"); // the segfault fix
+    expect(SET_FAVORITES_SWIFT).toContain("dlopen");
   });
 });
