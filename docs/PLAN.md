@@ -944,3 +944,12 @@ So we CAN'T pre-approve them. Best achievable (and what connect does): batch + G
 one pass, deep-linking the exact System Settings panes (superwhisper mic/accessibility,
 cleanshot screen-recording, + new accessibility-grant for envsetup's own Chrome/Finder AX
 automation) instead of scattered first-run surprises.
+
+
+## BetterDisplay licensing — NO scriptable path (researched 2026-08-26)
+Verified on the installed app: BetterDisplay uses Paddle online licensing. There is NO CLI
+license command (betterdisplaycli only does display control), NO license key in its defaults
+domain (only showProLicenseError), and NO URL-scheme activation. Unlike CleanShot (plain
+defaults activationKey), it CAN'T be pre-seeded. The better-display-license ceremony copies
+the key (861D06B5-…) to the clipboard, opens the app, and guides pasting into Settings →
+license (activates online). That is the ceiling for this app.

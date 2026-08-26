@@ -137,7 +137,24 @@ export const HANDLERS: Record<string, CeremonyHandler> = {
     },
   },
 
-  "better-display-license": licenseCeremony(SECRET_KEYS.betterDisplayLicense, "BetterDisplay", "/Applications/BetterDisplay.app"),
+  "better-display-license": {
+    async run(ctx) {
+      const key = await getSecret(SECRET_KEYS.betterDisplayLicense);
+      if (key === null) {
+        p.log.warn("no BetterDisplay license in the store — run `envsetup secrets unlock` first, or paste it manually");
+      } else {
+        const pb = Bun.spawn(["pbcopy"], { stdin: "pipe" });
+        pb.stdin.write(key); await pb.stdin.end(); await pb.exited;
+        p.log.info("BetterDisplay license copied to clipboard");
+      }
+      p.note(
+        "BetterDisplay validates licenses online (Paddle) — no scriptable path.\nIn the app: open Settings, find the license/purchase section, and paste\n(\u2318V) the key. It activates over the network.",
+        "BetterDisplay license",
+      );
+      await ctx.run(["open", "/Applications/BetterDisplay.app"]);
+      return confirmDone("BetterDisplay activated (shows as licensed)?");
+    },
+  },
   "better-display-settings": {
     async run(ctx) {
       p.note(
