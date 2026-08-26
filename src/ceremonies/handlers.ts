@@ -112,6 +112,38 @@ export const HANDLERS: Record<string, CeremonyHandler> = {
     },
   },
 
+  "chrome-pwas-install": {
+    async run(ctx) {
+      const { PWAS, CHROME_APPS_DIR, renamePwaBundles } = await import("../items/chrome/chrome-pwas.ts");
+      const { readdir, rename } = await import("node:fs/promises");
+      const { join } = await import("node:path");
+      for (const spec of PWAS) {
+        p.note(
+          `Chrome opens ${spec.name}'s page.\n⋮ menu → Cast, Save and Share → Install Page as App → Install.`,
+          `install ${spec.name}`,
+        );
+        await ctx.run(["open", "-a", "Google Chrome", spec.url]);
+        const ok = await confirmDone(`${spec.name} installed?`);
+        if (!ok) return false;
+      }
+      // Idempotent rename pass: bundle filename = Dock label (Peter-verified).
+      const result = await renamePwaBundles(
+        async (bundle) => {
+          const r = await ctx.run([
+            "defaults", "read", join(CHROME_APPS_DIR, bundle, "Contents", "Info"), "CrAppModeShortcutURL",
+          ]);
+          return r.exitCode === 0 ? r.stdout.trim() : null;
+        },
+        async () => (await readdir(CHROME_APPS_DIR).catch(() => [])).filter((f) => f.endsWith(".app")),
+        async (from, to) => rename(join(CHROME_APPS_DIR, from), join(CHROME_APPS_DIR, to)),
+      );
+      if (result.renamed.length > 0) p.log.success(`renamed: ${result.renamed.join(", ")}`);
+      if (result.missing.length > 0) p.log.warn(`not found (skipped?): ${result.missing.join(", ")}`);
+      p.log.info("run `envsetup sync` to add them to the Dock");
+      return result.missing.length === 0;
+    },
+  },
+
   "github-device-flow": {
     async run() {
       // Handled by the github-auth item / `envsetup auth`; nothing to do here.

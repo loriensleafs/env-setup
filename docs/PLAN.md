@@ -844,3 +844,23 @@ GH Actions pipeline (bun compile darwin-arm64+x64, ad-hoc codesign, release asse
   = JSON data blobs (⇧⌘=768, keys 20/21/23 = 3/4/5). cleanshot-config is now a REAL applier
   (license from secret store + full captured settings + hex -data blob writes, mechanism
   round-trip-verified); ceremonies collapsed to one verify step (screen-recording grant).
+
+## Web apps FINAL design — 2026-08-26 (policy DROPPED; Peter's synthesis probe settled it)
+Peter manually installed Gmail as a Chrome app to enable investigation. Findings:
+- Bundles: ~/Applications/Chrome Apps.localized/<Name>.app — thin app_mode_loader keyed by
+  CrAppModeShortcutID; **bundle FILENAME controls the Dock label** (Peter-verified live,
+  incl. launching from a renamed bundle).
+- Full synthesis RULED OUT empirically: forged bundle with computed app-id (crx-style
+  SHA256(start_url)→a-p) launches NO app window — profile-side registration (undocumented
+  LevelDB) is required; not writing that blind.
+- Chrome regenerated Gmail.app after the rename test → renames may revert on Chrome updates;
+  detect() notices and the idempotent rename pass re-applies (ghostty-icon pattern).
+DECIDED: ceremony + rename (no force-install policy → no permanently "managed" browser).
+chrome-pwas-install ceremony guides the 4 in-Chrome installs (⋮ → Cast, Save and Share →
+Install Page as App), then renames bundles by CrAppModeShortcutURL host-match → Mail/Calendar/
+Drive/Notes. WebAppInstallForceList research retained in RESEARCH doc as the zero-click
+alternative if Peter ever accepts the managed badge.
+
+## Final open-items status
+- clack npm swap: still blocked upstream (checked today: 1.7.0/1.4.3 unchanged).
+- Fresh-machine validation: awaits hardware. Everything else from the open list: CLOSED.
