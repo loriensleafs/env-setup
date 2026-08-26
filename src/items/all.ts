@@ -1,10 +1,16 @@
 import { brewCask, brewFormula } from "./factories/brew.ts";
 import { fontZip } from "./factories/font-zip.ts";
 import { bunRuntime } from "./defs/bun-runtime.ts";
+import { dock } from "./defs/dock.ts";
+import { gitIdentity } from "./defs/git-identity.ts";
 import { homebrew } from "./defs/homebrew.ts";
+import { macosDefaults } from "./defs/macos-defaults.ts";
 import { nodeLts } from "./defs/node-lts.ts";
 import { uv } from "./defs/uv.ts";
 import { xcodeClt } from "./defs/xcode-clt.ts";
+import { ghosttyConfig } from "./ghostty/ghostty-config.ts";
+import { ghosttyIcon } from "./ghostty/ghostty-icon.ts";
+import { quickActions } from "./quick-actions/quick-actions.ts";
 import { ItemRegistry } from "./registry.ts";
 
 /** Registry of everything envsetup knows how to manage (grows per docs/PLAN.md). */
@@ -72,5 +78,13 @@ export function buildRegistry(): ItemRegistry {
     url: `${NF}/RobotoMono.zip`,
     probeFile: "RobotoMonoNerdFont-Regular.ttf",
   }));
+  // Config-only / system items
+  r.register(macosDefaults);
+  r.register(gitIdentity);
+  r.register(ghosttyConfig);
+  r.register(ghosttyIcon);
+  r.register(brewFormula({ id: "dockutil", title: "dockutil (Dock manager)" }));
+  r.register(dock);
+  r.register(quickActions);
   return r;
 }

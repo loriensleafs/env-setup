@@ -741,3 +741,23 @@ navigation) — harness sends a resilient second Enter; watch for it in real usa
   Skipped-dependency steps surface as log.warn.
 - NEW FLAG `--show-installed`: installed items appear as toggleable options for cascade
   inspection — verified: unchecking Homebrew live-disables 23 dependent rows ("needs Homebrew").
+
+## Config-only items — BUILT 2026-08-26 (69 tests green; registry now 38 items)
+- macos-defaults: all 10 decided Finder/scroll settings via `defaults write` + ~/Library
+  chflags nohidden + Finder restart; detect = every value matches (idempotent skip).
+- ghostty-config: generates the decided config (One Dark Two, JetBrainsMono NF 13, shell
+  integration, clipboard, window, option-as-alt, global quick-terminal keybind — option names
+  verified against the local ghostty binary); Zod-clamped; backs up any unmanaged existing
+  config; "# managed by envsetup" marker for detection.
+- ghostty-icon: NSWorkspace.setIcon swap to the OS's Terminal.icns via transient Swift script
+  (session-validated technique); Dock restart; detect = Icon\r presence (cask upgrades wipe it,
+  sync reapplies).
+- git-identity: user.name from manifest, gpg.format ssh, commit.gpgsign, signingkey path,
+  init.defaultBranch main; email + real keys arrive with Stage C auth.
+- dockutil (brew) + dock: recents off, bottom, remove-all then add in Peter's decided order,
+  gracefully skipping not-yet-present apps (PWAs etc. — sync adds later).
+- quick-actions: 3 Automator .workflow Services (silent, per decision) wrapping PURE BUN
+  payloads written to ~/.config/envsetup/scripts/; pbs -update registers without logout.
+- New "System & config" section in the selection UI.
+Still pending: Chrome customization + PWAs (policy research/empirical gate), Typora/CleanShot/
+superwhisper/Raycast/Podman/VS Code/Cursor config appliers, repos/marketplace, auth+secrets.
