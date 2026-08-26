@@ -22,7 +22,11 @@
 # ═══════════════════ CURRENT STATUS (2026-08-26) ═══════════════════
 
 **Repo**: github.com/loriensleafs/env-setup (public) · 71 tests green · registry: 40 items
-**Phases**: A (app config decisions) ✅ · C (tech foundation) ✅ · B (repo) ✅ · BUILD in progress
+**Phases**: A ✅ · C ✅ · B ✅ · BUILD: feature-complete for v0.0.1
+**RELEASE LIVE (2026-08-26)**: v0.0.1 on GitHub Releases — pipeline green first run
+(darwin-arm64 65MB + x64 72MB, ad-hoc signed). THE CURL ONE-LINER WORKS END-TO-END:
+`curl -fsSL https://raw.githubusercontent.com/loriensleafs/env-setup/main/install.sh | sh`
+(arch-detect → download → exec verified on this machine, zero prerequisites).
 
 BUILT: core spine (paths/manifest/journal/items) · orchestrator · Stage A UI (group
 multiselect w/ cascade, radio-group, stock path prompt via vendored clack) · bootstrap flow
