@@ -28,12 +28,18 @@ export default defineCommand({
   args: {
     action: {
       type: "positional",
-      description: "init (encrypt .secrets.local.json) · show (masked) · reveal (full values) · unlock (decrypt to config dir for items)",
+      description: "init · list (names) · show (masked) · reveal (full) · copy <key> · unlock (decrypt to config dir)",
       required: true,
+    },
+    key: {
+      type: "positional",
+      description: "secret name (for `copy`)",
+      required: false,
     },
   },
   async run({ args }) {
     const action = args.action as string;
+    const keyArg = args.key as string | undefined;
     p.intro(`envsetup secrets ${action}`);
 
     if (action === "init") {
@@ -51,7 +57,7 @@ export default defineCommand({
       return;
     }
 
-    if (action === "show" || action === "reveal" || action === "unlock") {
+    if (action === "list" || action === "show" || action === "reveal" || action === "copy" || action === "unlock") {
       const blob = Bun.file(AGE_FILE);
       if (!(await blob.exists())) bail(`${AGE_FILE} not found in the current directory`);
       const pass = await askPassphrase(false);
@@ -61,7 +67,16 @@ export default defineCommand({
       } catch {
         bail("wrong passphrase (or corrupted file)");
       }
-      if (action === "show" || action === "reveal") {
+      if (action === "list") {
+        p.note(Object.keys(secrets).join("\n") || "(none)", "available secrets");
+      } else if (action === "copy") {
+        if (keyArg === undefined) bail("usage: envsetup secrets copy <key>  (see `secrets list`)");
+        const value = secrets[keyArg];
+        if (value === undefined) bail(`no secret named "${keyArg}" (see \`secrets list\`)`);
+        const pb = Bun.spawn(["pbcopy"], { stdin: "pipe" });
+        pb.stdin.write(value); await pb.stdin.end(); await pb.exited;
+        p.log.success(`${keyArg} copied to clipboard`);
+      } else if (action === "show" || action === "reveal") {
         const full = action === "reveal";
         p.note(
           Object.entries(secrets)
@@ -79,6 +94,6 @@ export default defineCommand({
       return;
     }
 
-    bail(`unknown action "${action}" — use init, show, reveal, or unlock`);
+    bail(`unknown action "${action}" — use init, list, show, reveal, copy, or unlock`);
   },
 });

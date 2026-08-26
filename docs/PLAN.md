@@ -953,3 +953,12 @@ domain (only showProLicenseError), and NO URL-scheme activation. Unlike CleanSho
 defaults activationKey), it CAN'T be pre-seeded. The better-display-license ceremony copies
 the key (861D06B5-…) to the clipboard, opens the app, and guides pasting into Settings →
 license (activates online). That is the ceiling for this app.
+
+
+## Secrets UX + auto-licensing confirmation — 2026-08-26
+- CONFIRMED: apps with a scriptable license are fully automatic — CleanShot's activationKey is
+  written from the store via `defaults` in cleanshot-config (no paste). Only online-validated
+  apps (BetterDisplay/Paddle, Typora, superwhisper) need the clipboard+paste ceremony.
+- `envsetup secrets` gained: `list` (names only, no values), `copy <key>` (value → clipboard,
+  behind passphrase). Full command set: init · list · show (masked) · reveal (full) ·
+  copy <key> · unlock.
