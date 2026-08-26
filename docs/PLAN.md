@@ -538,3 +538,9 @@ assets/), src/ui/ (custom clack prompts), named shared homes (src/manifest/, src
 built — no lib/ junk drawer. kebab-case filenames. Peter's calls: spikes/ → test/spikes/
 (PTY-harness seeds, delete when real tests supersede); templates/ dissolved into per-item
 assets/ dirs (they're item payloads, not scaffolding templates).
+
+## Testing convention (Peter, 2026-08-26)
+Test files live in a `__tests__` directory that is a SIBLING of the file under test, named
+`<original-filename>.test.ts`. Example: src/manifest/schema.ts → src/manifest/__tests__/
+schema.test.ts. (test/spikes/ predates this rule and holds research spikes, not unit tests;
+it dies when real tests supersede it.)
