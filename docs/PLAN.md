@@ -611,3 +611,15 @@ as a regular item (Claude hooks need it).
   before use. Google Sans (non-code) + Peter's fonts repo (dankmono/hack/ligahack) still
   pending: repo needs auth flow; config-only items (ghostty config/icon, chrome, dock,
   defaults, quick actions, PWAs) arrive with the orchestrator.
+
+## Stage B orchestrator — BUILT 2026-08-26 (59 tests green)
+src/orchestrator/orchestrator.ts — UI-agnostic engine (events interface; clack layer attaches
+at bootstrap wiring): topo-ordered execution over the selection; per-step journaling;
+detection short-circuit (installed & satisfies → skipped-installed); DECIDED failure policy
+encoded — maxAttempts=2 (one auto-retry), REQUIRED failure aborts the run (journals RUN_END
+failed), optional failure continues with transitive dependents skipped-with-reason;
+resume continues the same runId when the latest run didn't finish, skipping its completed
+steps; configure() runs after install with schema-validated manifest config (defaultConfig
+fallback; invalid config fails the step — clamping is the prompt layer's job).
+Full test coverage: happy path, skip-installed, retry, dependent-skipping, abort, resume
+(same-runId continuation), config validation paths, transitive dependents.
