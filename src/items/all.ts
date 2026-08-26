@@ -18,6 +18,7 @@ import { raycastConfig } from "./defs/raycast-config.ts";
 import { githubAuth } from "./defs/github-auth.ts";
 import { dotfiles } from "./defs/dotfiles.ts";
 import { gitEmail } from "./defs/git-email.ts";
+import { googleSans } from "./defs/google-sans.ts";
 import { personalFonts } from "./defs/personal-fonts.ts";
 import { sshKeys } from "./defs/ssh-keys.ts";
 import { ACMELABS_REPOS, REFERENCE_REPOS, repoItem } from "./repos/repo-factory.ts";
@@ -117,6 +118,7 @@ export function buildRegistry(): ItemRegistry {
   r.register(gitEmail);
   r.register(dotfiles);
   r.register(personalFonts);
+  r.register(googleSans);
   for (const spec of ACMELABS_REPOS) r.register(repoItem(spec));
   for (const spec of REFERENCE_REPOS) r.register(repoItem(spec));
   r.register(acmelabsMarketplace);

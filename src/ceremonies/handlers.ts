@@ -42,7 +42,14 @@ function licenseCeremony(secretKey: string, appName: string, appPath: string): C
 
 export const HANDLERS: Record<string, CeremonyHandler> = {
   "typora-license": licenseCeremony(SECRET_KEYS.typoraLicense, "Typora", "/Applications/Typora.app"),
-  "cleanshot-license": licenseCeremony(SECRET_KEYS.cleanshotLicense, "CleanShot X", "/Applications/CleanShot X.app"),
+  "cleanshot-verify": {
+    async run(ctx) {
+      p.log.info("CleanShot was licensed + configured from the manifest — verifying it took");
+      await ctx.run(["open", "/Applications/CleanShot X.app"]);
+      p.note("Grant SCREEN RECORDING when it asks.\nIf it still shows a trial, the key is in the secret store: `envsetup secrets show`.", "CleanShot");
+      return confirmDone("CleanShot activated with screen-recording granted?");
+    },
+  },
   "superwhisper-signin": licenseCeremony(SECRET_KEYS.superwhisperLicense, "superwhisper", "/Applications/superwhisper.app"),
 
   "superwhisper-permissions": {
@@ -54,24 +61,6 @@ export const HANDLERS: Record<string, CeremonyHandler> = {
       await ctx.run(["open", "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone"]);
       await ctx.run(["open", "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"]);
       return confirmDone("both permissions granted?");
-    },
-  },
-
-  "cleanshot-settings": {
-    async run(ctx) {
-      p.note(
-        [
-          "In CleanShot's settings, apply the decided setup:",
-          "• Shortcuts: take over ⇧⌘3 / ⇧⌘4 / ⇧⌘5",
-          "• Save to: ~/Screenshots · format PNG",
-          "• After capture: show Quick Access Overlay (no auto-copy)",
-          "• No window shadows · freeze screen on area select",
-          "• Launch at login",
-        ].join("\n"),
-        "CleanShot settings",
-      );
-      await ctx.run(["open", "/Applications/CleanShot X.app"]);
-      return confirmDone("settings applied?");
     },
   },
 

@@ -830,3 +830,17 @@ radio, string → text; humanized labels); answers land in manifest.items[id].co
 schema parse (invalid → defaults + warning). `--defaults` flag skips screens (automation/E2E).
 PTY-verified: podman cpus edited 4→6 through the real screen. Release: v0.0.1 tag fired the
 GH Actions pipeline (bun compile darwin-arm64+x64, ad-hoc codesign, release assets).
+
+## Open-items sweep — 2026-08-26 (Peter-driven completion round)
+- secrets `show` verified by Peter; .secrets.local.json DELETED (licenses exist only encrypted
+  + in his password manager). `secrets unlock` flow live-validated (decrypted cache at
+  ~/.config/envsetup/secrets.json is the working store per design).
+- Google Sans: now OFL-licensed on fonts.google.com — font-google-sans item installs the 18
+  static TTFs via the official download/list manifest (XSSI-prefix handled). Verified live.
+- clack swap: upstream still 1.7.0/1.4.3 — vendored tarballs stay (externally blocked).
+- **CleanShot CAPTURED**: installed + activated + configured on this machine; defaults domain
+  diffed pre/post. Key findings: activationKey is a PLAIN defaults key (licensing is
+  scriptable pre-launch!); app only persists changed-from-default settings; shortcut takeover
+  = JSON data blobs (⇧⌘=768, keys 20/21/23 = 3/4/5). cleanshot-config is now a REAL applier
+  (license from secret store + full captured settings + hex -data blob writes, mechanism
+  round-trip-verified); ceremonies collapsed to one verify step (screen-recording grant).
