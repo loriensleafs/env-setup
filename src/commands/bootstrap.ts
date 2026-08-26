@@ -73,33 +73,26 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
     list.push(item);
     sections.set(section, list);
   }
-  // All detections run in PARALLEL; each section renders one streamed step
-  // line that completes with its installed-count as results land.
-  const pending = new Map<string, Promise<DetectResult>>();
-  for (const items of sections.values()) {
-    for (const item of items) {
-      pending.set(
-        item.id,
-        item.detect(scanCtx).catch(() => ({ installed: false as const })),
-      );
-    }
-  }
-  for (const [section, items] of sections) {
-    await p.stream.step(
-      (async function* () {
-        yield `Evaluating ${section.toLowerCase()} `;
-        let installed = 0;
-        for (const item of items) {
-          const d = await (pending.get(item.id) as Promise<DetectResult>);
+  // Single task-log group: transient "Evaluating …" messages as sections
+  // finish (detections all run in parallel), collapsing to one success line —
+  // the per-section numbers don't matter this early and just go away.
+  const scanLog = p.taskLog({ title: "Initializing", limit: 4 });
+  const scanGroup = scanLog.group("Evaluating environment");
+  await Promise.all(
+    [...sections.entries()].map(async ([section, items]) => {
+      const results = await Promise.all(
+        items.map(async (item) => {
+          const d = await item.detect(scanCtx).catch(() => ({ installed: false as const }));
           detection.set(item.id, d);
-          if (d.installed && d.satisfies !== false) installed++;
-        }
-        yield `(${installed}/${items.length} installed)`;
-      })(),
-    );
-  }
+          return d;
+        }),
+      );
+      const installed = results.filter((d) => d.installed && d.satisfies !== false).length;
+      scanGroup.message(`Evaluated ${section.toLowerCase()} (${installed}/${items.length} installed)`);
+    }),
+  );
   const elapsed = ((Date.now() - scanStart) / 1000).toFixed(1);
-  p.log.success(`Initialization complete in ${elapsed}s`);
+  scanGroup.success(`Environment evaluated in ${elapsed}s`);
 
   // --- Identity + locations (Group 6) ------------------------------------
   // Zod schemas double as prompt validators (Standard Schema bridge).

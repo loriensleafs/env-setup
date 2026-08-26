@@ -718,7 +718,13 @@ PTY note: the vendored stock path prompt sometimes consumes the first Enter (sug
 navigation) — harness sends a resilient second Enter; watch for it in real usage.
 
 ## Progress-UX rework (Peter, 2026-08-26)
-- SCAN (revised same day, Peter): **stream.step lines with PARALLEL detection** — all item
+- SCAN (final form, Peter, after stream + custom-renderer iterations): **taskLog with a single
+  group** — title "Initializing", group "Evaluating environment", transient .message lines
+  ("Evaluated apps (5/11 installed)") appearing as sections complete out of order (detections
+  fully parallel), all collapsing on group.success("Environment evaluated in Xs") — the
+  per-section numbers vanish, meaningless that early. Custom parallel-steps renderer built then
+  DELETED same session (stream is append-only, but taskLog transience fit better anyway).
+- (superseded) stream.step lines with PARALLEL detection — all item
   detections launch concurrently; each section renders one streamed step line completing with
   its count: "◇ Evaluating apps (5/11 installed)"; ends with "Initialization complete in Xs".
   (Supersedes both the per-section spinners and the taskLog-groups intermediate; parallelism
