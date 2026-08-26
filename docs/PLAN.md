@@ -927,3 +927,20 @@ LESSON: don't declare an approach impossible from one failed attempt — researc
 - VENDOR kept (tab-complete needs clack main; npm still 1.7.0/1.4.3) but now documented:
   vendor/README.md gives the exact convert-to-npm steps + the release signal to watch
   (@clack/core > 1.4.3 with completeOnTab).
+
+## Dependency audit + permissions reality — 2026-08-26 (Peter's follow-ups)
+DEP AUDIT (brew auto-installs formula/cask deps; risk is only NON-brew methods):
+- betterdisplaycli brew formula needs FULL Xcode.app (compiles from source) → switched to the
+  PREBUILT signed binary (curl the v1.0.1 release zip → /opt/homebrew/bin). App works without it.
+- pnpm/yarn: not installed; node-lts now runs `corepack enable` (bundled with Node via fnm) so
+  pnpm/yarn are available on demand without pinning a global — the modern idiom.
+- Added explicit git dep (xcode-clt) to git-identity. Verified installer-script items
+  (bun/uv/fonts) only use curl/unzip/fetch (all present by default). All brew formulae in the
+  registry are bottled (no full-Xcode compile) except the betterdisplaycli case above.
+PERMISSIONS (TCC) — RESEARCHED, honest finding: TCC (Accessibility, Screen Recording, Mic,
+Camera, Full Disk) is SIP-protected and CANNOT be granted programmatically on a personal
+(non-MDM) Mac — tccutil only RESETS; even MDM can't auto-grant Screen Recording/Mic/Camera.
+So we CAN'T pre-approve them. Best achievable (and what connect does): batch + GUIDE them in
+one pass, deep-linking the exact System Settings panes (superwhisper mic/accessibility,
+cleanshot screen-recording, + new accessibility-grant for envsetup's own Chrome/Finder AX
+automation) instead of scattered first-run surprises.

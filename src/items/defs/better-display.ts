@@ -41,8 +41,25 @@ export const betterDisplay = defineItem<BetterDisplayConfig>({
   install: async (ctx) => {
     const r = await ctx.run(["/opt/homebrew/bin/brew", "install", "--cask", "betterdisplay"]);
     if (r.exitCode !== 0) throw new Error(`brew install betterdisplay failed: ${r.stderr.trim()}`);
-    // The companion CLI (used for scripted display control later).
-    await ctx.run(["/opt/homebrew/bin/brew", "install", "waydabber/betterdisplay/betterdisplaycli"]);
+    // Companion CLI via the PREBUILT signed binary — the brew formula compiles
+    // from source and requires full Xcode.app (not just CLT).
+    const zip = "/tmp/envsetup-betterdisplaycli.zip";
+    const dl = await ctx.run([
+      "curl", "-fsSL", "-o", zip,
+      "https://github.com/waydabber/betterdisplaycli/releases/download/v1.0.1/betterdisplaycli-v1.0.1.zip",
+    ]);
+    if (dl.exitCode === 0) {
+      await ctx.run(["unzip", "-o", zip, "-d", "/tmp/envsetup-bdcli"]);
+      const find = await ctx.run(["/bin/sh", "-c", "find /tmp/envsetup-bdcli -name betterdisplaycli -type f | head -1"]);
+      const bin = find.stdout.trim();
+      if (bin) {
+        await ctx.run(["chmod", "+x", bin]);
+        await ctx.run(["mv", bin, "/opt/homebrew/bin/betterdisplaycli"]);
+      }
+      await ctx.run(["rm", "-rf", zip, "/tmp/envsetup-bdcli"]);
+    } else {
+      ctx.log("betterdisplaycli download skipped (offline?) — the app works without it");
+    }
   },
   configure: async (ctx, config) => {
     for (const [key, value] of [

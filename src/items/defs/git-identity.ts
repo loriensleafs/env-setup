@@ -10,6 +10,7 @@ export const gitIdentity = defineItem({
   id: "git-identity",
   title: "Git identity & signing config",
   kind: "config-only",
+  deps: ["xcode-clt"],
   detect: async (ctx) => {
     const name = await ctx.run(["git", "config", "--global", "user.name"]);
     const format = await ctx.run(["git", "config", "--global", "gpg.format"]);

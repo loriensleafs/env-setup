@@ -149,6 +149,17 @@ export const HANDLERS: Record<string, CeremonyHandler> = {
     },
   },
 
+  "accessibility-grant": {
+    async run(ctx) {
+      p.note(
+        "envsetup automates Chrome (web apps) and the Finder sidebar via macOS\nAccessibility. Grant it to your terminal now so those steps run unattended.\n(macOS won't let ANY tool pre-grant this — it's SIP-protected.)",
+        "Accessibility",
+      );
+      await ctx.run(["open", "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"]);
+      return confirmDone("Accessibility granted to the terminal?");
+    },
+  },
+
   "github-device-flow": {
     async run() {
       // Handled by the github-auth item / `envsetup auth`; nothing to do here.
