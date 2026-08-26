@@ -702,3 +702,17 @@ instead of extensions retaining stock look. Fix at the root:
 - Scanning spinner now narrates per-item: "Checking <title> (i/31)" + found-count summary;
   orchestrator steps show "(i/n)". Richer taskLog-style install output (per Peter's task-log
   example screenshots) planned when installs stream real output.
+
+## DESIGN REVISION (Peter, 2026-08-26): detect+lock is DEAD — everything toggleable
+After three rounds of friction, the locked-on Required concept is removed entirely. ALL shown
+items are normal toggleable options (default-selected). Safety now comes from the
+requires-CASCADE: registry deps feed the UI's requires (filtered to shown items — absent deps
+are installed, hence satisfied), so unselecting e.g. fnm visibly disables "Node.js LTS (needs
+fnm)"; unselecting Homebrew would disable every brew item. Verified live in PTY (uv toggled
+off → manifest false; fnm toggle → cascade hint renders). The Required section header is now a
+real group toggle like every other section.
+Also per stock (deliberate deviation from the docs example, Peter-confirmed twice): option
+labels render white ONLY when focused; selection is the checkbox's job — otherwise focus is
+invisible in a mostly-selected list.
+PTY note: the vendored stock path prompt sometimes consumes the first Enter (suggestion
+navigation) — harness sends a resilient second Enter; watch for it in real usage.

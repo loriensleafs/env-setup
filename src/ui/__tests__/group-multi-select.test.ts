@@ -8,8 +8,8 @@ import {
 
 const groups: SelectGroups = {
   Required: [
-    { id: "xcode-clt", label: "Xcode CLT", locked: "on" },
-    { id: "homebrew", label: "Homebrew", locked: "installed", hint: "installed 4.6" },
+    { id: "xcode-clt", label: "Xcode CLT" },
+    { id: "homebrew", label: "Homebrew", hint: "core" },
   ],
   Apps: [
     { id: "raycast", label: "Raycast" },
@@ -21,11 +21,11 @@ const groups: SelectGroups = {
 };
 
 describe("initialSelection", () => {
-  test("locked-on and defaults selected; installed rows not in selection", () => {
+  test("defaults selected", () => {
     const s = initialSelection(groups);
     expect(s.has("xcode-clt")).toBe(true);
     expect(s.has("raycast")).toBe(true);
-    expect(s.has("homebrew")).toBe(false);
+    expect(s.has("homebrew")).toBe(true);
   });
 
   test("initialSelected false respected", () => {
@@ -56,10 +56,10 @@ describe("computeDisabled", () => {
     expect(disabled.get("pwa")).toBe("needs Ghostty config");
   });
 
-  test("locked requirements always satisfy (installed homebrew)", () => {
+  test("selected requirements satisfy", () => {
     const g: SelectGroups = {
       A: [
-        { id: "homebrew", label: "Homebrew", locked: "installed" },
+        { id: "homebrew", label: "Homebrew" },
         { id: "jq", label: "jq", requires: ["homebrew"] },
       ],
     };
@@ -77,12 +77,12 @@ describe("computeDisabled", () => {
 });
 
 describe("selectionResult", () => {
-  test("locked-on included, installed excluded, disabled excluded", () => {
+  test("disabled excluded, selected included", () => {
     const sel = initialSelection(groups);
     sel.delete("jetbrains-font");
     const r = selectionResult(groups, sel);
     expect(r).toContain("xcode-clt");
-    expect(r).not.toContain("homebrew");
+    expect(r).toContain("homebrew");
     expect(r).not.toContain("ghostty-config");
     expect(r).toContain("raycast");
   });

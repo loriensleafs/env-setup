@@ -30,12 +30,7 @@ export interface SelectOption {
   id: string;
   label: string;
   hint?: string;
-  /**
-   * "installed": already present — shown ✓ dim, not toggleable, satisfies deps.
-   * "on": required and missing — always selected, not toggleable, satisfies deps.
-   */
-  locked?: "installed" | "on";
-  /** Ids that must ALL be satisfied for this option to be enabled. */
+  /** Ids that must ALL be selected for this option to be enabled. */
   requires?: string[];
   initialSelected?: boolean;
 }
@@ -57,16 +52,13 @@ export function flatten(groups: SelectGroups): SelectOption[] {
 export function initialSelection(groups: SelectGroups): Set<string> {
   const selected = new Set<string>();
   for (const o of flatten(groups)) {
-    if (o.locked === "on" || (o.locked === undefined && o.initialSelected !== false)) {
-      selected.add(o.id);
-    }
+    if (o.initialSelected !== false) selected.add(o.id);
   }
   return selected;
 }
 
 function satisfied(o: SelectOption | undefined, selection: Set<string>): boolean {
   if (!o) return false;
-  if (o.locked !== undefined) return true;
   return selection.has(o.id);
 }
 
@@ -83,7 +75,7 @@ export function computeDisabled(groups: SelectGroups, selection: Set<string>): D
   while (changed) {
     changed = false;
     for (const o of all) {
-      if (o.locked !== undefined || !o.requires?.length) continue;
+      if (!o.requires?.length) continue;
       const missing = o.requires.filter(
         (r) => !satisfied(byId.get(r), nextSelection) || disabled.has(r),
       );
@@ -100,12 +92,11 @@ export function computeDisabled(groups: SelectGroups, selection: Set<string>): D
   return { disabled, selection: nextSelection };
 }
 
-/** Final result: locked-on + selected enabled options (installed rows excluded). */
+/** Final result: selected, enabled options. */
 export function selectionResult(groups: SelectGroups, selection: Set<string>): string[] {
   const { disabled, selection: clean } = computeDisabled(groups, selection);
   return flatten(groups)
-    .filter((o) => !disabled.has(o.id))
-    .filter((o) => o.locked === "on" || (o.locked === undefined && clean.has(o.id)))
+    .filter((o) => !disabled.has(o.id) && clean.has(o.id))
     .map((o) => o.id);
 }
 
@@ -125,9 +116,6 @@ type FlatOption = CoreOption & { group: string | boolean };
 
 export async function groupMultiselect(opts: GroupMultiselectOptions): Promise<string[] | symbol> {
   const meta = new Map(flatten(opts.groups).map((o) => [o.id, o]));
-  const lockedOn = new Set(
-    flatten(opts.groups).filter((o) => o.locked === "on").map((o) => o.id),
-  );
   const memory = initialSelection(opts.groups);
 
   const coreGroups: Record<string, CoreOption[]> = {};
@@ -165,9 +153,7 @@ export async function groupMultiselect(opts: GroupMultiselectOptions): Promise<s
           const lines = flat.map((option, i) => {
             const active = i === this.cursor;
             if (option.group === true) {
-              const items = flat.filter(
-                (o) => o.group === option.value && !o.disabled && !lockedOn.has(o.value),
-              );
+              const items = flat.filter((o) => o.group === option.value && !o.disabled);
               // Zero togglable items → plain heading, no checkbox that can
               // never fill (the Required-section fix).
               if (items.length === 0) {
@@ -184,9 +170,6 @@ export async function groupMultiselect(opts: GroupMultiselectOptions): Promise<s
             const next = flat[i + 1];
             const isLast = next === undefined || next.group === true;
             const tree = styleText("dim", isLast ? `${S_BAR_END} ` : `${S_BAR} `);
-            if (lockedOn.has(option.value)) {
-              return `${tree}${styleText("green", S_CHECKBOX_SELECTED)} ${option.label}`;
-            }
             if (option.disabled) {
               return `${tree}${styleText("gray", S_CHECKBOX_INACTIVE)} ${styleText(
                 ["strikethrough", "gray"],
@@ -199,7 +182,10 @@ export async function groupMultiselect(opts: GroupMultiselectOptions): Promise<s
               : active
                 ? styleText("cyan", S_CHECKBOX_ACTIVE)
                 : styleText("dim", S_CHECKBOX_INACTIVE);
-            const label = active || selected ? option.label : styleText("dim", option.label);
+            // Stock styling (deviation from the example, per Peter): the label
+            // is white only when FOCUSED — otherwise focus is invisible when
+            // most options are selected. Selection lives in the checkbox.
+            const label = active ? option.label : styleText("dim", option.label);
             const hint = active && option.hint ? ` ${styleText("dim", `(${option.hint})`)}` : "";
             return `${tree}${checkbox} ${label}${hint}`;
           });
@@ -229,15 +215,12 @@ export async function groupMultiselect(opts: GroupMultiselectOptions): Promise<s
   const flatOptions = prompt.options as FlatOption[];
   const itemsOf = (group: string) => flatOptions.filter((option) => option.group === group);
   const blocked = (option: FlatOption | undefined) =>
-    option !== undefined &&
-    option.group !== true &&
-    (option.disabled === true || lockedOn.has(option.value));
+    option !== undefined && option.group !== true && option.disabled === true;
 
   let previousValue: string[] = [...((prompt.value as string[] | undefined) ?? [])];
 
   const recompute = () => {
     const selected = new Set<string>((prompt.value as string[] | undefined) ?? []);
-    for (const id of lockedOn) selected.add(id);
     const result = computeDisabled(opts.groups, selected);
     let changed = false;
     for (const option of flatOptions) {

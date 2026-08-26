@@ -11,7 +11,7 @@ import { loadManifest, saveManifest } from "../manifest/store.ts";
 import { orchestrate, type StepOutcome } from "../orchestrator/orchestrator.ts";
 import { journalPath } from "../paths/paths.ts";
 import { groupMultiselect } from "../ui/group-multi-select.ts";
-import type { SelectGroups, SelectOption } from "../ui/group-multi-select.ts";
+import type { SelectGroups } from "../ui/group-multi-select.ts";
 
 /** Placeholder until Stage C auth resolves the real GitHub noreply address. */
 export const EMAIL_PENDING = "pending-noreply-resolution";
@@ -113,13 +113,31 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
   // --- Unified selection --------------------------------------------------
   // Already-installed-and-current items don't appear at all (Peter's call):
   // they're part of the machine and go straight into the manifest.
+  // Everything shown is TOGGLEABLE (Peter revised detect+lock 2026-08-26);
+  // safety comes from the requires-cascade: unselecting a dependency disables
+  // its dependents with a visible reason.
+  const shown = new Set(
+    registry.all()
+      .filter((item) => {
+        const d = detection.get(item.id) ?? { installed: false };
+        return !(d.installed && d.satisfies !== false);
+      })
+      .map((item) => item.id),
+  );
   const groups: SelectGroups = { Required: [], Apps: [], "CLI tools": [], Fonts: [] };
   for (const item of registry.all()) {
+    if (!shown.has(item.id)) continue;
     const d = detection.get(item.id) ?? { installed: false };
-    if (d.installed && d.satisfies !== false) continue;
-    const locked: SelectOption["locked"] = item.required ? "on" : undefined;
     const hint = d.installed ? `installed${d.version ? ` ${d.version}` : ""} — needs update` : undefined;
-    groups[sectionFor(item)]?.push({ id: item.id, label: item.title, locked, hint });
+    // Registry deps feed the UI cascade — only deps that are themselves shown
+    // (absent ones are installed, i.e. already satisfied).
+    const requires = (item.deps ?? []).filter((dep) => shown.has(dep));
+    groups[sectionFor(item)]?.push({
+      id: item.id,
+      label: item.title,
+      hint,
+      requires: requires.length > 0 ? requires : undefined,
+    });
   }
   for (const [section, items] of Object.entries(groups)) {
     if (items.length === 0) delete groups[section];

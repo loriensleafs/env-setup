@@ -10,8 +10,8 @@ const picks = await groupMultiselect({
   message: "What should this machine get?",
   groups: {
     Required: [
-      { id: "xcode-clt", label: "Xcode Command Line Tools", locked: "on" },
-      { id: "uv", label: "uv (Python)", locked: "on" },
+      { id: "xcode-clt", label: "Xcode Command Line Tools" },
+      { id: "uv", label: "uv (Python)", requires: ["xcode-clt"] },
     ],
     Apps: [
       { id: "chrome", label: "Google Chrome", hint: "installed 139 → will upgrade to 140" },
