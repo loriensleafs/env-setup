@@ -11,8 +11,7 @@ const picks = await unifiedSelect({
   groups: {
     Required: [
       { id: "xcode-clt", label: "Xcode Command Line Tools", locked: "on" },
-      { id: "homebrew", label: "Homebrew", locked: "installed", hint: "installed 4.6.20 ✓" },
-      { id: "bun", label: "Bun", locked: "installed", hint: "installed 1.4.0 ✓" },
+      { id: "uv", label: "uv (Python)", locked: "on" },
     ],
     Apps: [
       { id: "chrome", label: "Google Chrome", hint: "installed 139 → will upgrade to 140" },

@@ -10,6 +10,7 @@ import { MANIFEST_VERSION, type Manifest } from "../manifest/schema.ts";
 import { loadManifest, saveManifest } from "../manifest/store.ts";
 import { orchestrate, type StepOutcome } from "../orchestrator/orchestrator.ts";
 import { journalPath } from "../paths/paths.ts";
+import { pathPrompt } from "../ui/path-prompt.ts";
 import { unifiedSelect } from "../ui/unified-select.ts";
 import type { UnifiedGroups, UnifiedOption } from "../ui/unified-select-state.ts";
 
@@ -91,7 +92,7 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
             .regex(/^[a-zA-Z0-9-]+$/, "GitHub usernames are letters, digits, and dashes"),
         }),
       devDir: () =>
-        p.path({
+        pathPrompt({
           message: "Dev directory (repos clone here — may not exist yet)",
           directory: true,
           initialValue: `${homedir()}/Dev`,
@@ -107,14 +108,18 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
   const { name, githubUser, devDir } = answers;
 
   // --- Unified selection --------------------------------------------------
+  // Already-installed-and-current items don't appear at all (Peter's call):
+  // they're part of the machine and go straight into the manifest.
   const groups: UnifiedGroups = { Required: [], Apps: [], "CLI tools": [], Fonts: [] };
   for (const item of registry.all()) {
     const d = detection.get(item.id) ?? { installed: false };
-    let locked: UnifiedOption["locked"];
-    if (d.installed && d.satisfies !== false) locked = "installed";
-    else if (item.required) locked = "on";
-    const hint = d.installed ? `installed${d.version ? ` ${d.version}` : ""}` : undefined;
+    if (d.installed && d.satisfies !== false) continue;
+    const locked: UnifiedOption["locked"] = item.required ? "on" : undefined;
+    const hint = d.installed ? `installed${d.version ? ` ${d.version}` : ""} — needs update` : undefined;
     groups[sectionFor(item)]?.push({ id: item.id, label: item.title, locked, hint });
+  }
+  for (const [section, items] of Object.entries(groups)) {
+    if (items.length === 0) delete groups[section];
   }
 
   const picks = await unifiedSelect({ message: "What should this machine get?", groups });

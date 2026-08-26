@@ -668,3 +668,19 @@ custom/dynamic-group-multiselect.ts). Rebuilt accordingly:
   bootstrap E2E stays green. Horizontal radio also switched to clack's exported symbols.
 Resource noted: ~/Dev/clack/examples/docs (basic/advanced/new-features/custom) — consult before
 building further UI.
+
+## Peter's second round of UI feedback — FIXED 2026-08-26
+1. TAB path completion: root-caused — published @clack/prompts 1.7.0 ADVERTISES "Tab: complete"
+   but core's completeOnTab is unreleased (clack main only, no prerelease dist-tag). Built
+   src/ui/path-prompt.ts: our own AutocompletePrompt-based path input with the tab behavior
+   ported from unreleased main via public/protected surface. SWAP back to stock p.path() when
+   clack releases (watch @clack/core > 1.4.3 / prompts > 1.7.0). Verified: typing partial path
+   + Tab completes in the real bootstrap E2E.
+2. "Required section acts like broken single-select": all its rows are locked so space did
+   nothing and the header checkbox could never fill. Fixed by (a) Peter's call — items that are
+   installed AND current no longer appear in the UI at all (straight into manifest; empty
+   sections dropped), and (b) group headers with zero togglable items render as plain headings
+   without a checkbox.
+3. Label styling drifted from stock (the docs example itself deviates): stock clack renders an
+   option label WHITE ONLY WHEN FOCUSED — selection is shown by the checkbox alone. Verified
+   against packages/prompts/src/group-multi-select.ts state table; fixed.

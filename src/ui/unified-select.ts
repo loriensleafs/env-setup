@@ -71,7 +71,12 @@ export async function unifiedSelect(opts: UnifiedSelectOptions): Promise<string[
           const items = flat.filter(
             (x) => x.group === o.value && isTogglable(x.value as string),
           );
-          const allSelected = items.length > 0 && items.every((x) => value.includes(x.value as string));
+          // A section with nothing togglable is a plain heading — a checkbox
+          // that can never fill reads as broken (Peter's Required-section bug).
+          if (items.length === 0) {
+            return `${color.bold(active ? (o.label as string) : color.dim(o.label as string))}`;
+          }
+          const allSelected = items.every((x) => value.includes(x.value as string));
           const checkbox = allSelected
             ? color.green(S_CHECKBOX_SELECTED)
             : active
@@ -101,7 +106,9 @@ export async function unifiedSelect(opts: UnifiedSelectOptions): Promise<string[
           : active
             ? color.cyan(S_CHECKBOX_ACTIVE)
             : color.dim(S_CHECKBOX_INACTIVE);
-        const label = active || selected ? o.label : color.dim(o.label);
+        // Stock clack styling: the label is white only when FOCUSED; selection
+        // is communicated by the checkbox alone.
+        const label = active ? o.label : color.dim(o.label);
         const hint = active && baseHint ? ` ${color.dim(baseHint)}` : "";
         return `${tree}${checkbox} ${label}${hint}`;
       });
