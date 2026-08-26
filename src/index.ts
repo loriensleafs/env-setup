@@ -7,6 +7,7 @@ const main = defineCommand({
     description: "One-command Mac environment setup",
   },
   subCommands: {
+    auth: () => import("./commands/auth.ts").then((m) => m.default),
     doctor: () => import("./commands/doctor.ts").then((m) => m.default),
     sync: () => import("./commands/sync.ts").then((m) => m.default),
     secrets: () => import("./commands/secrets.ts").then((m) => m.default),

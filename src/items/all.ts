@@ -16,6 +16,8 @@ import { cursorConfig, vscodeConfig } from "./editors/editor-config.ts";
 import { podmanMachine } from "./defs/podman-machine.ts";
 import { raycastConfig } from "./defs/raycast-config.ts";
 import { githubAuth } from "./defs/github-auth.ts";
+import { gitEmail } from "./defs/git-email.ts";
+import { sshKeys } from "./defs/ssh-keys.ts";
 import { ACMELABS_REPOS, REFERENCE_REPOS, repoItem } from "./repos/repo-factory.ts";
 import { acmelabsMarketplace } from "./repos/acmelabs-marketplace.ts";
 import { claudeSettings } from "./claude-code/claude-settings.ts";
@@ -109,6 +111,8 @@ export function buildRegistry(): ItemRegistry {
   r.register(raycastConfig);
   // Repos + Claude Code flagship
   r.register(githubAuth);
+  r.register(sshKeys);
+  r.register(gitEmail);
   for (const spec of ACMELABS_REPOS) r.register(repoItem(spec));
   for (const spec of REFERENCE_REPOS) r.register(repoItem(spec));
   r.register(acmelabsMarketplace);

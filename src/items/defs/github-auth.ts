@@ -1,9 +1,10 @@
 import { defineItem } from "../item.ts";
+import { githubAuthCeremony } from "../../auth/auth-ceremony.ts";
 
 /**
- * Auth gate: private clones and API work depend on this. Today detect-only
- * (satisfied when `gh auth status` passes); the in-tool device flow lands
- * with the auth round and replaces the manual instruction.
+ * Auth gate: private clones and API work depend on this. Satisfied when gh is
+ * authenticated; otherwise runs the device-flow ceremony (envsetup's own app
+ * identity) when a terminal is attached.
  */
 export const githubAuth = defineItem({
   id: "github-auth",
@@ -17,8 +18,10 @@ export const githubAuth = defineItem({
   },
   install: async (ctx) => {
     const r = await ctx.run(["/opt/homebrew/bin/gh", "auth", "status"]);
-    if (r.exitCode !== 0) {
-      throw new Error("GitHub auth needed — run `gh auth login --web` and re-run (device flow lands in the auth phase)");
+    if (r.exitCode === 0) return;
+    if (!process.stdout.isTTY) {
+      throw new Error("GitHub sign-in needed — run envsetup in a terminal to approve in the browser");
     }
+    await githubAuthCeremony(ctx.run);
   },
 });
