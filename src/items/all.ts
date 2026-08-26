@@ -1,4 +1,5 @@
-import { brewFormula } from "./factories/brew.ts";
+import { brewCask, brewFormula } from "./factories/brew.ts";
+import { fontZip } from "./factories/font-zip.ts";
 import { bunRuntime } from "./defs/bun-runtime.ts";
 import { homebrew } from "./defs/homebrew.ts";
 import { nodeLts } from "./defs/node-lts.ts";
@@ -23,5 +24,53 @@ export function buildRegistry(): ItemRegistry {
   r.register(brewFormula({ id: "delta", title: "delta (git diffs)", name: "git-delta" }));
   r.register(brewFormula({ id: "lazygit", title: "lazygit" }));
   r.register(brewFormula({ id: "dust", title: "dust (disk usage)" }));
+  // Apps (Group 2)
+  r.register(brewCask({ id: "ghostty", title: "Ghostty", appPath: "/Applications/Ghostty.app" }));
+  r.register(brewCask({ id: "cursor", title: "Cursor", appPath: "/Applications/Cursor.app" }));
+  r.register(
+    brewCask({ id: "vscode", title: "VS Code", name: "visual-studio-code", appPath: "/Applications/Visual Studio Code.app" }),
+  );
+  r.register(
+    brewCask({ id: "chrome", title: "Google Chrome", name: "google-chrome", appPath: "/Applications/Google Chrome.app" }),
+  );
+  r.register(
+    brewCask({ id: "superwhisper", title: "superwhisper", appPath: "/Applications/superwhisper.app" }),
+  );
+  r.register(brewCask({ id: "raycast", title: "Raycast", appPath: "/Applications/Raycast.app" }));
+  r.register(
+    brewCask({ id: "cleanshot", title: "CleanShot X", appPath: "/Applications/CleanShot X.app" }),
+  );
+  r.register(brewCask({ id: "zoom", title: "Zoom", name: "zoom", appPath: "/Applications/zoom.us.app" }));
+  r.register(brewCask({ id: "discord", title: "Discord", appPath: "/Applications/Discord.app" }));
+  r.register(brewCask({ id: "typora", title: "Typora", appPath: "/Applications/Typora.app" }));
+  r.register(
+    brewCask({ id: "claude-desktop", title: "Claude desktop", name: "claude", appPath: "/Applications/Claude.app" }),
+  );
+  r.register(brewFormula({ id: "podman", title: "Podman" }));
+  // Fonts — brew casks
+  r.register(brewCask({ id: "font-jetbrains-nf", title: "JetBrains Mono Nerd Font", name: "font-jetbrains-mono-nerd-font" }));
+  r.register(brewCask({ id: "font-fira-nf", title: "Fira Code Nerd Font", name: "font-fira-code-nerd-font" }));
+  r.register(brewCask({ id: "font-geist", title: "Geist (Typora/Vercel theme)", name: "font-geist" }));
+  r.register(brewCask({ id: "font-inter", title: "Inter (Typora/Vercel theme)", name: "font-inter" }));
+  // Fonts — Peter's pinned Nerd Fonts v3.5.1 zips
+  const NF = "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1";
+  r.register(fontZip({
+    id: "font-google-sans-code-nf",
+    title: "Google Sans Code Nerd Font (pinned v3.5.1)",
+    url: `${NF}/GoogleSansCode.zip`,
+    probeFile: "GoogleSansCodeNerdFont-Regular.ttf",
+  }));
+  r.register(fontZip({
+    id: "font-noto-nf",
+    title: "Noto Nerd Font (pinned v3.5.1)",
+    url: `${NF}/Noto.zip`,
+    probeFile: "NotoSansNerdFont-Regular.ttf",
+  }));
+  r.register(fontZip({
+    id: "font-roboto-mono-nf",
+    title: "Roboto Mono Nerd Font (pinned v3.5.1)",
+    url: `${NF}/RobotoMono.zip`,
+    probeFile: "RobotoMonoNerdFont-Regular.ttf",
+  }));
   return r;
 }

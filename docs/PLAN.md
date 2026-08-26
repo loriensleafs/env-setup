@@ -598,3 +598,16 @@ as a regular item (Claude hooks need it).
 - `envsetup doctor` is REAL: live detection over the registry with versions. Verified on this
   machine (correctly found CLT/brew/bun/gh, correctly flagged missing uv/go/fnm/node/jq/...).
 - Fixed citty quirk: root run() fires even after a subcommand — guarded by rawArgs check.
+
+## Group 2 apps + fonts registered — BUILT 2026-08-26 (50 tests green, 31 items in registry)
+- brewCask factory gained .app-bundle fallback detection: manually-installed apps read as
+  installed with version from Info.plist, marked "(not brew-managed)" — verified live
+  (Chrome 152, Typora 1.14.9 — Peter installed Typora himself mid-project).
+- fontZip factory: pinned-URL zip → *.ttf/*.otf into ~/Library/Fonts (honors version pins).
+- Registry now: required spine + jq/delta/lazygit/dust + all Group 2 casks (ghostty, cursor,
+  vscode, chrome, superwhisper, raycast, cleanshot, zoom, discord, typora, claude-desktop,
+  podman) + fonts (jetbrains-nf, fira-nf, geist, inter via brew; google-sans-code/noto/
+  roboto-mono via pinned v3.5.1 nerd-font zips). All 16 brew names verified against brew
+  before use. Google Sans (non-code) + Peter's fonts repo (dankmono/hack/ligahack) still
+  pending: repo needs auth flow; config-only items (ghostty config/icon, chrome, dock,
+  defaults, quick actions, PWAs) arrive with the orchestrator.

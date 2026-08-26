@@ -10,6 +10,12 @@ export interface BrewSpec {
   required?: boolean;
   /** Extra deps beyond homebrew itself. */
   deps?: string[];
+  /**
+   * Casks only: the installed .app bundle path. Detection falls back to this
+   * so manually-installed apps (not brew-managed) still read as installed,
+   * with the version taken from the bundle's Info.plist.
+   */
+  appPath?: string;
 }
 
 async function brewDetect(
@@ -50,7 +56,19 @@ export function brewCask(spec: BrewSpec): Item {
     kind: "brew-cask",
     required: spec.required,
     deps: ["homebrew", ...(spec.deps ?? [])],
-    detect: (ctx) => brewDetect(ctx, "cask", name),
+    detect: async (ctx) => {
+      const viaBrew = await brewDetect(ctx, "cask", name);
+      if (viaBrew.installed || !spec.appPath) return viaBrew;
+      // Manually-installed app: read the bundle version from Info.plist.
+      const plist = await ctx.run([
+        "defaults",
+        "read",
+        `${spec.appPath}/Contents/Info`,
+        "CFBundleShortVersionString",
+      ]);
+      if (plist.exitCode !== 0) return { installed: false };
+      return { installed: true, version: `${plist.stdout.trim()} (not brew-managed)` };
+    },
     install: async (ctx) => {
       const r = await ctx.run([BREW, "install", "--cask", name]);
       if (r.exitCode !== 0) throw new Error(`brew install --cask ${name} failed: ${r.stderr.trim()}`);

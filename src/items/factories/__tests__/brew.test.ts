@@ -55,3 +55,29 @@ describe("brewFormula", () => {
     expect(ctx.calls[0]).toContain("--cask");
   });
 });
+
+describe("brewCask .app fallback", () => {
+  test("manually-installed app detected via Info.plist", async () => {
+    const ctx = ctxWith({
+      "defaults read /Applications/Google Chrome.app/Contents/Info CFBundleShortVersionString": {
+        exitCode: 0,
+        stdout: "140.0.7339.80\n",
+        stderr: "",
+      },
+    });
+    const item = brewCask({
+      id: "chrome",
+      title: "Chrome",
+      name: "google-chrome",
+      appPath: "/Applications/Google Chrome.app",
+    });
+    const d = await item.detect(ctx);
+    expect(d.installed).toBe(true);
+    expect(d.version).toContain("not brew-managed");
+  });
+
+  test("absent app with appPath is not installed", async () => {
+    const item = brewCask({ id: "x", title: "X", appPath: "/Applications/Nope.app" });
+    expect((await item.detect(ctxWith({}))).installed).toBe(false);
+  });
+});
