@@ -10,6 +10,8 @@ import { uv } from "./defs/uv.ts";
 import { xcodeClt } from "./defs/xcode-clt.ts";
 import { ghosttyConfig } from "./ghostty/ghostty-config.ts";
 import { ghosttyIcon } from "./ghostty/ghostty-icon.ts";
+import { chromeConfig } from "./chrome/chrome-config.ts";
+import { chromePwas } from "./chrome/chrome-pwas.ts";
 import { quickActions } from "./quick-actions/quick-actions.ts";
 import { ItemRegistry } from "./registry.ts";
 
@@ -86,5 +88,7 @@ export function buildRegistry(): ItemRegistry {
   r.register(brewFormula({ id: "dockutil", title: "dockutil (Dock manager)" }));
   r.register(dock);
   r.register(quickActions);
+  r.register(chromeConfig);
+  r.register(chromePwas);
   return r;
 }
