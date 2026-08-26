@@ -11,13 +11,16 @@ const main = defineCommand({
     sync: () => import("./commands/sync.ts").then((m) => m.default),
     secrets: () => import("./commands/secrets.ts").then((m) => m.default),
   },
-  async run({ rawArgs }) {
+  args: {
+    "dry-run": { type: "boolean", description: "Plan and write the manifest, install nothing" },
+  },
+  async run({ rawArgs, args }) {
     // citty invokes the root run() even when a subcommand matched — only
     // bootstrap when the invocation is bare.
     const sub = rawArgs.find((a) => !a.startsWith("-"));
     if (sub !== undefined) return;
     const { bootstrap } = await import("./commands/bootstrap.ts");
-    await bootstrap();
+    await bootstrap({ dryRun: args["dry-run"] === true });
   },
 });
 

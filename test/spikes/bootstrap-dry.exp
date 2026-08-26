@@ -1,0 +1,17 @@
+#!/usr/bin/expect -f
+set stty_init "rows 45 columns 120"
+set timeout 30
+
+spawn bun src/index.ts --dry-run
+expect { -re "Scanned \\d+ items" { puts stderr "SCAN-OK" } timeout { puts stderr "NO-SCAN"; exit 1 } }
+expect { "Your name" { puts stderr "NAME-OK" } timeout { puts stderr "NO-NAME"; exit 1 } }
+after 300; send "\r"
+expect { "GitHub username" { puts stderr "GH-OK" } timeout { puts stderr "NO-GH"; exit 1 } }
+after 300; send "\r"
+expect { "Dev directory" { puts stderr "DEV-OK" } timeout { puts stderr "NO-DEV"; exit 1 } }
+after 300; send "\r"
+expect { "What should this machine get?" { puts stderr "SELECT-OK" } timeout { puts stderr "NO-SELECT"; exit 1 } }
+after 500; send "\r"
+expect { "Proceed?" { puts stderr "CONFIRM-OK" } timeout { puts stderr "NO-CONFIRM"; exit 1 } }
+after 300; send "y"
+expect { "dry run complete" { puts stderr "DONE"; exit 0 } eof { puts stderr "EOF-END"; exit 0 } timeout { puts stderr "NO-END"; exit 1 } }

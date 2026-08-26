@@ -623,3 +623,17 @@ steps; configure() runs after install with schema-validated manifest config (def
 fallback; invalid config fails the step — clamping is the prompt layer's job).
 Full test coverage: happy path, skip-installed, retry, dependent-skipping, abort, resume
 (same-runId continuation), config validation paths, transitive dependents.
+
+## Bootstrap flow — WIRED 2026-08-26 (E2E dry-run passes on this machine)
+`envsetup` (bare) now runs the real Stage A: detection scan (7s for 31 items) → identity +
+Dev-dir prompts (hardcoded defaults) → unified selection screen fed by LIVE detection
+(installed items render locked-✓ with versions; required-missing locked-on) → summary note →
+confirm ("nothing has touched the system yet" honored) → manifest written → orchestrator with
+clack spinner rendering (per-step ✓/✗/↷ outcomes) → triage note on failures / abort message
+on required failure. `--dry-run` stops after the manifest + prints execution order (safe to
+run on any machine). Resume: unfinished journal + manifest → offer resume, same runId.
+Manifest semantics fix: already-installed items record selected=true (machine definition,
+not install work-list — doctor/sync depend on this). identity.email = pending-noreply
+placeholder until Stage C auth resolves the real address.
+E2E: test/spikes/bootstrap-dry.exp — full PTY drive of the dry-run flow (proven green).
+Config-prompt hook point marked in bootstrap for per-app screens (arrive with app items).
