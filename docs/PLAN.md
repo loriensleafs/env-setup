@@ -544,3 +544,19 @@ Test files live in a `__tests__` directory that is a SIBLING of the file under t
 `<original-filename>.test.ts`. Example: src/manifest/schema.ts → src/manifest/__tests__/
 schema.test.ts. (test/spikes/ predates this rule and holds research spikes, not unit tests;
 it dies when real tests supersede it.)
+
+## Core spine — BUILT 2026-08-26 (25 tests green, typecheck clean)
+- src/paths/ — XDG dirs (~/.config/envsetup, ~/.local/state/envsetup) honoring XDG_* overrides.
+  DEVIATION from earlier decision: env-paths DROPPED — on macOS it returns Library/* (GUI-app
+  convention) while dev CLIs (git, gh, ghostty, claude) use ~/.config; we follow the dev-CLI
+  norm with a 20-line module instead.
+- src/manifest/ — Zod schema (version-pinned, identity/locations/items), migration chain
+  (MIGRATIONS registry, future-version guard w/ upgrade message), Bun.file store.
+- src/journal/ — Zod-validated JSONL events, torn-line-tolerant reader, computeResume
+  (latest run only; failed-then-retried steps count as completed; RUN_END_STEP marker).
+- src/items/ — Item interface (detect/install/configure/verify, deps, ceremonies, per-item Zod
+  configSchema + defaultConfig, defineItem typing helper), deterministic Kahn toposort
+  (cycle + unknown-dep errors), ItemRegistry with executionOrder(selection) that ignores
+  deps outside the run.
+- Tests follow Peter's sibling-__tests__/<name>.test.ts convention.
+- Claude hook assets excluded from project typecheck (they're payloads, not source).
