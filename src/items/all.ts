@@ -11,6 +11,12 @@ import { xcodeClt } from "./defs/xcode-clt.ts";
 import { ghosttyConfig } from "./ghostty/ghostty-config.ts";
 import { ghosttyIcon } from "./ghostty/ghostty-icon.ts";
 import { chromeConfig } from "./chrome/chrome-config.ts";
+import { cleanshotConfig } from "./defs/cleanshot-config.ts";
+import { cursorConfig, vscodeConfig } from "./editors/editor-config.ts";
+import { podmanMachine } from "./defs/podman-machine.ts";
+import { raycastConfig } from "./defs/raycast-config.ts";
+import { superwhisperConfig } from "./defs/superwhisper-config.ts";
+import { typoraConfig } from "./typora/typora-config.ts";
 import { chromePwas } from "./chrome/chrome-pwas.ts";
 import { quickActions } from "./quick-actions/quick-actions.ts";
 import { ItemRegistry } from "./registry.ts";
@@ -90,5 +96,12 @@ export function buildRegistry(): ItemRegistry {
   r.register(quickActions);
   r.register(chromeConfig);
   r.register(chromePwas);
+  r.register(typoraConfig);
+  r.register(superwhisperConfig);
+  r.register(cleanshotConfig);
+  r.register(cursorConfig);
+  r.register(vscodeConfig);
+  r.register(podmanMachine);
+  r.register(raycastConfig);
   return r;
 }

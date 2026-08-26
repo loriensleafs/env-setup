@@ -31,12 +31,27 @@ doctor · required-spine items · Group 2 casks+fonts · config-only items (maco
 ghostty config+icon, git-identity, dock, quick-actions) · chrome-config + chrome-pwas
 (prefs empirically verified unprotected) · pure-bun statusline
 
-PENDING (build order): per-app config appliers (Typora license+theme, CleanShot prefs+license,
-Cursor/VS Code settings+extensions, Podman machine, superwhisper, Raycast) · repos + generated
-ACMElabs marketplace + reference clones · fonts from Peter's repo + Google Sans · auth
-(device flow, NEEDS PETER: OAuth app registration) · secrets (age store, NEEDS PETER:
-passphrase) · Stage C ceremonies (sign-ins, permissions, default browser, noreply email,
-SSH keys) · per-app config SCREENS in bootstrap · release pipeline test · doctor/sync diffing
+BUILT (cont.): secrets provider (env-file/config/local fallbacks; age store slots behind it) ·
+typora-config (Vercel theme pinned v1.0.1 from tecladochen repo, defaults theme/autosave;
+license blobs verified machine-bound → clipboard ceremony) · superwhisper-config (captured
+defaults: right-⌘ push-to-talk, mini recorder, no dock icon, experimental models) ·
+cleanshot-config (license ceremony; defaults keys undocumented + app absent → guided-settings
+ceremony until first configured machine is captured) · cursor-config + vscode-config (shared
+editorConfigItem factory: merged settings.json — One Dark Pro/material icons/JetBrains NF/
+format-on-save/project-config-first — + 12 extensions via --install-extension;
+anthropic.claude-code id VERIFIED via marketplace gallery API) · podman-machine (init 4CPU/
+8GB/100GB, Zod-clamped, existing machine untouched, on-demand start) · raycast-config
+(Spotlight symbolic-hotkey 64 off via PlistBuddy, raycastGlobalHotkey Command-49,
+activateSettings reload; onboarding/extensions = ceremony). Registry: 45 items, 76 tests.
+NOTE: Cursor model gating (only Haiku/Opus/Sonnet/Fable, default Opus) is app-state, not
+settings.json → guided ceremony at Stage C (research finding).
+
+PENDING (build order): repos + generated ACMElabs marketplace + reference clones · fonts from
+Peter's repo + Google Sans · auth (device flow, NEEDS PETER: OAuth app registration) · secrets
+age store (NEEDS PETER: passphrase) · Stage C ceremonies (sign-ins, permissions, default
+browser, noreply email, SSH keys, Typora/CleanShot/superwhisper license entry, Cursor models)
+· per-app config SCREENS in bootstrap · dotfiles item (PATH lines, docker alias) · release
+pipeline test · doctor/sync diffing
 
 # ─── Product & process decisions ───
 ## What this is
