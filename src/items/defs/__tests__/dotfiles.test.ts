@@ -2,12 +2,13 @@ import { describe, expect, test } from "bun:test";
 import { MANAGED_BLOCK } from "../dotfiles.ts";
 
 describe("dotfiles managed block", () => {
-  test("owns the decided lines: bun/local PATH, brew, fnm hook, docker alias", () => {
-    expect(MANAGED_BLOCK).toContain(".bun/bin");
-    expect(MANAGED_BLOCK).toContain(".local/bin");
-    expect(MANAGED_BLOCK).toContain("brew shellenv");
-    expect(MANAGED_BLOCK).toContain("fnm env --use-on-cd");
-    expect(MANAGED_BLOCK).toContain("alias docker=podman");
+  test("owns PATH for every installed tool + hooks + completions + alias", () => {
+    for (const needle of [
+      ".bun/bin", ".local/bin", "brew shellenv", "GOPATH", ".cargo/bin",
+      "fnm env --use-on-cd", ".bun/_bun", "site-functions", "alias docker=podman",
+    ]) {
+      expect(MANAGED_BLOCK).toContain(needle);
+    }
   });
 
   test("guards are conditional so a missing tool can't break shell startup", () => {

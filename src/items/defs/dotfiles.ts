@@ -12,9 +12,24 @@ const MARK_END = "# <<< envsetup managed <<<";
  * everything else in .zshrc is untouched.
  */
 export const MANAGED_BLOCK = `${MARK_START}
-export PATH="$HOME/.bun/bin:$HOME/.local/bin:$PATH"
+# PATH: Homebrew, bun, uv/pipx (~/.local/bin), Go tools, Cargo — added once, deduped by zsh.
 eval "$(/opt/homebrew/bin/brew shellenv zsh)" 2>/dev/null
+export PATH="$HOME/.bun/bin:$HOME/.local/bin:$PATH"
+[ -d "$(/opt/homebrew/bin/brew --prefix 2>/dev/null)/opt/go/libexec/bin" ] && export PATH="$(/opt/homebrew/bin/brew --prefix)/opt/go/libexec/bin:$PATH"
+export GOPATH="$HOME/go"
+[ -d "$GOPATH/bin" ] && export PATH="$GOPATH/bin:$PATH"
+[ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH"
+
+# Runtimes: fnm (Node) auto-switching; bun completions.
 command -v fnm >/dev/null && eval "$(fnm env --use-on-cd)"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+
+# zsh completions from Homebrew (gh, etc.) — before compinit.
+if type brew >/dev/null 2>&1; then
+  FPATH="$(brew --prefix)/share/zsh/site-functions:$FPATH"
+fi
+
+# Aliases: docker → podman (containers decision).
 command -v podman >/dev/null && alias docker=podman
 ${MARK_END}`;
 
@@ -22,14 +37,24 @@ export const dotfiles = defineItem({
   id: "dotfiles",
   title: "Shell config (PATH, fnm hook, docker alias)",
   kind: "config-only",
-  detect: async () => {
+  detect: async (ctx) => {
+    const shell = await ctx.run(["dscl", ".", "-read", `/Users/${process.env.USER}`, "UserShell"]);
+    if (!shell.stdout.includes("/zsh")) return { installed: false };
     const file = Bun.file(ZSHRC);
     if (!(await file.exists())) return { installed: false };
-    const text = await file.text();
-    // Present AND current (the block content matters, not just the markers).
-    return { installed: text.includes(MANAGED_BLOCK) };
+    // Present AND current (the exact block content matters — this is the
+    // validation Peter asked for: doctor/sync flag any drift from it).
+    return { installed: (await file.text()).includes(MANAGED_BLOCK) };
   },
   configure: async (ctx) => {
+    // macOS has defaulted to zsh since Catalina (2019), but ensure it — some
+    // migrated/old accounts still have bash as the login shell.
+    const shell = await ctx.run(["dscl", ".", "-read", `/Users/${process.env.USER}`, "UserShell"]);
+    if (!shell.stdout.includes("/zsh")) {
+      const chsh = await ctx.run(["chsh", "-s", "/bin/zsh"]);
+      if (chsh.exitCode === 0) ctx.log("login shell switched to zsh (re-open terminal)");
+      else ctx.log("could not switch shell automatically — run `chsh -s /bin/zsh` yourself");
+    }
     const file = Bun.file(ZSHRC);
     let text = (await file.exists()) ? await file.text() : "";
     const start = text.indexOf(MARK_START);

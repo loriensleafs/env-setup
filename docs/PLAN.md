@@ -884,3 +884,25 @@ Full breakthrough after extended AX spelunking (Gemini session cracked the two h
   <name>` per app (Mail/Calendar/Drive/Notes). One-time Accessibility grant for the runner is
   the only manual bit. 93 tests; embedded swift verified byte-identical to the tested file.
 Requires: Accessibility permission (like superwhisper) — Stage C.
+
+## Round of additions — 2026-08-26 (Peter's follow-ups)
+- SECRETS: `envsetup secrets reveal` added (prompts passphrase, prints FULL values); `show`
+  stays masked. `reveal` is the "show me my secrets" command.
+- DRY-RUN clarified: bare `envsetup` ALREADY runs the full install one-shot (verified — dryRun
+  defaults false → real orchestrator). `--dry-run` is an opt-in preview only (what we used for
+  tests). No behavior change; kept as a useful preview.
+- BetterDisplay ADDED (betterdisplay.pro): brew cask + betterdisplaycli companion; license
+  key 861D06B5-… in secret store (better-display); app-level defaults (startAtLogin,
+  showMenuBarItem, checkForUpdates) via Zod-schema config screen. Its config is huge and
+  PER-DISPLAY — not presettable without the actual displays and Peter's Highspot config is
+  gone — so per-display tuning is a guided ceremony (capture later like CleanShot). License =
+  clipboard ceremony.
+- DOTFILES expanded to cover EVERYTHING: brew shellenv, bun/uv(.local)/Go(GOPATH)/Cargo PATH,
+  fnm --use-on-cd, bun completions, brew zsh site-functions (FPATH), docker→podman alias — all
+  guarded so a missing tool can't break startup. detect() is the VALIDATION Peter asked for
+  (exact-block match → doctor/sync flag drift). Also ENSURES login shell is zsh (chsh if a
+  migrated account still has bash; macOS default since Catalina).
+- FINDER FAVORITES ADDED: Swift LSSharedFileList helper (mysides Apple-disabled Oct 2025;
+  deprecated-but-works API, embedded in item for compiled builds) rewrites the sidebar to the
+  decided order: Applications · Home · Desktop · Documents · Downloads · Dev · .claude.
+Registry now larger; 96 tests green.

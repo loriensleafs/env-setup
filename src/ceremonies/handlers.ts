@@ -137,6 +137,18 @@ export const HANDLERS: Record<string, CeremonyHandler> = {
     },
   },
 
+  "better-display-license": licenseCeremony(SECRET_KEYS.betterDisplayLicense, "BetterDisplay", "/Applications/BetterDisplay.app"),
+  "better-display-settings": {
+    async run(ctx) {
+      p.note(
+        "BetterDisplay's useful config is per-display (HiDPI/scaling, brightness,\nXDR). Set up your displays now; it's remembered per-machine.",
+        "BetterDisplay",
+      );
+      await ctx.run(["open", "/Applications/BetterDisplay.app"]);
+      return confirmDone("displays configured?");
+    },
+  },
+
   "github-device-flow": {
     async run() {
       // Handled by the github-auth item / `envsetup auth`; nothing to do here.

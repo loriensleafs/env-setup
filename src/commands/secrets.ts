@@ -28,7 +28,7 @@ export default defineCommand({
   args: {
     action: {
       type: "positional",
-      description: "init (create from .secrets.local.json) · show (decrypt to screen) · unlock (decrypt to config dir for items)",
+      description: "init (encrypt .secrets.local.json) · show (masked) · reveal (full values) · unlock (decrypt to config dir for items)",
       required: true,
     },
   },
@@ -51,7 +51,7 @@ export default defineCommand({
       return;
     }
 
-    if (action === "show" || action === "unlock") {
+    if (action === "show" || action === "reveal" || action === "unlock") {
       const blob = Bun.file(AGE_FILE);
       if (!(await blob.exists())) bail(`${AGE_FILE} not found in the current directory`);
       const pass = await askPassphrase(false);
@@ -61,10 +61,13 @@ export default defineCommand({
       } catch {
         bail("wrong passphrase (or corrupted file)");
       }
-      if (action === "show") {
+      if (action === "show" || action === "reveal") {
+        const full = action === "reveal";
         p.note(
-          Object.entries(secrets).map(([k, v]) => `${k}: ${v.slice(0, 4)}…${v.slice(-4)}`).join("\n"),
-          "secrets (masked)",
+          Object.entries(secrets)
+            .map(([k, v]) => `${k}: ${full ? v : `${v.slice(0, 4)}…${v.slice(-4)}`}`)
+            .join("\n"),
+          full ? "secrets" : "secrets (masked)",
         );
       } else {
         await mkdir(configDir(), { recursive: true });
@@ -76,6 +79,6 @@ export default defineCommand({
       return;
     }
 
-    bail(`unknown action "${action}" — use init, show, or unlock`);
+    bail(`unknown action "${action}" — use init, show, reveal, or unlock`);
   },
 });

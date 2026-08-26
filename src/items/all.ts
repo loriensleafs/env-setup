@@ -10,6 +10,8 @@ import { uv } from "./defs/uv.ts";
 import { xcodeClt } from "./defs/xcode-clt.ts";
 import { ghosttyConfig } from "./ghostty/ghostty-config.ts";
 import { ghosttyIcon } from "./ghostty/ghostty-icon.ts";
+import { betterDisplay } from "./defs/better-display.ts";
+import { finderFavorites } from "./finder/finder-favorites.ts";
 import { chromeConfig } from "./chrome/chrome-config.ts";
 import { cleanshotConfig } from "./defs/cleanshot-config.ts";
 import { cursorConfig, vscodeConfig } from "./editors/editor-config.ts";
@@ -105,6 +107,8 @@ export function buildRegistry(): ItemRegistry {
   r.register(quickActions);
   r.register(chromeConfig);
   r.register(chromePwas);
+  r.register(betterDisplay);
+  r.register(finderFavorites);
   r.register(typoraConfig);
   r.register(superwhisperConfig);
   r.register(cleanshotConfig);

@@ -18,6 +18,7 @@ export const SECRET_KEYS = {
   superwhisperLicense: "superwhisper",
   cleanshotLicense: "cleanshot",
   anthropicApiKey: "anthropic-api-key",
+  betterDisplayLicense: "better-display",
 } as const;
 
 export async function loadSecrets(): Promise<Secrets> {
