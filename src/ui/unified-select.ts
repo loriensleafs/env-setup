@@ -37,7 +37,16 @@ export async function unifiedSelect(opts: UnifiedSelectOptions): Promise<string[
       render() {
         const lines: string[] = [];
         const rows = visibleRows(state);
-        for (let i = 0; i < rows.length; i++) {
+        // Viewport: window the list to the terminal height so long lists
+        // scroll with the cursor instead of overflowing.
+        const maxRows = Math.max(8, (process.stdout.rows ?? 24) - 7);
+        let start = 0;
+        if (rows.length > maxRows) {
+          start = Math.min(Math.max(0, state.cursor - Math.floor(maxRows / 2)), rows.length - maxRows);
+        }
+        const end = Math.min(rows.length, start + maxRows);
+        if (start > 0) lines.push(`${color.cyan(S_BAR)}  ${color.dim(`↑ ${start} more`)}`);
+        for (let i = start; i < end; i++) {
           const row = rows[i];
           if (!row) continue;
           if (row.kind === "header") {
@@ -52,7 +61,7 @@ export async function unifiedSelect(opts: UnifiedSelectOptions): Promise<string[
           if (o.locked === "installed") {
             line = `${color.green(S_INSTALLED)} ${color.dim(o.label)}${hint}`;
           } else if (o.locked === "on") {
-            line = `${color.green(S_LOCKED_ON)} ${o.label} ${color.dim("(required)")}${hint}`;
+            line = `${color.green(S_LOCKED_ON)} ${o.label}${hint}`;
           } else {
             const box = state.selected.has(o.id)
               ? color.green(S_CHECKBOX_SELECTED)
@@ -62,6 +71,7 @@ export async function unifiedSelect(opts: UnifiedSelectOptions): Promise<string[
           }
           lines.push(`${color.cyan(S_BAR)}  ${active ? color.cyan("❯") : " "} ${line}`);
         }
+        if (end < rows.length) lines.push(`${color.cyan(S_BAR)}  ${color.dim(`↓ ${rows.length - end} more`)}`);
         const header = `${symbolFor(this.state)}  ${opts.message} ${color.dim("(space to toggle, enter to confirm)")}`;
         return `${color.gray(S_BAR)}\n${header}\n${lines.join("\n")}\n${color.cyan(S_BAR_END)}\n`;
       },

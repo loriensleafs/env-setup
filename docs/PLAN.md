@@ -637,3 +637,15 @@ not install work-list — doctor/sync depend on this). identity.email = pending-
 placeholder until Stage C auth resolves the real address.
 E2E: test/spikes/bootstrap-dry.exp — full PTY drive of the dry-run flow (proven green).
 Config-prompt hook point marked in bootstrap for per-app screens (arrive with app items).
+
+## Peter's dry-run feedback — FIXED 2026-08-26 (all five findings)
+1. Dev directory → clack `path` prompt (directory autocomplete, ~/Dev default).
+2. Identity/location prompts wrapped in p.group (single onCancel).
+3. "Couldn't reach Required section": root cause was locked rows being cursor-SKIPPED plus a
+   list taller than the terminal with no scrolling. Fixed: ALL option rows are navigable
+   (locked ones just aren't toggleable) + viewport windowing follows the cursor with
+   "↑/↓ N more" indicators. "(required)" suffix dropped — the section header says it.
+4. Input validation: Zod schemas passed DIRECTLY as clack `validate` (Standard Schema bridge,
+   as researched) — name nonempty, GitHub username charset, devDir absolute-or-~ path.
+   Empty-input probe verified the error renders in-prompt.
+5. Raw ZodError escape at saveManifest → caught, friendly message, clean cancel.

@@ -68,7 +68,9 @@ export function visibleRows(state: UnifiedState): Row[] {
       currentSection = option.section;
       rows.push({ kind: "header", section: currentSection });
     }
-    rows.push({ kind: "option", option, interactive: option.locked === undefined });
+    // All visible options are navigable (so long lists can scroll to locked
+    // sections); only unlocked ones are toggleable.
+    rows.push({ kind: "option", option, interactive: true });
   }
   return rows;
 }
@@ -94,7 +96,7 @@ export function moveCursor(state: UnifiedState, direction: 1 | -1): void {
 /** Toggle the option under the cursor. Hidden dependents keep their memory. */
 export function toggleAtCursor(state: UnifiedState): void {
   const row = visibleRows(state)[state.cursor];
-  if (!row || row.kind !== "option" || !row.interactive) return;
+  if (!row || row.kind !== "option" || row.option.locked !== undefined) return;
   const id = row.option.id;
   if (state.selected.has(id)) state.selected.delete(id);
   else state.selected.add(id);

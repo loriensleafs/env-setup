@@ -1,5 +1,7 @@
+import { homedir } from "node:os";
 import * as p from "@clack/prompts";
 import color from "picocolors";
+import { z } from "zod";
 import { run } from "../exec/run.ts";
 import { buildRegistry } from "../items/all.ts";
 import type { DetectResult, Item, ItemContext } from "../items/item.ts";
@@ -69,12 +71,40 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
   s.stop(`Scanned ${detection.size} items`);
 
   // --- Identity + locations (Group 6) ------------------------------------
-  const name = await p.text({ message: "Your name (git commits)", initialValue: "Peter Kloss" });
-  if (p.isCancel(name)) bail("cancelled");
-  const githubUser = await p.text({ message: "GitHub username", initialValue: "loriensleafs" });
-  if (p.isCancel(githubUser)) bail("cancelled");
-  const devDir = await p.text({ message: "Dev directory", initialValue: "~/Dev" });
-  if (p.isCancel(devDir)) bail("cancelled");
+  // Zod schemas double as prompt validators (Standard Schema bridge).
+  const nonEmpty = (what: string) => z.string().trim().min(1, `${what} is required`);
+  const answers = await p.group(
+    {
+      name: () =>
+        p.text({
+          message: "Your name (git commits)",
+          initialValue: "Peter Kloss",
+          validate: nonEmpty("name"),
+        }),
+      githubUser: () =>
+        p.text({
+          message: "GitHub username",
+          initialValue: "loriensleafs",
+          validate: z
+            .string()
+            .trim()
+            .regex(/^[a-zA-Z0-9-]+$/, "GitHub usernames are letters, digits, and dashes"),
+        }),
+      devDir: () =>
+        p.path({
+          message: "Dev directory (repos clone here — may not exist yet)",
+          directory: true,
+          initialValue: `${homedir()}/Dev`,
+          validate: z
+            .string()
+            .trim()
+            .min(1, "a directory path is required")
+            .regex(/^(~|\/)/, "use an absolute path (or ~/...)"),
+        }),
+    },
+    { onCancel: () => bail("cancelled") },
+  );
+  const { name, githubUser, devDir } = answers;
 
   // --- Unified selection --------------------------------------------------
   const options: UnifiedOption[] = registry.all().map((item) => {
@@ -131,7 +161,12 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
       }),
     ),
   };
-  await saveManifest(manifest);
+  try {
+    await saveManifest(manifest);
+  } catch (err) {
+    p.log.error(`could not save the manifest: ${err instanceof Error ? err.message : String(err)}`);
+    bail("nothing was changed");
+  }
   p.log.success("manifest written");
 
   await executePlan(manifest, { dryRun: opts.dryRun, selection: toInstall });

@@ -19,14 +19,14 @@ const options: UnifiedOption[] = [
 ];
 
 describe("createState", () => {
-  test("locked-on and default options start selected; cursor lands on first interactive row", () => {
+  test("locked-on and default options start selected; cursor lands on first option row", () => {
     const s = createState(options);
     expect(s.selected.has("xcode-clt")).toBe(true);
     expect(s.selected.has("raycast")).toBe(true);
     const rows = visibleRows(s);
     const row = rows[s.cursor];
     expect(row?.kind).toBe("option");
-    expect(row?.kind === "option" && row.option.id).toBe("raycast");
+    expect(row?.kind === "option" && row.option.id).toBe("xcode-clt");
   });
 
   test("initialSelected false starts unselected", () => {
@@ -44,7 +44,9 @@ describe("visibility / live dependency filtering", () => {
 
   test("unselecting a requirement hides the dependent; reselecting restores it", () => {
     const s = createState(options);
-    // navigate to ghostty (2nd interactive row) and toggle it off
+    // navigate to ghostty (4th navigable row: clt, brew, raycast, ghostty) and toggle it off
+    moveCursor(s, 1);
+    moveCursor(s, 1);
     moveCursor(s, 1);
     toggleAtCursor(s);
     expect(s.selected.has("ghostty")).toBe(false);
@@ -58,6 +60,8 @@ describe("visibility / live dependency filtering", () => {
 
   test("hidden dependents drop out of result but keep memory", () => {
     const s = createState(options);
+    moveCursor(s, 1);
+    moveCursor(s, 1);
     moveCursor(s, 1); // ghostty
     toggleAtCursor(s); // off → ghostty-config hidden
     expect(result(s)).not.toContain("ghostty-config");
@@ -66,9 +70,8 @@ describe("visibility / live dependency filtering", () => {
 
   test("chained requirements: dependent needs ALL", () => {
     const s = createState(options);
-    // unselect the font (3rd interactive: raycast → ghostty → jetbrains-font)
-    moveCursor(s, 1);
-    moveCursor(s, 1);
+    // unselect the font (5th navigable: clt → brew → raycast → ghostty → jetbrains-font)
+    for (let i = 0; i < 4; i++) moveCursor(s, 1);
     toggleAtCursor(s);
     expect(s.selected.has("jetbrains-font")).toBe(false);
     expect(result(s)).not.toContain("ghostty-config");
@@ -76,23 +79,23 @@ describe("visibility / live dependency filtering", () => {
 });
 
 describe("cursor", () => {
-  test("skips headers and locked rows, wraps around", () => {
+  test("visits every option row incl. locked, skips headers, wraps around", () => {
     const s = createState(options);
     const ids: string[] = [];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 6; i++) {
       const row = visibleRows(s)[s.cursor];
       if (row?.kind === "option") ids.push(row.option.id);
       moveCursor(s, 1);
     }
-    expect(ids).toEqual(["raycast", "ghostty", "jetbrains-font", "ghostty-config"]);
+    expect(ids).toEqual(["xcode-clt", "homebrew", "raycast", "ghostty", "jetbrains-font", "ghostty-config"]);
     const wrapped = visibleRows(s)[s.cursor];
-    expect(wrapped?.kind === "option" && wrapped.option.id).toBe("raycast");
+    expect(wrapped?.kind === "option" && wrapped.option.id).toBe("xcode-clt");
   });
 
   test("cursor lands on a valid row after its own row disappears", () => {
     const s = createState(options);
-    // move to ghostty-config (4th interactive), then unselect ghostty via direct memory edit
-    for (let i = 0; i < 3; i++) moveCursor(s, 1);
+    // move to ghostty-config (6th navigable), then unselect ghostty via direct memory edit
+    for (let i = 0; i < 5; i++) moveCursor(s, 1);
     s.selected.delete("ghostty");
     // simulate a toggle elsewhere forcing recompute: move cursor
     moveCursor(s, 1);
