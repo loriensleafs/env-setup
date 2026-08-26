@@ -718,10 +718,11 @@ PTY note: the vendored stock path prompt sometimes consumes the first Enter (sug
 navigation) — harness sends a resilient second Enter; watch for it in real usage.
 
 ## Progress-UX rework (Peter, 2026-08-26)
-- SCAN: spinner PER SECTION ("Evaluating apps…" + "Checking Ghostty (3/12)" messages), each
-  collapsing to "Apps: 7 installed, 5 to install"; ends with "Initialization complete in Xs".
-  (Chosen over taskLog for scan because taskLog headers are static diamonds — a real spinner
-  per group gives the animation Peter wanted without forking clack.)
+- SCAN (revised same day, Peter): **stream.step lines with PARALLEL detection** — all item
+  detections launch concurrently; each section renders one streamed step line completing with
+  its count: "◇ Evaluating apps (5/11 installed)"; ends with "Initialization complete in Xs".
+  (Supersedes both the per-section spinners and the taskLog-groups intermediate; parallelism
+  makes the scan much faster and stream fits the concurrent nature.)
 - EXECUTION: taskLog with a GROUP PER STEP ("Ghostty (4/22)") — streamed messages collapse on
   success ("ghostty installed"), are RETAINED on failure (taskLog's forte); ends with
   "Installed N items in Xs". Failure triage = concise log.error lines (big notes removed).

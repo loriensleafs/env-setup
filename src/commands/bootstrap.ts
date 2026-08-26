@@ -73,20 +73,29 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
     list.push(item);
     sections.set(section, list);
   }
-  for (const [section, items] of sections) {
-    const s = p.spinner();
-    s.start(`Evaluating ${section.toLowerCase()}`);
-    let installed = 0;
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i] as (typeof items)[number];
-      s.message(`Checking ${item.title} (${i + 1}/${items.length})`);
-      const d = await item.detect(scanCtx).catch(() => ({ installed: false as const }));
-      detection.set(item.id, d);
-      if (d.installed && d.satisfies !== false) installed++;
+  // All detections run in PARALLEL; each section renders one streamed step
+  // line that completes with its installed-count as results land.
+  const pending = new Map<string, Promise<DetectResult>>();
+  for (const items of sections.values()) {
+    for (const item of items) {
+      pending.set(
+        item.id,
+        item.detect(scanCtx).catch(() => ({ installed: false as const })),
+      );
     }
-    const toInstall = items.length - installed;
-    s.stop(
-      `${section}: ${installed} installed, ${toInstall} to install`,
+  }
+  for (const [section, items] of sections) {
+    await p.stream.step(
+      (async function* () {
+        yield `Evaluating ${section.toLowerCase()} `;
+        let installed = 0;
+        for (const item of items) {
+          const d = await (pending.get(item.id) as Promise<DetectResult>);
+          detection.set(item.id, d);
+          if (d.installed && d.satisfies !== false) installed++;
+        }
+        yield `(${installed}/${items.length} installed)`;
+      })(),
     );
   }
   const elapsed = ((Date.now() - scanStart) / 1000).toFixed(1);
