@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "model": "opus[1m]",
+  "fallbackModel": [
+    "claude-sonnet-5"
+  ],
+  "effortLevel": "high",
+  "alwaysThinkingEnabled": false,
+  "showThinkingSummaries": true,
+  "promptCacheTtl": "1h",
+  "subagentPromptCacheTtl": "1h",
+  "agent": "orchestrator",
+  "teammateMode": "in-process",
+  "workflowSizeGuideline": "small",
+  "memoryMode": "auto",
+  "autoMemoryEnabled": true,
+  "autoMemoryAgentsEnabled": true,
+  "autoMemoryDirectory": "~/.claude/memory",
+  "autoDreamEnabled": true,
+  "dreamAgentsEnabled": true,
+  "permissions": {
+    "defaultMode": "auto",
+    "deny": [
+      "Bash(gh release:*)",
+      "Read(.secrets)",
+      "Read(//**/.env)",
+      "Read(~/.aws/**)",
+      "Read(~/.claude/credentials.json)",
+      "Read(~/.ssh/**)"
+    ],
+    "ask": [
+      "Bash(gh config:*)",
+      "Bash(gh gist:*)",
+      "Bash(gh issue:*)",
+      "Bash(gh pr close:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr edit:*)",
+      "Bash(gh pr merge:*)",
+      "Bash(gh pr ready:*)",
+      "Bash(gh pr reopen:*)",
+      "Bash(gh repo:*)",
+      "Bash(gh run:*)",
+      "Bash(gh variable:*)",
+      "Bash(git remote:*)",
+      "Bash(git reset:*)",
+      "Bash(rm:*)",
+      "Bash(skate:*)"
+    ]
+  },
+  "autoMode": {
+    "environment": [
+      "$defaults",
+      "Trusted GitHub account: github.com/loriensleafs — personal repositories",
+      "Trusted GitHub organization: github.com/acmelabs-15 — my own org"
+    ]
+  },
+  "env": {
+    "CLAUDE_CODE_ENABLE_AUTO_MODE": "1",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "CLAUDE_CODE_NEW_INIT": "1",
+    "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1",
+    "BASH_DEFAULT_TIMEOUT_MS": "300000",
+    "BASH_MAX_TIMEOUT_MS": "1200000",
+    "BASH_MAX_OUTPUT_LENGTH": "100000",
+    "MCP_TOOL_TIMEOUT": "60000",
+    "MAX_MCP_OUTPUT_TOKENS": "50000",
+    "SLASH_COMMAND_TOOL_CHAR_BUDGET": "75000",
+    "CLAUDE_CODE_NO_FLICKER": "1",
+    "CLAUDE_CODE_SYNTAX_HIGHLIGHT": "1",
+    "CLAUDE_CODE_SCROLL_SPEED": "3"
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "permission_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun ~/.claude/hooks/notify.ts"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun ~/.claude/hooks/notify.ts --stop"
+          }
+        ]
+      }
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledPlugins": {
+    "agent-orchestration@claude-code-workflows": true,
+    "agent-teams@claude-code-workflows": true,
+    "ask-user-question@ACMElabs": true,
+    "browser-use@claude-plugins-official": true,
+    "chrome-devtools-mcp@claude-plugins-official": true,
+    "code-review@ACMElabs": true,
+    "code-simplifier@ACMElabs": true,
+    "context7@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": true,
+    "skills@ACMElabs": true,
+    "superwhisper@superwhisper": true,
+    "typescript-lsp@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "ACMElabs": {
+      "source": {
+        "source": "file",
+        "path": "/Users/peter.kloss/Dev/ACMElabs/.claude-plugin/marketplace.json"
+      },
+      "autoUpdate": true
+    },
+    "superwhisper": {
+      "source": {
+        "source": "github",
+        "repo": "superultrainc/superwhisper-claude-code"
+      }
+    }
+  },
+  "attribution": {
+    "commit": "Are you pondering what I am pondering? — 🧠",
+    "pr": "\n---\n\n> Are you pondering what I am pondering? —🧠"
+  },
+  "worktree": {
+    "symlinkDirectories": [
+      "node_modules"
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh",
+    "refreshInterval": 5
+  },
+  "subagentStatusLine": {
+    "type": "command",
+    "command": "bun ~/.claude/hooks/subagent-statusline.ts"
+  },
+  "footerLinksRegexes": [
+    "[A-Z][A-Z0-9]+-\\d+"
+  ],
+  "theme": "auto",
+  "viewMode": "verbose",
+  "showSpinnerTree": true,
+  "spinnerVerbs": {
+    "mode": "append",
+    "verbs": [
+      "Assembling the doomsday device",
+      "Being a genius",
+      "Being insane",
+      "Calibrating the mind-control device",
+      "Consulting the Brain",
+      "Doing the same thing we do every night",
+      "Enlarging the cranium",
+      "Escaping the cage",
+      "Growing to enormous size",
+      "Hijacking every channel",
+      "Hypnotizing the populace",
+      "Narfing",
+      "Outwitting Snowball",
+      "Plotting world domination",
+      "Poiting",
+      "Pondering what you're pondering",
+      "Practicing the maniacal laugh",
+      "Preparing for tomorrow night",
+      "Rehearsing tonight's plan",
+      "Running the maze",
+      "Scheming at Acme Labs",
+      "Slipping past the night guard",
+      "Spinning the globe",
+      "Splicing genes",
+      "Thinking so, Brain",
+      "Trozing",
+      "Trying to take over the world",
+      "Unrolling the blueprints",
+      "Waiting on Pinky",
+      "Zorting"
+    ]
+  },
+  "skillListingBudgetFraction": 0.08,
+  "agentPushNotifEnabled": true,
+  "inputNeededNotifEnabled": true,
+  "cleanupPeriodDays": 14,
+  "skipAutoPermissionPrompt": true,
+  "skipWorkflowUsageWarning": true
+}

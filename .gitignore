@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.secrets.local.json
+*.local
+.DS_Store

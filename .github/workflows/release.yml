@@ -1,0 +1,24 @@
+name: release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bun tsc --noEmit
+      - name: Compile binaries
+        run: |
+          bun build --compile --target=bun-darwin-arm64 src/index.ts --outfile dist/envsetup-darwin-arm64
+          bun build --compile --target=bun-darwin-x64 src/index.ts --outfile dist/envsetup-darwin-x64
+          codesign --force -s - dist/envsetup-darwin-arm64
+          codesign --force -s - dist/envsetup-darwin-x64
+      - name: Attach to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/envsetup-darwin-*
