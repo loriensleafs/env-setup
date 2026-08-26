@@ -28,7 +28,7 @@ export default defineCommand({
   args: {
     action: {
       type: "positional",
-      description: "init · list (names) · show (masked) · reveal (full) · copy <key> · unlock (decrypt to config dir)",
+      description: "init · list · show · reveal · copy <key> · set <key> · unlock",
       required: true,
     },
     key: {
@@ -53,6 +53,26 @@ export default defineCommand({
       const blob = await encryptSecrets(secrets, pass);
       await Bun.write(AGE_FILE, blob);
       p.log.success(`${AGE_FILE} written (${Object.keys(secrets).length} secrets) — commit it; the passphrase goes in your password manager`);
+      p.outro("done");
+      return;
+    }
+
+    if (action === "set") {
+      const blob = Bun.file(AGE_FILE);
+      if (!(await blob.exists())) bail(`${AGE_FILE} not found — run \`secrets init\` first`);
+      if (keyArg === undefined) bail("usage: envsetup secrets set <key>  (you'll be prompted for the value)");
+      const pass = await askPassphrase(false);
+      let secrets: Record<string, string>;
+      try {
+        secrets = await decryptSecrets(new Uint8Array(await blob.arrayBuffer()), pass);
+      } catch {
+        bail("wrong passphrase (or corrupted file)");
+      }
+      const value = await p.password({ message: `Value for "${keyArg}"` });
+      if (p.isCancel(value) || value === "") bail("cancelled");
+      secrets[keyArg] = value as string;
+      await Bun.write(AGE_FILE, await encryptSecrets(secrets, pass));
+      p.log.success(`${keyArg} added — commit ${AGE_FILE}`);
       p.outro("done");
       return;
     }
@@ -94,6 +114,6 @@ export default defineCommand({
       return;
     }
 
-    bail(`unknown action "${action}" — use init, list, show, reveal, copy, or unlock`);
+    bail(`unknown action "${action}" — use init, list, show, reveal, copy, set, or unlock`);
   },
 });

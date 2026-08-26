@@ -892,7 +892,7 @@ Requires: Accessibility permission (like superwhisper) — Stage C.
   defaults false → real orchestrator). `--dry-run` is an opt-in preview only (what we used for
   tests). No behavior change; kept as a useful preview.
 - BetterDisplay ADDED (betterdisplay.pro): brew cask + betterdisplaycli companion; license
-  key 861D06B5-… in secret store (better-display); app-level defaults (startAtLogin,
+  key in secret store (better-display); app-level defaults (startAtLogin,
   showMenuBarItem, checkForUpdates) via Zod-schema config screen. Its config is huge and
   PER-DISPLAY — not presettable without the actual displays and Peter's Highspot config is
   gone — so per-display tuning is a guided ceremony (capture later like CleanShot). License =
@@ -951,7 +951,7 @@ Verified on the installed app: BetterDisplay uses Paddle online licensing. There
 license command (betterdisplaycli only does display control), NO license key in its defaults
 domain (only showProLicenseError), and NO URL-scheme activation. Unlike CleanShot (plain
 defaults activationKey), it CAN'T be pre-seeded. The better-display-license ceremony copies
-the key (861D06B5-…) to the clipboard, opens the app, and guides pasting into Settings →
+the key to the clipboard, opens the app, and guides pasting into Settings →
 license (activates online). That is the ceiling for this app.
 
 
@@ -962,3 +962,14 @@ license (activates online). That is the ceiling for this app.
 - `envsetup secrets` gained: `list` (names only, no values), `copy <key>` (value → clipboard,
   behind passphrase). Full command set: init · list · show (masked) · reveal (full) ·
   copy <key> · unlock.
+
+## Secrets integrity — 2026-08-26
+- AUDIT (Peter noticed the BetterDisplay key was never stored): NO full license key is in the
+  repo tree or git history — verified 0 files / 0 commits for all four. Repo-creation scrub
+  worked; full Typora/superwhisper/CleanShot keys only went to the untracked .secrets.local.json
+  (deleted). A truncated first-block fragment (not a usable key) was left in PLAN.md; scrubbed.
+- GAP: SECRET_KEYS.betterDisplayLicense was added to code but the VALUE never entered
+  secrets.json.age (key provided AFTER secrets init). BetterDisplay license currently MISSING.
+- FIX: `envsetup secrets set <key>` prompts passphrase + hidden value, updates secrets.json.age
+  in place. Use it to add better-display without recreating .secrets.local.json.
+- RULE reinforced: NEVER put a license key (even partial) in a tracked file or commit message.
