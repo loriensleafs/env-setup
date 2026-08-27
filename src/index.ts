@@ -16,7 +16,8 @@ const main = defineCommand({
   args: {
     "show-installed": {
       type: "boolean",
-      description: "Show already-installed items as toggleable options (for inspecting the dependency cascade)",
+      description:
+        "Show already-installed items as toggleable options (for inspecting the dependency cascade)",
     },
     defaults: {
       type: "boolean",

@@ -60,7 +60,10 @@ export const sshKeys = defineItem({
     const block = `${marker}\nHost github.com\n  AddKeysToAgent yes\n  UseKeychain yes\n  IdentityFile ${AUTH_KEY}\n`;
     const existing = (await Bun.file(configPath).exists()) ? await Bun.file(configPath).text() : "";
     if (!existing.includes(marker)) {
-      await Bun.write(configPath, `${existing}${existing.endsWith("\n") || existing === "" ? "" : "\n"}${block}`);
+      await Bun.write(
+        configPath,
+        `${existing}${existing.endsWith("\n") || existing === "" ? "" : "\n"}${block}`,
+      );
     }
     // Upload public halves (auth as access key, signing as signing key).
     const token = await storedToken(ctx.run);
@@ -70,7 +73,12 @@ export const sshKeys = defineItem({
     }
     const machineTitle = `${machine} (envsetup ${stamp})`;
     await uploadKey(token, "keys", machineTitle, await Bun.file(`${AUTH_KEY}.pub`).text());
-    await uploadKey(token, "ssh_signing_keys", `${machineTitle} signing`, await Bun.file(`${SIGN_KEY}.pub`).text());
+    await uploadKey(
+      token,
+      "ssh_signing_keys",
+      `${machineTitle} signing`,
+      await Bun.file(`${SIGN_KEY}.pub`).text(),
+    );
     ctx.log("public keys registered on GitHub (auth + signing)");
   },
   verify: async () => (await Bun.file(AUTH_KEY).exists()) && Bun.file(SIGN_KEY).exists(),

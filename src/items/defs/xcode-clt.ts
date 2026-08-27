@@ -26,7 +26,8 @@ export const xcodeClt = defineItem({
         .split("\n")
         .map((l) => l.match(/\*\s*Label:\s*(Command Line Tools for Xcode-.*)/)?.[1])
         .find((l) => l !== undefined);
-      if (!label) throw new Error("could not find a Command Line Tools label in softwareupdate --list");
+      if (!label)
+        throw new Error("could not find a Command Line Tools label in softwareupdate --list");
       ctx.log(`installing "${label}" — this takes several minutes`);
       const r = await ctx.run(["softwareupdate", "--install", label, "--verbose"]);
       if (r.exitCode !== 0) throw new Error(`softwareupdate failed: ${r.stderr.trim()}`);

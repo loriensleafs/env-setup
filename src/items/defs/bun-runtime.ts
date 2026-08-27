@@ -9,6 +9,11 @@ export const bunRuntime = defineItem({
   title: "Bun",
   kind: "installer-script",
   required: true,
+  zsh: () => ({
+    comment: "bun",
+    env: ['export PATH="$HOME/.bun/bin:$PATH"'],
+    init: ['[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"'],
+  }),
   detect: async (ctx) => {
     for (const bin of [BUN_BIN, "bun"]) {
       const r = await ctx.run([bin, "--version"]);

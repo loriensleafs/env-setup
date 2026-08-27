@@ -7,6 +7,12 @@ export const uv = defineItem({
   title: "uv (Python)",
   kind: "installer-script",
   required: true,
+  zsh: () => ({
+    comment: "uv / uvx (~/.local/bin also hosts cursor/code shims)",
+    env: ['export PATH="$HOME/.local/bin:$PATH"'],
+    // uv ships no site-functions file; generate completions at shell init.
+    init: ['command -v uv >/dev/null && eval "$(uv generate-shell-completion zsh)"'],
+  }),
   detect: async (ctx) => {
     for (const bin of [`${homedir()}/.local/bin/uv`, "uv"]) {
       const r = await ctx.run([bin, "--version"]);
@@ -15,9 +21,12 @@ export const uv = defineItem({
     return { installed: false };
   },
   install: async (ctx) => {
-    const r = await ctx.run(["/bin/bash", "-c", "curl -LsSf https://astral.sh/uv/install.sh | sh"], {
-      env: { UV_NO_MODIFY_PATH: "1" },
-    });
+    const r = await ctx.run(
+      ["/bin/bash", "-c", "curl -LsSf https://astral.sh/uv/install.sh | sh"],
+      {
+        env: { UV_NO_MODIFY_PATH: "1" },
+      },
+    );
     if (r.exitCode !== 0) throw new Error(`uv install failed: ${r.stderr.slice(-500)}`);
   },
   verify: async (ctx) =>

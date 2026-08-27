@@ -2,6 +2,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { mkdir, writeFile } from "node:fs/promises";
 import { defineItem } from "../item.ts";
+import type { Runner } from "../../exec/run.ts";
 
 // Decided Finder sidebar Favorites order (top → bottom), from Peter's
 // screenshot. Reasoning: Applications + Home at the top (most-launched),
@@ -37,9 +38,12 @@ typealias SFLCreateFn   = @convention(c) (CFAllocator?, CFString, CFTypeRef?) ->
 typealias SFLSnapshotFn = @convention(c) (CFTypeRef, UnsafeMutablePointer<UInt32>) -> CFArray?
 typealias SFLInsertFn   = @convention(c) (CFTypeRef, OpaquePointer?, CFString?, CFTypeRef?, CFURL, CFDictionary?, CFArray?) -> CFTypeRef?
 typealias SFLRemoveFn   = @convention(c) (CFTypeRef, CFTypeRef) -> OSStatus
+typealias SFLItemURLFn  = @convention(c) (CFTypeRef, UInt32, UnsafeMutableRawPointer?) -> Unmanaged<CFURL>?
 
-let paths = Array(CommandLine.arguments.dropFirst())
-if paths.isEmpty { print("no paths"); exit(1) }
+let args = Array(CommandLine.arguments.dropFirst())
+let listMode = args.first == "--list"
+let paths = listMode ? [] : args
+if !listMode && paths.isEmpty { print("no paths"); exit(1) }
 
 guard let handle = dlopen("/System/Library/Frameworks/CoreServices.framework/CoreServices", RTLD_LAZY) else {
     print("FAIL dlopen CoreServices"); exit(1)
@@ -52,6 +56,7 @@ guard let create: SFLCreateFn = sym("LSSharedFileListCreate"),
       let snapshot: SFLSnapshotFn = sym("LSSharedFileListCopySnapshot"),
       let insert: SFLInsertFn = sym("LSSharedFileListInsertItemURL"),
       let remove: SFLRemoveFn = sym("LSSharedFileListItemRemove"),
+      let itemURL: SFLItemURLFn = sym("LSSharedFileListItemCopyResolvedURL"),
       let kFavPtr = dlsym(handle, "kLSSharedFileListFavoriteItems"),
       let kLastPtr = dlsym(handle, "kLSSharedFileListItemLast") else {
     print("FAIL dlsym symbols"); exit(1)
@@ -61,6 +66,21 @@ let kLastRaw = kLastPtr.assumingMemoryBound(to: UInt.self).pointee
 guard let kLast = OpaquePointer(bitPattern: kLastRaw) else { print("FAIL sentinel"); exit(1) }
 
 guard let list = create(nil, kFav, nil) else { print("FAIL create list"); exit(1) }
+
+// --list mode: print the current favorite file paths, one per line, in order.
+// Flags 3 = NoUserInteraction | DoNotMountVolumes (no prompts, no side effects).
+if listMode {
+    var n: UInt32 = 0
+    if let snap = snapshot(list, &n) as? [CFTypeRef] {
+        for item in snap {
+            if let u = itemURL(item, 3, nil)?.takeRetainedValue() {
+                let url = u as URL
+                if url.isFileURL { print(url.path) }
+            }
+        }
+    }
+    exit(0)
+}
 
 // Clear existing favorites.
 var count: UInt32 = 0
@@ -84,11 +104,43 @@ if ok == paths.count { print("OK favorites set (\\(ok))") } else { print("PARTIA
 `;
 
 const SWIFT_PATH = join(homedir(), ".config", "envsetup", "set-favorites.swift");
+const BIN_PATH = SWIFT_PATH.replace(/\.swift$/, "");
 
-async function writeHelper(): Promise<string> {
+/** Absolute, tilde-expanded target order. */
+export function expandedFavorites(): string[] {
+  return FAVORITES.map((p) => p.replace(/^~/, homedir()));
+}
+
+/** Ordered exact-equality: the sidebar must match the target list precisely. */
+export function sameOrder(have: string[], want: string[]): boolean {
+  return have.length === want.length && have.every((p, i) => p === want[i]);
+}
+
+/** Write + compile the helper if the binary is missing. Returns the binary path. */
+async function ensureBinary(ctx: { run: Runner }): Promise<string> {
+  if (await Bun.file(BIN_PATH).exists()) return BIN_PATH;
   await mkdir(join(SWIFT_PATH, ".."), { recursive: true });
   await writeFile(SWIFT_PATH, SET_FAVORITES_SWIFT);
-  return SWIFT_PATH;
+  const build = await ctx.run(["swiftc", SWIFT_PATH, "-o", BIN_PATH]);
+  if (build.exitCode !== 0)
+    throw new Error(`compiling favorites helper failed: ${build.stderr.trim()}`);
+  return BIN_PATH;
+}
+
+/** Read the current Finder Favorites (file paths, in order) via the helper. */
+async function currentFavorites(ctx: { run: Runner }): Promise<string[]> {
+  const bin = await ensureBinary(ctx);
+  const r = await ctx.run([bin, "--list"]);
+  if (r.exitCode !== 0) return [];
+  return r.stdout
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+}
+
+/** True when the sidebar already matches FAVORITES exactly, in order. */
+async function matchesDesired(ctx: { run: Runner }): Promise<boolean> {
+  return sameOrder(await currentFavorites(ctx), expandedFavorites());
 }
 
 /** Sets the Finder sidebar Favorites to the decided list, in order. */
@@ -96,18 +148,16 @@ export const finderFavorites = defineItem({
   id: "finder-favorites",
   title: "Finder sidebar favorites",
   kind: "system",
+  deps: ["xcode-clt"], // needs swiftc to compile the helper
   configure: async (ctx) => {
-    const src = await writeHelper();
-    const bin = src.replace(/\.swift$/, "");
-    const build = await ctx.run(["swiftc", src, "-o", bin]);
-    if (build.exitCode !== 0) throw new Error(`compiling favorites helper failed: ${build.stderr.trim()}`);
-    const paths = FAVORITES.map((p) => p.replace(/^~/, homedir()));
-    const r = await ctx.run([bin, ...paths]);
+    const bin = await ensureBinary(ctx);
+    const r = await ctx.run([bin, ...expandedFavorites()]);
     if (r.exitCode !== 0 || !/OK favorites set/.test(r.stdout)) {
       throw new Error(`set favorites failed: ${(r.stdout + r.stderr).trim()}`);
     }
     await ctx.run(["killall", "Finder"]);
     ctx.log("Finder sidebar favorites set");
   },
-  detect: async () => ({ installed: false }),
+  detect: async (ctx) => ({ installed: await matchesDesired(ctx) }),
+  verify: async (ctx) => matchesDesired(ctx),
 });

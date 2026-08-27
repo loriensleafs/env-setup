@@ -27,9 +27,9 @@ type Task = {
   description?: string;
   label?: string;
   startTime?: number | string;
-  model?: string;              // resolved model id, v2.1.205+
-  effort?: string | number;    // v2.1.214+, absent when inherited
-  contextWindowSize?: number;  // v2.1.205+
+  model?: string; // resolved model id, v2.1.205+
+  effort?: string | number; // v2.1.214+, absent when inherited
+  contextWindowSize?: number; // v2.1.205+
   tokenCount?: number;
   cwd?: string;
 };
@@ -143,3 +143,6 @@ try {
 } catch {
   // Emit nothing -> every row keeps its default rendering.
 }
+
+// Module marker: Bun runs this as ESM (enables top-level await); tsc needs the hint.
+export {};

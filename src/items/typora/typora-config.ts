@@ -23,8 +23,16 @@ export const typoraConfig = defineItem({
   detect: async (ctx) => {
     const css = await Bun.file(join(THEMES, "vercel.css")).exists();
     if (!css) return { installed: false };
-    const theme = await ctx.run(["defaults", "read", "abnerworks.Typora", "theme"]);
-    return { installed: theme.stdout.trim() === "Vercel" };
+    // Drift-aware: verify all three written defaults, not just the theme.
+    for (const [key, expected] of [
+      ["theme", "Vercel"],
+      ["useDarkTheme", "0"],
+      ["enableAutoSave", "0"],
+    ] as const) {
+      const r = await ctx.run(["defaults", "read", "abnerworks.Typora", key]);
+      if (r.stdout.trim() !== expected) return { installed: false };
+    }
+    return { installed: true };
   },
   configure: async (ctx) => {
     await mkdir(THEMES, { recursive: true });

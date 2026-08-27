@@ -31,7 +31,10 @@ export class ItemRegistry {
       const item = this.items.get(id);
       if (item?.deps?.length) {
         // Only order against deps that are also part of this run.
-        deps.set(id, item.deps.filter((d) => selected.includes(d)));
+        deps.set(
+          id,
+          item.deps.filter((d) => selected.includes(d)),
+        );
       }
     }
     return toposort(selected, deps);

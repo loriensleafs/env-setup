@@ -5,7 +5,10 @@ export class DependencyCycleError extends Error {
 }
 
 export class UnknownDependencyError extends Error {
-  constructor(public readonly from: string, public readonly to: string) {
+  constructor(
+    public readonly from: string,
+    public readonly to: string,
+  ) {
     super(`item "${from}" depends on unknown item "${to}"`);
   }
 }

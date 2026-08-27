@@ -13,14 +13,18 @@ function ctx(reads: Record<string, string>, calls: string[] = []): ItemContext {
         if (key in reads) return { exitCode: 0, stdout: `${reads[key]}\n`, stderr: "" };
         return { exitCode: 1, stdout: "", stderr: "missing" };
       }
-      if (cmd[0] === "ls") return { exitCode: 0, stdout: "drwx------ peterkloss Library", stderr: "" };
+      if (cmd[0] === "ls")
+        return { exitCode: 0, stdout: "drwx------ peterkloss Library", stderr: "" };
       return { exitCode: 0, stdout: "", stderr: "" };
     },
   };
 }
 
 const allSet = Object.fromEntries(
-  DEFAULTS.map((d) => [`${d.domain}.${d.key}`, d.type === "bool" ? (d.value === "true" ? "1" : "0") : d.value]),
+  DEFAULTS.map((d) => [
+    `${d.domain}.${d.key}`,
+    d.type === "bool" ? (d.value === "true" ? "1" : "0") : d.value,
+  ]),
 );
 
 describe("macos-defaults", () => {

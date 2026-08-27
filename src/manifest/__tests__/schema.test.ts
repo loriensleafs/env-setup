@@ -4,7 +4,11 @@ import { MANIFEST_VERSION, manifestSchema } from "../schema.ts";
 const valid = {
   manifestVersion: MANIFEST_VERSION,
   createdAt: "2026-08-26T12:00:00Z",
-  identity: { name: "Peter Kloss", githubUser: "loriensleafs", email: "x@users.noreply.github.com" },
+  identity: {
+    name: "Peter Kloss",
+    githubUser: "loriensleafs",
+    email: "x@users.noreply.github.com",
+  },
   locations: { devDir: "~/Dev", referenceDirName: "reference" },
   items: { ghostty: { selected: true }, chrome: { selected: true, config: { flags: [] } } },
 };

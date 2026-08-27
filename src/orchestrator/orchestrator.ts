@@ -67,19 +67,12 @@ export function transitiveDependents(
 }
 
 export async function orchestrate(opts: OrchestratorOptions): Promise<RunReport> {
-  const {
-    registry,
-    manifest,
-    selection,
-    journalPath,
-    runner,
-    events = {},
-    maxAttempts = 2,
-  } = opts;
+  const { registry, manifest, selection, journalPath, runner, events = {}, maxAttempts = 2 } = opts;
 
   const prior = opts.resume ? computeResume(await readEvents(journalPath)) : null;
   const priorCompleted = prior && !prior.finished ? prior.completedSteps : new Set<string>();
-  const runId = opts.runId ?? (prior && !prior.finished && prior.runId ? prior.runId : crypto.randomUUID());
+  const runId =
+    opts.runId ?? (prior && !prior.finished && prior.runId ? prior.runId : crypto.randomUUID());
 
   const report: RunReport = {
     runId,
@@ -93,8 +86,16 @@ export async function orchestrate(opts: OrchestratorOptions): Promise<RunReport>
 
   const order = registry.executionOrder(selection);
   const toSkip = new Map<string, string>(); // id -> failed dependency id
-  const journal = (step: string, status: "started" | "succeeded" | "failed" | "skipped", attempt = 1, error?: string) =>
-    appendEvent({ ts: new Date().toISOString(), runId, step, status, attempt, ...(error ? { error } : {}) }, journalPath);
+  const journal = (
+    step: string,
+    status: "started" | "succeeded" | "failed" | "skipped",
+    attempt = 1,
+    error?: string,
+  ) =>
+    appendEvent(
+      { ts: new Date().toISOString(), runId, step, status, attempt, ...(error ? { error } : {}) },
+      journalPath,
+    );
 
   for (const id of order) {
     const item = registry.get(id);

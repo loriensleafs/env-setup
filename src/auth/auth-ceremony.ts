@@ -27,7 +27,10 @@ export async function storedToken(run: Runner): Promise<string | null> {
  * Device flow under envsetup's app id → token into macOS Keychain → handed to
  * gh (so clones/API work) → gh becomes git's credential helper.
  */
-export async function githubAuthCeremony(run: Runner, opts: { force?: boolean } = {}): Promise<AuthResult> {
+export async function githubAuthCeremony(
+  run: Runner,
+  opts: { force?: boolean } = {},
+): Promise<AuthResult> {
   const existing = opts.force ? null : await storedToken(run);
   if (existing !== null) {
     try {
@@ -52,8 +55,20 @@ export async function githubAuthCeremony(run: Runner, opts: { force?: boolean } 
   s.stop(`Signed in as ${user.login}`);
 
   // Keychain (idempotent update), then hand the token to gh + git.
-  await run(["security", "add-generic-password", "-U", "-s", KEYCHAIN_SERVICE, "-a", user.login, "-w", accessToken]);
-  const ghLogin = Bun.spawn(["/opt/homebrew/bin/gh", "auth", "login", "--with-token"], { stdin: "pipe" });
+  await run([
+    "security",
+    "add-generic-password",
+    "-U",
+    "-s",
+    KEYCHAIN_SERVICE,
+    "-a",
+    user.login,
+    "-w",
+    accessToken,
+  ]);
+  const ghLogin = Bun.spawn(["/opt/homebrew/bin/gh", "auth", "login", "--with-token"], {
+    stdin: "pipe",
+  });
   ghLogin.stdin.write(accessToken);
   await ghLogin.stdin.end();
   if ((await ghLogin.exited) !== 0) {

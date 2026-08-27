@@ -71,8 +71,11 @@ describe("orchestrate", () => {
     r.register(makeItem("leaf", probe, { deps: ["mid"] }));
     const path = jpath();
     const report = await orchestrate({
-      registry: r, manifest: manifest(), selection: ["leaf", "base", "mid"],
-      journalPath: path, runner,
+      registry: r,
+      manifest: manifest(),
+      selection: ["leaf", "base", "mid"],
+      journalPath: path,
+      runner,
     });
     expect(probe.installs).toEqual(["base", "mid", "leaf"]);
     expect(report.finished).toBe(true);
@@ -87,7 +90,11 @@ describe("orchestrate", () => {
     const r = new ItemRegistry();
     r.register(makeItem("present", probe, { installed: true }));
     const report = await orchestrate({
-      registry: r, manifest: manifest(), selection: ["present"], journalPath: jpath(), runner,
+      registry: r,
+      manifest: manifest(),
+      selection: ["present"],
+      journalPath: jpath(),
+      runner,
     });
     expect(probe.installs).toEqual([]);
     expect(report.skippedInstalled).toEqual(["present"]);
@@ -99,7 +106,11 @@ describe("orchestrate", () => {
     r.register(makeItem("flaky", probe, { failTimes: 1 }));
     const path = jpath();
     const report = await orchestrate({
-      registry: r, manifest: manifest(), selection: ["flaky"], journalPath: path, runner,
+      registry: r,
+      manifest: manifest(),
+      selection: ["flaky"],
+      journalPath: path,
+      runner,
     });
     expect(report.succeeded).toEqual(["flaky"]);
     const events = await readEvents(path);
@@ -115,9 +126,11 @@ describe("orchestrate", () => {
     r.register(makeItem("grandchild", probe, { deps: ["child"] }));
     r.register(makeItem("bystander", probe));
     const report = await orchestrate({
-      registry: r, manifest: manifest(),
+      registry: r,
+      manifest: manifest(),
       selection: ["bad", "child", "grandchild", "bystander"],
-      journalPath: jpath(), runner,
+      journalPath: jpath(),
+      runner,
     });
     expect(report.finished).toBe(true);
     expect(report.failed.map((f) => f.id)).toEqual(["bad"]);
@@ -131,7 +144,11 @@ describe("orchestrate", () => {
     r.register(makeItem("clt", probe, { required: true, failTimes: 99 }));
     r.register(makeItem("later", probe));
     const report = await orchestrate({
-      registry: r, manifest: manifest(), selection: ["clt", "later"], journalPath: jpath(), runner,
+      registry: r,
+      manifest: manifest(),
+      selection: ["clt", "later"],
+      journalPath: jpath(),
+      runner,
     });
     expect(report.aborted?.id).toBe("clt");
     expect(report.finished).toBe(false);
@@ -145,7 +162,11 @@ describe("orchestrate", () => {
     r.register(makeItem("b", probe, { failTimes: 99 }));
     const path = jpath();
     const first = await orchestrate({
-      registry: r, manifest: manifest(), selection: ["a", "b"], journalPath: path, runner,
+      registry: r,
+      manifest: manifest(),
+      selection: ["a", "b"],
+      journalPath: path,
+      runner,
     });
     expect(first.succeeded).toEqual(["a"]);
     expect(first.failed.map((f) => f.id)).toEqual(["b"]);
@@ -160,13 +181,22 @@ describe("orchestrate", () => {
     rX.register(makeItem("ok", probeX));
     rX.register(makeItem("z-boom", probeX, { required: true, failTimes: 2 }));
     const runA = await orchestrate({
-      registry: rX, manifest: manifest(), selection: ["ok", "z-boom"], journalPath: path2, runner,
+      registry: rX,
+      manifest: manifest(),
+      selection: ["ok", "z-boom"],
+      journalPath: path2,
+      runner,
     });
     expect(runA.aborted?.id).toBe("z-boom");
     expect(probeX.installs).toEqual(["ok"]);
     // resume: ok skipped-as-completed, boom now succeeds (failTimes exhausted)
     const runB = await orchestrate({
-      registry: rX, manifest: manifest(), selection: ["ok", "z-boom"], journalPath: path2, runner, resume: true,
+      registry: rX,
+      manifest: manifest(),
+      selection: ["ok", "z-boom"],
+      journalPath: path2,
+      runner,
+      resume: true,
     });
     expect(runB.skippedCompleted).toEqual(["ok"]);
     expect(runB.succeeded).toEqual(["z-boom"]);
@@ -178,18 +208,37 @@ describe("orchestrate", () => {
     const probe: Probe = { installs: [], configures: [] };
     const schema = z.object({ cpus: z.number().int().min(1).max(16) });
     const r = new ItemRegistry();
-    r.register(makeItem("podman", probe, { configSchema: schema, defaultConfig: { cpus: 4 }, configure: true }));
+    r.register(
+      makeItem("podman", probe, {
+        configSchema: schema,
+        defaultConfig: { cpus: 4 },
+        configure: true,
+      }),
+    );
     await orchestrate({
-      registry: r, manifest: manifest({ podman: { selected: true, config: { cpus: 8 } } }),
-      selection: ["podman"], journalPath: jpath(), runner,
+      registry: r,
+      manifest: manifest({ podman: { selected: true, config: { cpus: 8 } } }),
+      selection: ["podman"],
+      journalPath: jpath(),
+      runner,
     });
     expect(probe.configures).toEqual([{ cpus: 8 }]);
     // and defaults when manifest has none
     const probe2: Probe = { installs: [], configures: [] };
     const r2b = new ItemRegistry();
-    r2b.register(makeItem("podman", probe2, { configSchema: schema, defaultConfig: { cpus: 4 }, configure: true }));
+    r2b.register(
+      makeItem("podman", probe2, {
+        configSchema: schema,
+        defaultConfig: { cpus: 4 },
+        configure: true,
+      }),
+    );
     await orchestrate({
-      registry: r2b, manifest: manifest(), selection: ["podman"], journalPath: jpath(), runner,
+      registry: r2b,
+      manifest: manifest(),
+      selection: ["podman"],
+      journalPath: jpath(),
+      runner,
     });
     expect(probe2.configures).toEqual([{ cpus: 4 }]);
   });
@@ -198,10 +247,19 @@ describe("orchestrate", () => {
     const probe: Probe = { installs: [], configures: [] };
     const schema = z.object({ cpus: z.number().int().min(1).max(16) });
     const r = new ItemRegistry();
-    r.register(makeItem("podman", probe, { configSchema: schema, defaultConfig: { cpus: 4 }, configure: true }));
+    r.register(
+      makeItem("podman", probe, {
+        configSchema: schema,
+        defaultConfig: { cpus: 4 },
+        configure: true,
+      }),
+    );
     const report = await orchestrate({
-      registry: r, manifest: manifest({ podman: { selected: true, config: { cpus: 999 } } }),
-      selection: ["podman"], journalPath: jpath(), runner,
+      registry: r,
+      manifest: manifest({ podman: { selected: true, config: { cpus: 999 } } }),
+      selection: ["podman"],
+      journalPath: jpath(),
+      runner,
     });
     expect(report.failed.map((f) => f.id)).toEqual(["podman"]);
   });

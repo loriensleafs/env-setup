@@ -11,7 +11,12 @@ const template = {
     "superwhisper@superwhisper": true,
   },
   extraKnownMarketplaces: {
-    ACMElabs: { source: { source: "file", path: "/Users/peter.kloss/Dev/ACMElabs/.claude-plugin/marketplace.json" } },
+    ACMElabs: {
+      source: {
+        source: "file",
+        path: "/Users/peter.kloss/Dev/ACMElabs/.claude-plugin/marketplace.json",
+      },
+    },
     superwhisper: { source: { source: "github", repo: "superultrainc/superwhisper-claude-code" } },
   },
   statusLine: { type: "command", command: "~/.claude/statusline.sh", refreshInterval: 5 },
@@ -23,7 +28,8 @@ const allRepos = new Set(Object.values(PLUGIN_REPO_MAP));
 describe("buildSettings", () => {
   test("templates the marketplace path onto the actual devDir (fixes peter.kloss path)", () => {
     const s = buildSettings({ template, devDir: "~/Dev", selection: allRepos });
-    const path = (s.extraKnownMarketplaces as Record<string, { source: { path: string } }>).ACMElabs.source.path;
+    const path = (s.extraKnownMarketplaces as Record<string, { source: { path: string } }>).ACMElabs
+      .source.path;
     expect(path).not.toContain("peter.kloss");
     expect(path).toContain("/Dev/ACMElabs/.claude-plugin/marketplace.json");
   });

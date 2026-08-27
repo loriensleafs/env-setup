@@ -13,4 +13,4 @@ describe("chrome-pwas", () => {
     expect(INSTALL_SWIFT).toContain("renameInstalledBundle");
     expect(INSTALL_SWIFT).toContain("kAXPressAction");
   });
-})
+});

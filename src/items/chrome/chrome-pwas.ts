@@ -228,10 +228,14 @@ export const chromePwas = defineItem({
   title: "Google web apps (Mail, Calendar, Drive, Notes)",
   kind: "config-only",
   deps: ["chrome"],
-  ceremonies: [{ id: "chrome-pwas-install", title: "Install the 4 Google web apps (drives Chrome)" }],
+  ceremonies: [
+    { id: "chrome-pwas-install", title: "Install the 4 Google web apps (drives Chrome)" },
+  ],
   detect: async () => {
     for (const p of PWAS) {
-      if (!(await Bun.file(join(CHROME_APPS_DIR, `${p.name}.app`, "Contents", "Info.plist")).exists())) {
+      if (
+        !(await Bun.file(join(CHROME_APPS_DIR, `${p.name}.app`, "Contents", "Info.plist")).exists())
+      ) {
         return { installed: false };
       }
     }

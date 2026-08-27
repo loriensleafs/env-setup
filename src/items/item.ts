@@ -31,6 +31,27 @@ export interface Ceremony {
   title: string;
 }
 
+/**
+ * A tool's ~/.zshrc needs, declared co-located with the item that installs it.
+ * The dotfiles collector (items/defs/shell-block.ts) assembles all items'
+ * contributions into the single managed block, in a fixed, correct order:
+ * env → completions (FPATH) → compinit → init hooks → aliases. EVERY line must
+ * be self-guarded (`command -v x >/dev/null && …`, `[ -d … ] && …`) because the
+ * block is emitted whole regardless of which items were selected.
+ */
+export interface ZshContribution {
+  /** Section label for this item's lines (e.g. "bun", "Go"). */
+  comment?: string;
+  /** PATH / environment exports — emitted first. */
+  env?: string[];
+  /** FPATH additions / compdef producers — must precede compinit. */
+  completions?: string[];
+  /** Hooks & evals needing PATH ready (fnm, uv/bun completions) — after compinit. */
+  init?: string[];
+  /** Aliases — emitted last. */
+  aliases?: string[];
+}
+
 export interface Item<C = unknown> {
   id: string;
   title: string;
@@ -42,6 +63,8 @@ export interface Item<C = unknown> {
   ceremonies?: Ceremony[];
   configSchema?: z.ZodType<C>;
   defaultConfig?: C;
+  /** Declares this item's ~/.zshrc needs. Pure (no I/O); may read config. */
+  zsh?(config?: C): ZshContribution | undefined;
   detect(ctx: ItemContext): Promise<DetectResult>;
   install?(ctx: ItemContext): Promise<void>;
   configure?(ctx: ItemContext, config: C): Promise<void>;

@@ -22,7 +22,10 @@ function ctx(presentPaths: string[], calls: string[]): ItemContext {
 describe("dock", () => {
   test("configure adds only present apps, in decided order, then restarts Dock", async () => {
     const calls: string[] = [];
-    await dock.configure?.(ctx(["/Applications/Ghostty.app", "/Applications/Cursor.app", "/Applications"], calls), undefined);
+    await dock.configure?.(
+      ctx(["/Applications/Ghostty.app", "/Applications/Cursor.app", "/Applications"], calls),
+      undefined,
+    );
     const adds = calls.filter((c) => c.includes("--add"));
     expect(adds.some((c) => c.includes("Ghostty"))).toBe(true);
     expect(adds.some((c) => c.includes("Typora"))).toBe(false); // absent → skipped
@@ -36,8 +39,17 @@ describe("dock", () => {
 
   test("decided dock order is recorded", () => {
     expect(DOCK_APPS.map((a) => a.label)).toEqual([
-      "Apps", "System Settings", "Ghostty", "Cursor", "Typora", "Claude",
-      "Chrome", "Mail", "Calendar", "Drive", "Notes",
+      "Apps",
+      "System Settings",
+      "Ghostty",
+      "Cursor",
+      "Typora",
+      "Claude",
+      "Chrome",
+      "Mail",
+      "Calendar",
+      "Drive",
+      "Notes",
     ]);
   });
 });

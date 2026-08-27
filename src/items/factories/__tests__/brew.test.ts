@@ -22,7 +22,9 @@ function ctxWith(responses: Record<string, RunResult>): ItemContext & { calls: s
 
 describe("brewFormula", () => {
   test("detect parses installed version", async () => {
-    const ctx = ctxWith({ "list --versions jq": { exitCode: 0, stdout: "jq 1.7.1\n", stderr: "" } });
+    const ctx = ctxWith({
+      "list --versions jq": { exitCode: 0, stdout: "jq 1.7.1\n", stderr: "" },
+    });
     const d = await brewFormula({ id: "jq", title: "jq" }).detect(ctx);
     expect(d).toEqual({ installed: true, version: "1.7.1" });
   });
@@ -35,7 +37,9 @@ describe("brewFormula", () => {
 
   test("install throws with stderr on failure; succeeds silently otherwise", async () => {
     const bad = ctxWith({});
-    await expect(brewFormula({ id: "jq", title: "jq" }).install?.(bad)).rejects.toThrow(/not mocked/);
+    await expect(brewFormula({ id: "jq", title: "jq" }).install?.(bad)).rejects.toThrow(
+      /not mocked/,
+    );
     const good = ctxWith({ "install jq": { exitCode: 0, stdout: "", stderr: "" } });
     await expect(brewFormula({ id: "jq", title: "jq" }).install?.(good)).resolves.toBeUndefined();
   });
@@ -43,13 +47,17 @@ describe("brewFormula", () => {
   test("respects custom brew name and extra deps", async () => {
     const item = brewFormula({ id: "delta", title: "delta", name: "git-delta", deps: ["x"] });
     expect(item.deps).toEqual(["homebrew", "x"]);
-    const ctx = ctxWith({ "list --versions git-delta": { exitCode: 0, stdout: "git-delta 0.18.2", stderr: "" } });
+    const ctx = ctxWith({
+      "list --versions git-delta": { exitCode: 0, stdout: "git-delta 0.18.2", stderr: "" },
+    });
     const d = await item.detect(ctx);
     expect(d.version).toBe("0.18.2");
   });
 
   test("cask uses --cask paths", async () => {
-    const ctx = ctxWith({ "list --cask --versions ghostty": { exitCode: 0, stdout: "ghostty 1.3.1", stderr: "" } });
+    const ctx = ctxWith({
+      "list --cask --versions ghostty": { exitCode: 0, stdout: "ghostty 1.3.1", stderr: "" },
+    });
     const d = await brewCask({ id: "ghostty", title: "Ghostty" }).detect(ctx);
     expect(d).toEqual({ installed: true, version: "1.3.1" });
     expect(ctx.calls[0]).toContain("--cask");
