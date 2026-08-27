@@ -17,6 +17,16 @@ const SHORTCUTS: [string, string][] = [
   ["LAVAtakeAllInOne", '{"carbonModifiers":768,"carbonKey":23}'],
 ];
 
+/**
+ * macOS's own screenshot shortcuts for the SAME key combos. System symbolic
+ * hotkeys beat app registrations (Kap #868; CleanShot's onboarding has you
+ * uncheck these), so the takeover above is dead unless these are disabled:
+ * 28 = ⇧⌘3 (save), 30 = ⇧⌘4 (save), 184 = ⇧⌘5 (screenshot/recording panel —
+ * parameters 53/23/1179648 verified locally). The ⌃⇧⌘ copy variants (29/31)
+ * don't collide and are left alone.
+ */
+const SCREENSHOT_HOTKEY_IDS = [28, 30, 184];
+
 function settings(home: string): [string, string[]][] {
   return [
     ["exportPath", ["-string", `${home}/Screenshots`]],
@@ -53,9 +63,54 @@ export const cleanshotConfig = defineItem({
     },
   ],
   detect: async (ctx) => {
-    const key = await ctx.run(["defaults", "read", DOMAIN, "activationKey"]);
-    const path = await ctx.run(["defaults", "read", DOMAIN, "exportPath"]);
-    return { installed: key.exitCode === 0 && path.stdout.includes("/Screenshots") };
+    // Drift-aware: EVERY written setting + the three shortcut blobs must match.
+    // `differs` = some CleanShot config exists but doesn't match our values.
+    let anyPresent = false;
+    let matches = true;
+    const check = (present: boolean, ok: boolean) => {
+      if (present) anyPresent = true;
+      if (!ok) matches = false;
+    };
+    // License: presence only — the value is a secret, not compared.
+    const lic = await ctx.run(["defaults", "read", DOMAIN, "activationKey"]);
+    check(lic.exitCode === 0, lic.exitCode === 0);
+    for (const [key, args] of settings(homedir())) {
+      const r = await ctx.run(["defaults", "read", DOMAIN, key]);
+      const present = r.exitCode === 0;
+      const raw = r.stdout.trim();
+      let expected: string;
+      if (args[0] === "-string") expected = args[1] as string;
+      else if (args[0] === "-bool") expected = args[1] === "true" ? "1" : "0";
+      else expected = args.slice(1).join(","); // -array
+      const actual = args[0] === "-array" ? raw.replace(/[\s()]/g, "") : raw;
+      check(present, present && actual === expected);
+    }
+    // Shortcut blobs: `defaults read` TRUNCATES -data values (verified), so
+    // compare via the exported XML plist's base64 <data> payloads instead.
+    const exp = await ctx.run(["defaults", "export", DOMAIN, "-"]);
+    const xml = exp.exitCode === 0 ? exp.stdout.replace(/\s/g, "") : "";
+    for (const [key, json] of SHORTCUTS) {
+      const b64 = Buffer.from(json, "utf8").toString("base64");
+      check(
+        xml.includes(`<key>${key}</key>`),
+        xml.includes(`<key>${key}</key><data>${b64}</data>`),
+      );
+    }
+    // The system screenshot shortcuts must be OFF or the takeover is dead.
+    // (Not counted toward anyPresent — this is system state, not CleanShot's.)
+    const hk = await ctx.run([
+      "defaults",
+      "read",
+      "com.apple.symbolichotkeys",
+      "AppleSymbolicHotKeys",
+    ]);
+    for (const id of SCREENSHOT_HOTKEY_IDS) {
+      const disabled =
+        hk.exitCode === 0 &&
+        new RegExp(`[\\s{]${id}\\s*=\\s*\\{\\s*enabled\\s*=\\s*0`).test(hk.stdout);
+      if (!disabled) matches = false;
+    }
+    return { installed: matches, ...(!matches && anyPresent ? { differs: true } : {}) };
   },
   configure: async (ctx) => {
     const license = await getSecret(SECRET_KEYS.cleanshotLicense);
@@ -70,7 +125,27 @@ export const cleanshotConfig = defineItem({
       const hex = Buffer.from(json, "utf8").toString("hex");
       await write(ctx, key, ["-data", hex]);
     }
-    ctx.log("licensed + configured (⇧⌘3/4/5 takeover, ~/Screenshots, overlay flow)");
+    // Free ⇧⌘3/4/5 from macOS so CleanShot's registrations actually fire.
+    // `defaults write -dict-add` goes through cfprefsd (safer than editing the
+    // plist file directly) and preserves the other hotkey entries.
+    for (const id of SCREENSHOT_HOTKEY_IDS) {
+      const r = await ctx.run([
+        "defaults",
+        "write",
+        "com.apple.symbolichotkeys",
+        "AppleSymbolicHotKeys",
+        "-dict-add",
+        String(id),
+        "<dict><key>enabled</key><false/></dict>",
+      ]);
+      if (r.exitCode !== 0)
+        throw new Error(`disabling system hotkey ${id} failed: ${r.stderr.trim()}`);
+    }
+    await ctx.run([
+      "/System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings",
+      "-u",
+    ]);
+    ctx.log("licensed + configured (⇧⌘3/4/5 takeover — system shortcuts freed, ~/Screenshots)");
   },
   verify: async (ctx) =>
     (await ctx.run(["defaults", "read", DOMAIN, "exportPath"])).stdout.includes("Screenshots"),

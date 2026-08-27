@@ -18,7 +18,9 @@ interface PluginJson {
  * real marketplaces (superwhisper, claude-plugins-official) 2026-08-26:
  * relative "./<dir>" sources; metadata from each repo's plugin.json.
  */
-export async function generateMarketplace(acmelabsDir: string): Promise<string[]> {
+export async function renderMarketplace(
+  acmelabsDir: string,
+): Promise<{ content: string; included: string[] }> {
   const plugins: Record<string, unknown>[] = [];
   const included: string[] = [];
   for (const spec of ACMELABS_REPOS) {
@@ -44,9 +46,14 @@ export async function generateMarketplace(acmelabsDir: string): Promise<string[]
     owner: { name: "Peter Kloss", email: "pkloss@gmail.com" },
     plugins,
   };
+  return { content: `${JSON.stringify(marketplace, null, 2)}\n`, included };
+}
+
+export async function generateMarketplace(acmelabsDir: string): Promise<string[]> {
+  const { content, included } = await renderMarketplace(acmelabsDir);
   const outDir = join(acmelabsDir, ".claude-plugin");
   await mkdir(outDir, { recursive: true });
-  await Bun.write(join(outDir, "marketplace.json"), `${JSON.stringify(marketplace, null, 2)}\n`);
+  await Bun.write(join(outDir, "marketplace.json"), content);
   return included;
 }
 
@@ -59,7 +66,14 @@ export const acmelabsMarketplace = defineItem({
   deps: ACMELABS_REPOS.map((r) => r.id),
   detect: async (ctx) => {
     const dir = join(expandHome(ctx.manifest.locations.devDir), "ACMElabs");
-    return { installed: await Bun.file(join(dir, ".claude-plugin", "marketplace.json")).exists() };
+    const file = Bun.file(join(dir, ".claude-plugin", "marketplace.json"));
+    // No file = never generated.
+    if (!(await file.exists())) return { installed: false };
+    // Drift-aware: the file must equal what we'd regenerate from the repos
+    // actually cloned right now (a repo added/removed since = stale listing).
+    const { content } = await renderMarketplace(dir);
+    const matches = (await file.text()) === content;
+    return { installed: matches, ...(matches ? {} : { differs: true }) };
   },
   configure: async (ctx) => {
     const dir = join(expandHome(ctx.manifest.locations.devDir), "ACMElabs");

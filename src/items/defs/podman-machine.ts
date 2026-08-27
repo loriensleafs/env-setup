@@ -60,8 +60,24 @@ export const podmanMachine = defineItem<PodmanMachineConfig>({
   configSchema: podmanMachineSchema,
   defaultConfig: podmanMachineSchema.parse({}),
   detect: async (ctx) => {
-    const r = await ctx.run([PODMAN, "machine", "list", "--format", "{{.Name}}"]);
-    return { installed: r.exitCode === 0 && r.stdout.trim() !== "" };
+    const list = await ctx.run([PODMAN, "machine", "list", "--format", "{{.Name}}"]);
+    // No machine = never set up.
+    if (list.exitCode !== 0 || list.stdout.trim() === "") return { installed: false };
+    // Drift-aware: the machine exists — the captured DOCKER_HOST env file must
+    // exist and point at the machine's actual socket, or Docker-API tools break
+    // silently while everything "looks" installed.
+    const sock = await ctx.run([
+      PODMAN,
+      "machine",
+      "inspect",
+      "--format",
+      "{{.ConnectionInfo.PodmanSocket.Path}}",
+    ]);
+    const path = sock.stdout.trim();
+    if (sock.exitCode !== 0 || !path) return { installed: true }; // socket unknowable — don't flag
+    const envFile = Bun.file(PODMAN_ENV);
+    const ok = (await envFile.exists()) && (await envFile.text()).includes(`unix://${path}`);
+    return ok ? { installed: true } : { installed: false, differs: true };
   },
   configure: async (ctx, config) => {
     const list = await ctx.run([PODMAN, "machine", "list", "--format", "{{.Name}}"]);

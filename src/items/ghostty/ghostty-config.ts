@@ -21,7 +21,8 @@ theme = ${config.theme}
 font-family = ${config.fontFamily}
 font-size = ${config.fontSize}
 
-# Shell integration feature set (list is absolute, not additive).
+# Shell integration features — all six flags, enabled explicitly.
+# (Omitted flags keep their Ghostty defaults; this list is not absolute.)
 shell-integration-features = cursor,title,path,sudo,ssh-env,ssh-terminfo
 
 # Clipboard: copy on select; warn when pasting text with hidden newlines.
@@ -48,12 +49,15 @@ export const ghosttyConfig = defineItem<GhosttyConfig>({
   defaultConfig: ghosttyConfigSchema.parse({}),
   detect: async (ctx) => {
     const file = Bun.file(CONFIG_PATH);
+    // No config file = never configured.
     if (!(await file.exists())) return { installed: false };
     // Drift-aware (like dotfiles): the file must EQUAL the freshly rendered
     // config for the effective settings — a marker-only check would miss theme/
-    // font/keybind drift or a template change in a newer envsetup.
+    // font/keybind drift or a template change in a newer envsetup. A file that
+    // exists but differs is a real differ (user- or hand-edited config).
     const config = ghosttyConfigSchema.parse(ctx.manifest.items["ghostty-config"]?.config ?? {});
-    return { installed: (await file.text()) === renderGhosttyConfig(config) };
+    const matches = (await file.text()) === renderGhosttyConfig(config);
+    return { installed: matches, ...(matches ? {} : { differs: true }) };
   },
   configure: async (ctx, config) => {
     await mkdir(join(CONFIG_PATH, ".."), { recursive: true });

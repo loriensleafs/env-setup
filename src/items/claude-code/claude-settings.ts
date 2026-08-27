@@ -58,30 +58,63 @@ export function buildSettings(input: BuildSettingsInput): Record<string, unknown
   return settings;
 }
 
+/** Key-order-independent JSON serialization, for deep equality. */
+function canonical(v: unknown): string {
+  if (Array.isArray(v)) return `[${v.map(canonical).join(",")}]`;
+  if (v !== null && typeof v === "object") {
+    const o = v as Record<string, unknown>;
+    const body = Object.keys(o)
+      .sort()
+      .map((k) => `${JSON.stringify(k)}:${canonical(o[k])}`)
+      .join(",");
+    return `{${body}}`;
+  }
+  return JSON.stringify(v) ?? "undefined";
+}
+
 export const claudeSettings = defineItem({
   id: "claude-settings",
   title: "Claude Code settings + hooks + statusline",
   kind: "config-only",
   deps: ["bun", "acmelabs-marketplace", "terminal-notifier"],
   ceremonies: [{ id: "claude-login", title: "Sign in to Claude Code" }],
-  detect: async () => {
-    const settings = Bun.file(join(CLAUDE_DIR, "settings.json"));
-    const statusline = Bun.file(join(CLAUDE_DIR, "statusline.ts"));
-    const formatHook = Bun.file(join(CLAUDE_DIR, "hooks", "format.ts"));
-    if (
-      !(await settings.exists()) ||
-      !(await statusline.exists()) ||
-      !(await formatHook.exists())
-    ) {
-      return { installed: false };
-    }
+  detect: async (ctx) => {
+    const settingsFile = Bun.file(join(CLAUDE_DIR, "settings.json"));
+    // No settings.json = never configured.
+    if (!(await settingsFile.exists())) return { installed: false };
+    // Drift-aware: settings.json must equal what we'd build for this manifest
+    // (key order ignored), and every deployed hook/statusline must match the
+    // shipped asset. Anything else is a differ — the user opts in to reset.
+    let current: Record<string, unknown>;
     try {
-      const current = (await settings.json()) as Record<string, unknown>;
-      const line = (current.statusLine as Record<string, unknown> | undefined)?.command;
-      return { installed: line === "bun ~/.claude/statusline.ts" };
+      current = (await settingsFile.json()) as Record<string, unknown>;
     } catch {
-      return { installed: false };
+      return { installed: false, differs: true };
     }
+    const template = (await Bun.file(join(ASSETS, "settings.template.json")).json()) as Record<
+      string,
+      unknown
+    >;
+    const selection = new Set(
+      Object.entries(ctx.manifest.items)
+        .filter(([, s]) => s.selected)
+        .map(([id]) => id),
+    );
+    const expected = buildSettings({ template, devDir: ctx.manifest.locations.devDir, selection });
+    if (canonical(current) !== canonical(expected)) return { installed: false, differs: true };
+    for (const [target, asset] of [
+      ["hooks/notify.ts", "hooks-notify.ts"],
+      ["hooks/subagent-statusline.ts", "hooks-subagent-statusline.ts"],
+      ["hooks/format.ts", "hooks-format.ts"],
+      ["statusline.ts", "statusline.ts"],
+    ] as const) {
+      const deployed = Bun.file(join(CLAUDE_DIR, target));
+      if (!(await deployed.exists())) return { installed: false, differs: true };
+      if ((await deployed.text()) !== (await Bun.file(join(ASSETS, asset)).text())) {
+        return { installed: false, differs: true };
+      }
+    }
+    return { installed: true };
   },
   configure: async (ctx) => {
     const template = (await Bun.file(join(ASSETS, "settings.template.json")).json()) as Record<
