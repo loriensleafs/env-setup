@@ -27,6 +27,12 @@ commands. Every installable/configurable thing is an **item** (`detect`/`install
 `doctor`/`sync` keep it in sync. Secrets are **age-encrypted**. Ships as a single
 `bun build --compile` binary (Bun embedded).
 
+**Your settings are respected.** Something already installed with settings that differ from
+envsetup's defaults is never silently overwritten — it shows in the picker as
+*"installed — settings differ (select to reset)"*, unchecked. Selecting it is the opt-in to
+reset; leave it unchecked and your configuration is untouched. `doctor` reports such drift
+as `≠` rather than "missing".
+
 Design + all decisions: **[docs/PLAN.md](docs/PLAN.md)** ·
 research: [docs/RESEARCH-clack-citty-bun.md](docs/RESEARCH-clack-citty-bun.md) ·
 conventions for agents: [CLAUDE.md](CLAUDE.md).
