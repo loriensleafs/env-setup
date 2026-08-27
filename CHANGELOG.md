@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2026-08-27
+
+### Bug Fixes
+- Piped-install prompts froze (dead /dev/tty reads) + 0-width-terminal OOM (0a7257a)
+
+### Other
+- Merge pull request #5 from loriensleafs/fix/tty-self-heal (5661d93)
+
 ## [0.1.1] - 2026-08-27
 
 ### Bug Fixes
