@@ -65,6 +65,18 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
     );
     process.exit(1);
   }
+  // stdout can be a terminal while stdin is not — the `curl … | sh` case, where
+  // stdin is the exhausted script pipe and every prompt would EOF-cancel.
+  // install.sh re-attaches /dev/tty; this guard turns any remaining case into a
+  // clear message instead of a silent instant exit at the first prompt.
+  if (!process.stdin.isTTY) {
+    console.error(
+      "envsetup bootstrap can't read your keyboard (stdin is not a terminal).\n" +
+        "If you piped the installer (`curl … | sh`), re-run it — install.sh attaches\n" +
+        "the terminal itself — or run the envsetup binary directly.",
+    );
+    process.exit(1);
+  }
 
   p.intro(color.bold("envsetup"));
 
