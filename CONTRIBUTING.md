@@ -37,8 +37,11 @@ If `bun` isn't found, add it to PATH: `export PATH="$HOME/.bun/bin:$PATH"`.
    `src/items/**`): implement `detect`/`install`/`configure`/`verify`, declare `deps`, add a
    Zod `configSchema` for user-tunable settings, and — if the tool needs a shell line — a
    co-located `zsh()` contribution (assembled by `src/items/defs/shell-block.ts`). Register it
-   in `src/items/all.ts`. Make `detect()` **drift-aware**: verify the config is *correct*, not
-   merely present, so `doctor` reports real drift.
+   in `src/items/all.ts`. Make `detect()` **drift-aware**: compare the actual current values to
+   the effective config, and return `{ installed: false, differs: true }` when config is
+   *present but mismatched* (vs plain `installed: false` for never-configured). `differs` is
+   what makes a drifted item show as an opt-in reset in bootstrap and as `≠` in `doctor` —
+   see [docs/CONFIG-COMPAT-PLAN.md](docs/CONFIG-COMPAT-PLAN.md) for the model.
 
 3. **Keep it green.**
 
@@ -76,22 +79,26 @@ After the release's changes are merged to `main`:
 ```bash
 git checkout main && git pull
 
-# 1. Bump the version in BOTH places
+# 1. Bump the version in BOTH places (use the next version — check `git tag` first)
 #    - package.json  "version"
 #    - src/index.ts  meta.version
-#    (edit them to e.g. 0.1.0)
+#    (edit them to e.g. 0.2.0)
 
 # 2. Regenerate the changelog for the new version
-bun run changelog -- --tag v0.1.0     # git-cliff renders the unreleased commits under [0.1.0]
+bun run changelog -- --tag v0.2.0     # git-cliff renders the unreleased commits under [0.2.0]
 
 # 3. Commit the release prep
 git add package.json src/index.ts CHANGELOG.md
-git commit -m "chore(release): v0.1.0"
+git commit -m "chore(release): v0.2.0"
 git push
 
 # 4. Tag and push the tag — this triggers the release build
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.2.0
+git push origin v0.2.0
+
+# 5. Verify: the release run compiled + attached both binaries
+gh run watch "$(gh run list --workflow=release.yml --limit 1 --json databaseId -q '.[0].databaseId')" --exit-status
+gh release view v0.2.0 --json assets -q '[.assets[].name] | join(", ")'   # expect both darwin binaries
 ```
 
 `release.yml` then compiles `dist/envsetup-darwin-arm64` and `-x64` (`bun build --compile`,

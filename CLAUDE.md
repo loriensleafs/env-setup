@@ -8,7 +8,8 @@ Bootstraps a fresh Mac (apps, runtimes, fonts, repos, macOS settings, app config
 it in shape with `doctor`/`sync`.
 
 **Source of truth: [docs/PLAN.md](docs/PLAN.md)** — every design decision and its rationale
-lives there. Read it before non-trivial work. Research foundation:
+lives there. Read it before non-trivial work. Config model + verified compatibility research:
+[docs/CONFIG-COMPAT-PLAN.md](docs/CONFIG-COMPAT-PLAN.md). Research foundation:
 [docs/RESEARCH-clack-citty-bun.md](docs/RESEARCH-clack-citty-bun.md). Contribution & release
 workflow: [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -32,6 +33,12 @@ workflow: [CONTRIBUTING.md](CONTRIBUTING.md).
   interface (`src/items/item.ts`) — `detect` / `install` / `configure` / `verify`, plus `deps`,
   `ceremonies`, `configSchema` (Zod), and an optional `zsh()` contribution. Create items with
   `defineItem`. The registry is assembled in `src/items/all.ts`.
+- **Reset-on-drift** (the config model): `detect()` must be drift-aware — compare the ACTUAL
+  current values to the effective config, and return `{ installed: false, differs: true }` when
+  config is present but mismatched (vs plain `installed: false` for never-configured). Drifted
+  items re-enter the bootstrap list as "installed — settings differ (select to reset)", default
+  UNCHECKED — selection is the user's consent to re-apply; we never silently overwrite. No
+  conflict checking, by decision (docs/CONFIG-COMPAT-PLAN.md).
 - **`zsh()` contributions** are co-located per item and assembled into the managed `~/.zshrc`
   block by `src/items/defs/shell-block.ts` (env → FPATH → compinit → init → aliases). Add shell
   needs to the item, not to a central block.
