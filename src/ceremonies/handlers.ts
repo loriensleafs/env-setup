@@ -172,7 +172,7 @@ export const HANDLERS: Record<string, CeremonyHandler> = {
         p.log.info("BetterDisplay license copied to clipboard");
       }
       p.note(
-        "BetterDisplay validates licenses online (Paddle) — no scriptable path.\nIn the app: open Settings, find the license/purchase section, and paste\n(\u2318V) the key. It activates over the network.",
+        "BetterDisplay validates licenses online (Paddle) — no scriptable path.\nIn the app: open Settings, find the license/purchase section, and paste\n(\u2318V) the key. It activates over the network.\n\nIf \u2318V does nothing: with the Dock icon hidden the app has no Edit menu\n(waydabber #2228). Keep the Settings window open — the Dock icon auto-shows\nand \u2318V works again — or right-click the field and choose Paste.",
         "BetterDisplay license",
       );
       await ctx.run(["open", "/Applications/BetterDisplay.app"]);

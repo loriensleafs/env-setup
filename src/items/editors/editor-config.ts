@@ -22,9 +22,16 @@ export const EXTENSIONS: string[] = [
   "anthropic.claude-code",
 ];
 
-/** Decided settings (docs/PLAN.md Cursor pass); project configs win for lint/format. */
+/**
+ * Decided settings (docs/PLAN.md Cursor pass); project configs win for lint/format.
+ * Theme note: with `window.autoDetectColorScheme`, VS Code REWRITES
+ * `workbench.colorTheme` from the preferred*ColorTheme keys on every OS scheme
+ * flip (vscode #196119) — so we pin the `preferred*` keys and deliberately do
+ * NOT set `workbench.colorTheme` (it's machine state, not config).
+ */
 export const EDITOR_SETTINGS: Record<string, unknown> = {
-  "workbench.colorTheme": "One Dark Pro",
+  "workbench.preferredDarkColorTheme": "One Dark Pro",
+  "workbench.preferredLightColorTheme": "Default Light Modern",
   "workbench.iconTheme": "material-icon-theme",
   "editor.fontFamily": "'JetBrainsMono Nerd Font', Menlo, monospace",
   "editor.fontSize": 13,
@@ -119,18 +126,28 @@ export function editorConfigItem(spec: EditorSpec): Item {
         : undefined,
     detect: async (ctx) => {
       const file = Bun.file(settingsPath);
+      // No settings file = never configured.
       if (!(await file.exists())) return { installed: false };
+      let current: Record<string, unknown>;
       try {
-        const current = (await file.json()) as Record<string, unknown>;
-        if (current["workbench.colorTheme"] !== "One Dark Pro") return { installed: false };
+        current = (await file.json()) as Record<string, unknown>;
       } catch {
-        return { installed: false };
+        // A settings file exists but can't be parsed — hand-edited, differs.
+        return { installed: false, differs: true };
+      }
+      // Drift-aware: EVERY decided key must match (deep, for the array/object
+      // values). Extra user keys are fine — configure() merges, not replaces.
+      for (const [key, want] of Object.entries(EDITOR_SETTINGS)) {
+        if (JSON.stringify(current[key]) !== JSON.stringify(want)) {
+          return { installed: false, differs: true };
+        }
       }
       // The terminal command must resolve (Peter's requirement).
       if (!(await resolveCli())) return { installed: false };
       const have = await installedExtensions(ctx);
       const missing = EXTENSIONS.filter((e) => !have.has(e.toLowerCase()));
-      return { installed: missing.length === 0 };
+      // Settings are ours but extensions are missing → still a drift, not absence.
+      return missing.length === 0 ? { installed: true } : { installed: false, differs: true };
     },
     configure: async (ctx) => {
       // Merge settings over whatever exists (user additions survive).

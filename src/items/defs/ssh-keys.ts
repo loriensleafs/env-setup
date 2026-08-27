@@ -65,6 +65,10 @@ export const sshKeys = defineItem({
         `${existing}${existing.endsWith("\n") || existing === "" ? "" : "\n"}${block}`,
       );
     }
+    // The signing key now exists — safe to enable commit signing (git-identity
+    // defers this exact write when the key file is absent, because gpgsign
+    // without a key makes every `git commit` fail).
+    await ctx.run(["git", "config", "--global", "commit.gpgsign", "true"]);
     // Upload public halves (auth as access key, signing as signing key).
     const token = await storedToken(ctx.run);
     if (token === null) {
