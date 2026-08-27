@@ -40,7 +40,12 @@ export function buildSettings(input: BuildSettingsInput): Record<string, unknown
     | undefined;
   const acme = marketplaces?.ACMElabs;
   if (acme?.source) {
-    acme.source.path = join(expandHome(input.devDir), "ACMElabs", ".claude-plugin", "marketplace.json");
+    acme.source.path = join(
+      expandHome(input.devDir),
+      "ACMElabs",
+      ".claude-plugin",
+      "marketplace.json",
+    );
   }
   const plugins = settings.enabledPlugins as Record<string, boolean> | undefined;
   if (plugins) {
@@ -48,8 +53,8 @@ export function buildSettings(input: BuildSettingsInput): Record<string, unknown
       if (!input.selection.has(repoItemId)) delete plugins[pluginKey];
     }
   }
-  (settings.statusLine as Record<string, unknown> | undefined) &&
-    ((settings.statusLine as Record<string, unknown>).command = "bun ~/.claude/statusline.ts");
+  const statusLine = settings.statusLine as Record<string, unknown> | undefined;
+  if (statusLine) statusLine.command = "bun ~/.claude/statusline.ts";
   return settings;
 }
 
@@ -57,12 +62,19 @@ export const claudeSettings = defineItem({
   id: "claude-settings",
   title: "Claude Code settings + hooks + statusline",
   kind: "config-only",
-  deps: ["bun", "acmelabs-marketplace"],
+  deps: ["bun", "acmelabs-marketplace", "terminal-notifier"],
   ceremonies: [{ id: "claude-login", title: "Sign in to Claude Code" }],
   detect: async () => {
     const settings = Bun.file(join(CLAUDE_DIR, "settings.json"));
     const statusline = Bun.file(join(CLAUDE_DIR, "statusline.ts"));
-    if (!(await settings.exists()) || !(await statusline.exists())) return { installed: false };
+    const formatHook = Bun.file(join(CLAUDE_DIR, "hooks", "format.ts"));
+    if (
+      !(await settings.exists()) ||
+      !(await statusline.exists()) ||
+      !(await formatHook.exists())
+    ) {
+      return { installed: false };
+    }
     try {
       const current = (await settings.json()) as Record<string, unknown>;
       const line = (current.statusLine as Record<string, unknown> | undefined)?.command;
@@ -72,7 +84,10 @@ export const claudeSettings = defineItem({
     }
   },
   configure: async (ctx) => {
-    const template = (await Bun.file(join(ASSETS, "settings.template.json")).json()) as Record<string, unknown>;
+    const template = (await Bun.file(join(ASSETS, "settings.template.json")).json()) as Record<
+      string,
+      unknown
+    >;
     const selection = new Set(
       Object.entries(ctx.manifest.items)
         .filter(([, s]) => s.selected)
@@ -100,11 +115,20 @@ export const claudeSettings = defineItem({
       join(CLAUDE_DIR, "hooks", "subagent-statusline.ts"),
       await Bun.file(join(ASSETS, "hooks-subagent-statusline.ts")).text(),
     );
+    // FileChanged formatter: auto-formats any changed file with each project's
+    // own Biome / markdownlint config (found via $CLAUDE_PROJECT_DIR). Global
+    // hook, per-project config — inert in projects without a matching config.
+    await Bun.write(
+      join(CLAUDE_DIR, "hooks", "format.ts"),
+      await Bun.file(join(ASSETS, "hooks-format.ts")).text(),
+    );
     await Bun.write(
       join(CLAUDE_DIR, "statusline.ts"),
       await Bun.file(join(ASSETS, "statusline.ts")).text(),
     );
-    ctx.log("settings, hooks and statusline in place — sign-in happens in the connect phase");
+    ctx.log(
+      "settings, hooks (notify + format) and statusline in place — sign-in happens in the connect phase",
+    );
   },
   verify: async () => Bun.file(join(CLAUDE_DIR, "settings.json")).exists(),
 });

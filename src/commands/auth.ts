@@ -4,7 +4,10 @@ import { githubAuthCeremony } from "../auth/auth-ceremony.ts";
 import { run } from "../exec/run.ts";
 
 export default defineCommand({
-  meta: { name: "auth", description: "Sign in to GitHub (device flow under envsetup's app identity)" },
+  meta: {
+    name: "auth",
+    description: "Sign in to GitHub (device flow under envsetup's app identity)",
+  },
   args: {
     force: { type: "boolean", description: "Re-authenticate even if a stored token works" },
   },

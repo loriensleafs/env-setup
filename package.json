@@ -6,9 +6,18 @@
   "private": true,
   "scripts": {
     "dev": "bun src/index.ts",
-    "check": "bun tsc --noEmit",
     "test": "bun test",
-    "compile": "bun build --compile src/index.ts --outfile dist/envsetup"
+    "typecheck": "bun tsc --noEmit",
+    "format": "biome format --write .",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "md:lint": "markdownlint-cli2",
+    "md:fix": "markdownlint-cli2 --fix",
+    "fix": "biome check --write . && markdownlint-cli2 --fix",
+    "check": "biome check . && bun tsc --noEmit && markdownlint-cli2",
+    "changelog": "git-cliff -o CHANGELOG.md",
+    "compile": "bun build --compile src/index.ts --outfile dist/envsetup",
+    "prepare": "lefthook install"
   },
   "dependencies": {
     "@clack/core": "./vendor/clack-core-1.4.3-main-20260815.tgz",
@@ -20,7 +29,11 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.10",
     "@types/bun": "^1.4.0",
+    "git-cliff": "^2.13.1",
+    "lefthook": "^2.1.10",
+    "markdownlint-cli2": "^0.23.2",
     "typescript": "^7.0.2"
   },
   "overrides": {

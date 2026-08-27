@@ -20,7 +20,13 @@ describe("toposort", () => {
 
   test("throws on cycles, naming the stuck nodes", () => {
     expect(() =>
-      toposort(["a", "b"], new Map([["a", ["b"]], ["b", ["a"]]])),
+      toposort(
+        ["a", "b"],
+        new Map([
+          ["a", ["b"]],
+          ["b", ["a"]],
+        ]),
+      ),
     ).toThrow(DependencyCycleError);
   });
 

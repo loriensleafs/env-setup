@@ -44,7 +44,8 @@ export default defineCommand({
 
     if (action === "init") {
       const local = Bun.file(".secrets.local.json");
-      if (!(await local.exists())) bail("no .secrets.local.json in the current directory to encrypt");
+      if (!(await local.exists()))
+        bail("no .secrets.local.json in the current directory to encrypt");
       const secrets = (await local.json()) as Record<string, string>;
       const expected = Object.values(SECRET_KEYS);
       const missing = expected.filter((k) => !(k in secrets));
@@ -52,7 +53,9 @@ export default defineCommand({
       const pass = await askPassphrase(true);
       const blob = await encryptSecrets(secrets, pass);
       await Bun.write(AGE_FILE, blob);
-      p.log.success(`${AGE_FILE} written (${Object.keys(secrets).length} secrets) — commit it; the passphrase goes in your password manager`);
+      p.log.success(
+        `${AGE_FILE} written (${Object.keys(secrets).length} secrets) — commit it; the passphrase goes in your password manager`,
+      );
       p.outro("done");
       return;
     }
@@ -60,7 +63,8 @@ export default defineCommand({
     if (action === "set") {
       const blob = Bun.file(AGE_FILE);
       if (!(await blob.exists())) bail(`${AGE_FILE} not found — run \`secrets init\` first`);
-      if (keyArg === undefined) bail("usage: envsetup secrets set <key>  (you'll be prompted for the value)");
+      if (keyArg === undefined)
+        bail("usage: envsetup secrets set <key>  (you'll be prompted for the value)");
       const pass = await askPassphrase(false);
       let secrets: Record<string, string>;
       try {
@@ -77,7 +81,13 @@ export default defineCommand({
       return;
     }
 
-    if (action === "list" || action === "show" || action === "reveal" || action === "copy" || action === "unlock") {
+    if (
+      action === "list" ||
+      action === "show" ||
+      action === "reveal" ||
+      action === "copy" ||
+      action === "unlock"
+    ) {
       const blob = Bun.file(AGE_FILE);
       if (!(await blob.exists())) bail(`${AGE_FILE} not found in the current directory`);
       const pass = await askPassphrase(false);
@@ -94,7 +104,9 @@ export default defineCommand({
         const value = secrets[keyArg];
         if (value === undefined) bail(`no secret named "${keyArg}" (see \`secrets list\`)`);
         const pb = Bun.spawn(["pbcopy"], { stdin: "pipe" });
-        pb.stdin.write(value); await pb.stdin.end(); await pb.exited;
+        pb.stdin.write(value);
+        await pb.stdin.end();
+        await pb.exited;
         p.log.success(`${keyArg} copied to clipboard`);
       } else if (action === "show" || action === "reveal") {
         const full = action === "reveal";

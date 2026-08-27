@@ -32,9 +32,7 @@ export async function readEvents(path = journalPath()): Promise<JournalEvent[]> 
     // A torn final line (crash mid-write) is skipped rather than fatal.
     try {
       events.push(journalEventSchema.parse(JSON.parse(line)));
-    } catch {
-      continue;
-    }
+    } catch {}
   }
   return events;
 }

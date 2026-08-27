@@ -15,7 +15,7 @@ export const ghosttyIcon = defineItem({
   id: "ghostty-icon",
   title: "Ghostty Terminal-style icon",
   kind: "config-only",
-  deps: ["ghostty"],
+  deps: ["ghostty", "xcode-clt"], // runs `swift` (ships with the CLT)
   detect: async (ctx) => {
     const r = await ctx.run(["ls", `${APP}/Icon\r`]);
     return { installed: r.exitCode === 0 };

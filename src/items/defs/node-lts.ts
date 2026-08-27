@@ -1,5 +1,4 @@
 import { defineItem } from "../item.ts";
-import { BREW } from "../factories/brew.ts";
 
 const FNM = "/opt/homebrew/bin/fnm";
 

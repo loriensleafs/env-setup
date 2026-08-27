@@ -1,16 +1,22 @@
 import { describe, expect, test } from "bun:test";
-import { FAVORITES, SET_FAVORITES_SWIFT } from "../finder-favorites.ts";
+import { homedir } from "node:os";
+import { FAVORITES, expandedFavorites, sameOrder } from "../finder-favorites.ts";
 
-describe("finder favorites", () => {
-  test("decided order (Applications, Home, Desktop, Documents, Downloads, Dev, .claude)", () => {
-    expect(FAVORITES).toEqual([
-      "/Applications", "~", "~/Desktop", "~/Documents", "~/Downloads", "~/Dev", "~/.claude",
-    ]);
+describe("finder-favorites", () => {
+  test("expandedFavorites resolves ~ to the home dir, preserving order", () => {
+    const out = expandedFavorites();
+    expect(out.length).toBe(FAVORITES.length);
+    expect(out[0]).toBe("/Applications");
+    expect(out[1]).toBe(homedir());
+    expect(out).toContain(`${homedir()}/Dev`);
+    expect(out.every((p) => !p.startsWith("~"))).toBe(true);
   });
-  test("embedded swift uses dlsym LSSharedFileList with OpaquePointer sentinel", () => {
-    expect(SET_FAVORITES_SWIFT).toContain("kLSSharedFileListFavoriteItems");
-    expect(SET_FAVORITES_SWIFT).toContain("LSSharedFileListInsertItemURL");
-    expect(SET_FAVORITES_SWIFT).toContain("OpaquePointer"); // the segfault fix
-    expect(SET_FAVORITES_SWIFT).toContain("dlopen");
+
+  test("sameOrder is exact and order-sensitive (detect/verify semantics)", () => {
+    const want = expandedFavorites();
+    expect(sameOrder(want, want)).toBe(true);
+    expect(sameOrder([...want].reverse(), want)).toBe(false); // reordered
+    expect(sameOrder(want.slice(0, -1), want)).toBe(false); // missing one
+    expect(sameOrder([...want, "/extra"], want)).toBe(false); // extra
   });
 });

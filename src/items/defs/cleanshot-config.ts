@@ -47,7 +47,10 @@ export const cleanshotConfig = defineItem({
   kind: "config-only",
   deps: ["cleanshot"],
   ceremonies: [
-    { id: "cleanshot-verify", title: "Confirm CleanShot activated + grant screen-recording permission" },
+    {
+      id: "cleanshot-verify",
+      title: "Confirm CleanShot activated + grant screen-recording permission",
+    },
   ],
   detect: async (ctx) => {
     const key = await ctx.run(["defaults", "read", DOMAIN, "activationKey"]);

@@ -134,10 +134,17 @@ export const quickActions = defineItem({
   id: "quick-actions",
   title: "Finder Quick Actions (Copy Path, Ghostty, Cursor)",
   kind: "system",
-  deps: ["bun"],
+  // ghostty/cursor are ordering-only deps (filtered to the selection): the
+  // "Open in Ghostty/Cursor" services should be created after those apps exist
+  // so they work on first click. quick-actions still runs if neither is picked.
+  deps: ["bun", "ghostty", "cursor"],
   detect: async () => {
     for (const a of ACTIONS) {
-      if (!(await Bun.file(join(SERVICES, `${a.name}.workflow`, "Contents", "document.wflow")).exists())) {
+      if (
+        !(await Bun.file(
+          join(SERVICES, `${a.name}.workflow`, "Contents", "document.wflow"),
+        ).exists())
+      ) {
         return { installed: false };
       }
     }

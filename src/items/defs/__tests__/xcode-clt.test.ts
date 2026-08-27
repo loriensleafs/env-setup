@@ -21,7 +21,7 @@ describe("xcode-clt", () => {
   test("detect reads pkgutil version when present", async () => {
     const ctx = ctxWith({
       "xcode-select": { exitCode: 0, stdout: "/Library/Developer/CommandLineTools\n", stderr: "" },
-      "pkgutil": { exitCode: 0, stdout: "version: 26.0.0.0.1\n", stderr: "" },
+      pkgutil: { exitCode: 0, stdout: "version: 26.0.0.0.1\n", stderr: "" },
     });
     expect(await xcodeClt.detect(ctx)).toEqual({ installed: true, version: "26.0.0.0.1" });
   });
@@ -48,7 +48,7 @@ describe("xcode-clt", () => {
       },
     };
     await xcodeClt.install?.(ctx);
-    expect(cmds.some((c) => c.includes('--install Command Line Tools for Xcode-26.0'))).toBe(true);
+    expect(cmds.some((c) => c.includes("--install Command Line Tools for Xcode-26.0"))).toBe(true);
   });
 
   test("install throws when no label found", async () => {

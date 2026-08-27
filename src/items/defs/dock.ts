@@ -26,7 +26,10 @@ export const dock = defineItem({
   id: "dock",
   title: "Dock layout",
   kind: "system",
-  deps: ["dockutil"],
+  // dockutil is a hard dep; the apps/PWAs are ordering-only (filtered to the
+  // selection) so the Dock is built AFTER they're installed and is complete on
+  // the first pass — absent ones are still skipped gracefully.
+  deps: ["dockutil", "ghostty", "cursor", "typora", "claude-desktop", "chrome", "chrome-pwas"],
   detect: async (ctx) => {
     const r = await ctx.run([DOCKUTIL, "--list"]);
     if (r.exitCode !== 0) return { installed: false };
@@ -52,7 +55,8 @@ export const dock = defineItem({
         continue;
       }
       const add = await ctx.run([DOCKUTIL, "--add", path, "--no-restart"]);
-      if (add.exitCode !== 0) throw new Error(`dockutil add ${app.label} failed: ${add.stderr.trim()}`);
+      if (add.exitCode !== 0)
+        throw new Error(`dockutil add ${app.label} failed: ${add.stderr.trim()}`);
     }
     await ctx.run(["killall", "Dock"]);
   },

@@ -46,8 +46,7 @@ async function osascript(script: string): Promise<void> {
 }
 
 /** Escape a string for embedding inside an AppleScript string literal. */
-const asLiteral = (s: string): string =>
-  s.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+const asLiteral = (s: string): string => s.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 
 /** Escape a string for embedding inside a single-quoted POSIX shell word. */
 const shQuote = (s: string): string => `'${s.replace(/'/g, `'\\''`)}'`;
@@ -129,11 +128,16 @@ async function notify(kind: "attention" | "done" = "attention"): Promise<void> {
       const proc = Bun.spawn(
         [
           notifier,
-          "-title", title,
-          "-message", message,
-          "-sound", sound,
-          "-group", `claude-${cwd}`,
-          "-execute", onClick,
+          "-title",
+          title,
+          "-message",
+          message,
+          "-sound",
+          sound,
+          "-group",
+          `claude-${cwd}`,
+          "-execute",
+          onClick,
         ],
         { stdout: "ignore", stderr: "ignore" },
       );
@@ -165,3 +169,6 @@ try {
   // Never surface a hook failure into the Claude Code session.
 }
 process.exit(0);
+
+// Module marker: Bun runs this as ESM (enables top-level await); tsc needs the hint.
+export {};

@@ -8,7 +8,10 @@ import { loadManifest } from "../manifest/store.ts";
 import { fallbackHandler, handlerFor } from "../ceremonies/handlers.ts";
 
 export default defineCommand({
-  meta: { name: "connect", description: "Run the attended finishing steps (sign-ins, permissions, licenses)" },
+  meta: {
+    name: "connect",
+    description: "Run the attended finishing steps (sign-ins, permissions, licenses)",
+  },
   async run() {
     p.intro("envsetup connect");
     const manifest = await loadManifest();

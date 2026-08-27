@@ -13,10 +13,7 @@ export const ghosttyConfigSchema = z.object({
 export type GhosttyConfig = z.infer<typeof ghosttyConfigSchema>;
 
 const MARKER = "# managed by envsetup";
-const CONFIG_PATH = join(
-  homedir(),
-  "Library/Application Support/com.mitchellh.ghostty/config",
-);
+const CONFIG_PATH = join(homedir(), "Library/Application Support/com.mitchellh.ghostty/config");
 
 export function renderGhosttyConfig(config: GhosttyConfig): string {
   return `${MARKER}
@@ -49,10 +46,14 @@ export const ghosttyConfig = defineItem<GhosttyConfig>({
   deps: ["ghostty", "font-jetbrains-nf"],
   configSchema: ghosttyConfigSchema,
   defaultConfig: ghosttyConfigSchema.parse({}),
-  detect: async () => {
+  detect: async (ctx) => {
     const file = Bun.file(CONFIG_PATH);
     if (!(await file.exists())) return { installed: false };
-    return { installed: (await file.text()).startsWith(MARKER) };
+    // Drift-aware (like dotfiles): the file must EQUAL the freshly rendered
+    // config for the effective settings — a marker-only check would miss theme/
+    // font/keybind drift or a template change in a newer envsetup.
+    const config = ghosttyConfigSchema.parse(ctx.manifest.items["ghostty-config"]?.config ?? {});
+    return { installed: (await file.text()) === renderGhosttyConfig(config) };
   },
   configure: async (ctx, config) => {
     await mkdir(join(CONFIG_PATH, ".."), { recursive: true });

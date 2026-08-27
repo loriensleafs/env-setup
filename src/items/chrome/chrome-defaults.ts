@@ -86,7 +86,7 @@ export const CHROME_FLAGS: string[] = [
   "webium@2",
   "webui-refresh-2026@1",
   "webui-rounded-icons@1",
-  "webui-toolbar@1"
+  "webui-toolbar@1",
 ];
 
 export const PINNED_ACTIONS: string[] = [
@@ -100,7 +100,7 @@ export const PINNED_ACTIONS: string[] = [
   "kActionShowPaymentsBubbleOrPage",
   "kActionNewIncognitoWindow",
   "kActionTaskManager",
-  "kActionDevTools"
+  "kActionDevTools",
 ];
 
 /** Claude extension (the one pinned extension). */

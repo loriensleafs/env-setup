@@ -1,6 +1,7 @@
 import { defineItem } from "../item.ts";
 import { storedToken } from "../../auth/auth-ceremony.ts";
 import { fetchUser, noreplyEmail } from "../../auth/github-device-flow.ts";
+import { saveManifest } from "../../manifest/store.ts";
 
 /** Resolves the GitHub noreply address and sets git user.email (docs/PLAN.md). */
 export const gitEmail = defineItem({
@@ -19,6 +20,13 @@ export const gitEmail = defineItem({
     const email = noreplyEmail(user);
     const r = await ctx.run(["git", "config", "--global", "user.email", email]);
     if (r.exitCode !== 0) throw new Error(`git config user.email failed: ${r.stderr.trim()}`);
+    // Persist the resolved address back into the manifest, replacing the
+    // bootstrap placeholder (EMAIL_PENDING) so the saved manifest is truthful.
+    if (ctx.manifest.identity.email !== email) {
+      ctx.manifest.identity.email = email;
+      await saveManifest(ctx.manifest);
+      ctx.log("manifest identity.email updated");
+    }
     ctx.log(`user.email = ${email}`);
   },
   verify: async (ctx) =>

@@ -16,7 +16,12 @@ export const DEFAULTS: DefaultsSpec[] = [
   { domain: "com.apple.finder", key: "_FXSortFoldersFirst", type: "bool", value: "true" },
   { domain: "com.apple.finder", key: "NewWindowTarget", type: "string", value: "PfHm" },
   { domain: "com.apple.finder", key: "FXDefaultSearchScope", type: "string", value: "SCcf" },
-  { domain: "com.apple.finder", key: "FXEnableExtensionChangeWarning", type: "bool", value: "false" },
+  {
+    domain: "com.apple.finder",
+    key: "FXEnableExtensionChangeWarning",
+    type: "bool",
+    value: "false",
+  },
   { domain: "com.apple.finder", key: "FXPreferredViewStyle", type: "string", value: "clmv" },
   { domain: "NSGlobalDomain", key: "com.apple.swipescrolldirection", type: "bool", value: "false" },
 ];
@@ -45,9 +50,15 @@ export const macosDefaults = defineItem({
   install: async (ctx) => {
     for (const spec of DEFAULTS) {
       const r = await ctx.run([
-        "defaults", "write", spec.domain, spec.key, `-${spec.type}`, spec.value,
+        "defaults",
+        "write",
+        spec.domain,
+        spec.key,
+        `-${spec.type}`,
+        spec.value,
       ]);
-      if (r.exitCode !== 0) throw new Error(`defaults write ${spec.key} failed: ${r.stderr.trim()}`);
+      if (r.exitCode !== 0)
+        throw new Error(`defaults write ${spec.key} failed: ${r.stderr.trim()}`);
     }
     await ctx.run(["chflags", "nohidden", `${process.env.HOME}/Library`]);
     await ctx.run(["killall", "Finder"]); // apply Finder-visible changes

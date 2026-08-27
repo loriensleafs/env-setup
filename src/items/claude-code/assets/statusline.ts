@@ -59,7 +59,7 @@ async function termWidth(): Promise<number | null> {
     if (tty !== "" && tty !== "?" && tty !== "??") {
       for (const dev of [`/dev/${tty}`, `/dev/${tty.replace(/^tty/, "")}`]) {
         if (await Bun.file(dev).exists()) {
-          const size = (await $`sh -c ${"stty size < " + dev}`.quiet().nothrow().text()).trim();
+          const size = (await $`sh -c ${`stty size < ${dev}`}`.quiet().nothrow().text()).trim();
           const width = Number(size.split(/\s+/)[1]);
           if (Number.isFinite(width) && width > 0) return width;
         }

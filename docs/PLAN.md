@@ -8,7 +8,7 @@
 > (no batched question lists). Be thorough, leave nothing out, make no assumptions. Challenge
 > Peter where it makes sense. If you don't know a thing, RESEARCH it — always evaluate options
 > and alternatives for the best way, not the first way.
-> **Install principle (Peter, 2026-08-26): install everything the BEST way, not the easiest way.
+>**Install principle (Peter, 2026-08-26): install everything the BEST way, not the easiest way.
 > For EVERY tool: research official docs' recommended method + community best practice before
 > choosing. Homebrew is fine when it IS the best way, never just because it's easy. Always
 > present research findings to Peter WITH a recommendation; never assume.
@@ -30,7 +30,7 @@
 
 BUILT: core spine (paths/manifest/journal/items) · orchestrator · Stage A UI (group
 multiselect w/ cascade, radio-group, stock path prompt via vendored clack) · bootstrap flow
-(scan → prompts → selection → manifest → orchestrate, --dry-run/--show-installed) · real
+(scan → prompts → selection → manifest → orchestrate, --show-installed) · real
 doctor · required-spine items · Group 2 casks+fonts · config-only items (macos-defaults,
 ghostty config+icon, git-identity, dock, quick-actions) · chrome-config + chrome-pwas
 (prefs empirically verified unprotected) · pure-bun statusline
@@ -38,7 +38,8 @@ ghostty config+icon, git-identity, dock, quick-actions) · chrome-config + chrom
 BUILT (cont.): secrets provider (env-file/config/local fallbacks; age store slots behind it) ·
 typora-config (Vercel theme pinned v1.0.1 from tecladochen repo, defaults theme/autosave;
 license blobs verified machine-bound → clipboard ceremony) · superwhisper-config (captured
-defaults: right-⌘ push-to-talk, mini recorder, no dock icon, experimental models) ·
+defaults, now a user-editable Zod schema: right-⌥ push-to-talk, mini recorder, no dock icon,
+experimental models, no recording view) ·
 cleanshot-config (license ceremony; defaults keys undocumented + app absent → guided-settings
 ceremony until first configured machine is captured) · cursor-config + vscode-config (shared
 editorConfigItem factory: merged settings.json — One Dark Pro/material icons/JetBrains NF/
@@ -67,7 +68,7 @@ BUILT (cont. 3, 2026-08-26): **AUTH LIVE** — device flow under envsetup's own 
 repo/admin:public_key/read:org/user:email); tested poll semantics (pending/slow_down/denied/
 expired); ceremony → Keychain (service envsetup-github) → gh --with-token handoff → gh
 setup-git; VALIDATED END-TO-END by Peter (token verified against API; noreply =
-315385+loriensleafs@users.noreply.github.com; gh keyring active). ssh-keys item (two
+<315385+loriensleafs@users.noreply.github.com>; gh keyring active). ssh-keys item (two
 per-machine ed25519 keys, ~/.ssh/config agent+keychain block, API upload of public halves
 incl. signing key; 422-tolerant re-runs). git-email item (noreply → git user.email).
 `envsetup auth` subcommand. **SECRETS LIVE** — age-encryption (typage) store;
@@ -93,10 +94,14 @@ PENDING: Google Sans (proper) font source research · per-app config SCREENS in 
 `secrets show` · swap vendored clack → npm when released
 
 # ─── Product & process decisions ───
+
 ## What this is
+
 A Bun + TypeScript interactive TUI (clack) that sets up a brand-new Mac from one curl command.
 Replaces ad-hoc setup. Lives in a GitHub repo under github.com/loriensleafs.
+
 ## Decisions made
+
 - **Runtime/stack**: Bun package, TypeScript, `@clack/prompts` (+`@clack/core` for custom prompts).
 - **Distribution: Option B** — `curl -fsSL <url>/install.sh | bash` shim that detects arch,
   downloads the bun-compiled binary from GitHub Releases, ad-hoc codesigns if needed, runs it.
@@ -109,7 +114,9 @@ Replaces ad-hoc setup. Lives in a GitHub repo under github.com/loriensleafs.
 - **Error handling per step**: clack log status on failure + clear message + one of:
   retry prompt (innocuous) / offer-to-fix-then-retry (fixable by tool, needs approval) /
   tell-user-what-to-do-manually-then-retry.
+
 ## Repo structure — DECIDED 2026-08-26 (research-backed; Peter approved)
+
 Single package, NO monorepo (community: workspaces only earn complexity with interdependent
 packages; Bun workspaces make a later split cheap — documented migration path). Feature-first
 layout (2026 consensus, over type-first): src/index.ts (citty entry), src/commands/ (one file
@@ -119,24 +126,32 @@ assets/), src/ui/ (custom clack prompts), named shared homes (src/manifest/, src
 built — no lib/ junk drawer. kebab-case filenames. Peter's calls: spikes/ → test/spikes/
 (PTY-harness seeds, delete when real tests supersede); templates/ dissolved into per-item
 assets/ dirs (they're item payloads, not scaffolding templates).
+
 ## Testing convention (Peter, 2026-08-26)
+
 Test files live in a `__tests__` directory that is a SIBLING of the file under test, named
-`<original-filename>.test.ts`. Example: src/manifest/schema.ts → src/manifest/__tests__/
+`<original-filename>.test.ts`. Example: src/manifest/schema.ts → src/manifest/**tests**/
 schema.test.ts. (test/spikes/ predates this rule and holds research spikes, not unit tests;
 it dies when real tests supersede it.)
+
 ## Script-language rule (Peter, 2026-08-26)
+
 Every script this project writes or installs — Automator Quick Action payloads, hooks, helpers —
 is PURE BUN, always. No Node, no Python, and shell only as unavoidable glue: the Automator
 .workflow wrapper may exec `bun <script>`, and install.sh is necessarily POSIX sh because it
 runs before bun exists (the single sanctioned exception; it does nothing but fetch + exec).
+
 ## Repo
+
 - **DECIDED**: repo `env-setup` on github.com/loriensleafs, binary `envsetup`.
   (Peter rejected themed names — wanted literal/descriptive. Chose envsetup in round 3.)
 - **DECIDED**: persistent CLI, not run-once. Bootstrap is flagship command; `envsetup doctor`
   (drift check) and `envsetup sync` (re-apply) come later. @bomb.sh/tab back in scope.
 
 # ─── Workflow design ───
+
 ## Workflow design — DECIDED 2026-08-26: three-stage model
+
 **Design principle (Peter): NOTHING touches the system until the summary screen is explicitly
 confirmed. No background preloading before confirm (CLT-preload idea REJECTED for this reason).
 Full transparency about what will be done. Applies to future subcommands too (sync shows diff first).**
@@ -200,6 +215,7 @@ Rejected alternative: Peter's original interleaved Phase 3 (prompt→install per
 Resume: re-run same curl → finds manifest+journal → "resume from step N / start over".
 
 ### Dependency logic
+
 - Unselecting a required item removes dependent optional items; reselecting restores them.
 - Clack constraint: prompts are forward-only, no back-nav, no cross-prompt reactivity.
   **DECIDED (Peter, 2026-08-26): build a custom unified prompt via @clack/core** to get true
@@ -208,13 +224,17 @@ Resume: re-run same curl → finds manifest+journal → "resume from step N / st
   the horizontal radio (2-4 options) is a second, smaller custom prompt.
 
 ### Custom prompt wanted
+
 - Horizontal radio-button select for enum settings with ≤3-4 values (model, theme, etc.),
   built on @clack/core. >4 values → stock vertical select.
 
 ### Validation
+
 - Comprehensive validation on all inputs. Numeric settings clamped to sane ranges
   (e.g. timeout 200000 → clamp). Paths validated/expandable. Enum-checked selects.
+
 ## DESIGN REVISION (Peter, 2026-08-26): detect+lock is DEAD — everything toggleable
+>
 > ✅ CURRENT LAW (supersedes detect+lock wherever mentioned above)
 After three rounds of friction, the locked-on Required concept is removed entirely. ALL shown
 items are normal toggleable options (default-selected). Safety now comes from the
@@ -228,7 +248,9 @@ labels render white ONLY when focused; selection is the checkbox's job — other
 invisible in a mostly-selected list.
 PTY note: the vendored stock path prompt sometimes consumes the first Enter (suggestion
 navigation) — harness sends a resilient second Enter; watch for it in real usage.
+
 ## Progress-UX rework (Peter, 2026-08-26)
+
 - SCAN (FINAL final form, Peter): taskLog({spacing:0}) + single unnamed group; message announces
   each section BEFORE its (internally parallel) evaluation — no counts; no group.success;
   taskLog.success collapses everything to "Ready in Xs".
@@ -254,10 +276,12 @@ navigation) — harness sends a resilient second Enter; watch for it in real usa
   inspection — verified: unchecking Homebrew live-disables 23 dependent rows ("needs Homebrew").
 
 # ─── Groups 1–6 decisions ───
+
 ## Runtimes — DECIDED 2026-08-26
+
 - bun: locked required (Claude hooks run via bun; Peter is bun-first for ALL his TS work).
   **Peter: critical that the NEWEST bun is installed.**
-  **DECIDED: official installer** (curl -fsSL https://bun.com/install | bash → ~/.bun).
+  **DECIDED: official installer** (curl -fsSL <https://bun.com/install> | bash → ~/.bun).
   Research: docs-primary method; `bun upgrade` self-updates day-zero; docs explicitly say brew
   installs forfeit self-upgrade ("use brew upgrade bun instead"). Suppress installer's .zshrc
   edit — OUR dotfiles step owns the ~/.bun/bin PATH line. doctor checks version natively.
@@ -285,7 +309,9 @@ navigation) — harness sends a resilient second Enter; watch for it in real usa
   'bad CPU type in executable' + offer `softwareupdate --install-rosetta --agree-to-license`
   while it still exists; any future item truly needing Rosetta declares it as ITS dependency
   per the transitive-prereq principle.
+
 ## Git/GitHub auth — DECIDED: Both (HTTPS via gh + SSH key)
+
 **Automation principle (Peter): automate EVERYTHING automatable — user manual steps are limited
 to true auth ceremonies (browser authorize click, OS permission dialogs). Nothing else.**
 Flow (Stage C): gh auth login (browser device-code; request admin:public_key scope up front)
@@ -303,12 +329,14 @@ gitconfig: gpg.format=ssh, commit.gpgsign=true, user.signingkey=~/.ssh/id_ed2551
 **DECIDED: hardcode Peter's identity as built-in defaults** (github loriensleafs, still
 editable at prompts per defaults-everywhere rule).
 **DECIDED: git user.email defaults to the GitHub NOREPLY address**
-(<id>+loriensleafs@users.noreply.github.com — exact form fetched via gh API during Stage C,
+(<id><+loriensleafs@users.noreply.github.com> — exact form fetched via gh API during Stage C,
 avoids public email exposure in commit objects; attribution+signing unaffected).
 user.name default: "Peter Kloss" (assumed, Peter hasn't corrected).
+
 ## Optional apps (Group 2) — decisions so far
+
 - Browsers **DECIDED**: Chrome STABLE ONLY (beta/dev exist on current machine but NOT in manifest)
-  + SET AS DEFAULT BROWSER. Note: macOS gates default-browser change behind a mandatory user
+  - SET AS DEFAULT BROWSER. Note: macOS gates default-browser change behind a mandatory user
   confirmation dialog → automatable up to one click; Stage C ceremony bucket. Research the
   cleanest method when building (candidates: `defaultbrowser` CLI / NSWorkspace API).
 - Known-wanted: Ghostty, Cursor, superwhisper, Claude Code (all with custom config steps TBD).
@@ -323,7 +351,7 @@ user.name default: "Peter Kloss" (assumed, Peter hasn't corrected).
   • All shown as defaults user can change during the Chrome customization screen.
   INVENTORY DONE (2026-08-26, this machine — full snapshot to be exported into repo at build):
   • Flags: 81 enabled in stable (Local State browser.enabled_labs_experiments — captured; beta/dev have 0)
-  • Account: pkloss@gmail.com (profile "Peter", Default profile, sync ON)
+  • Account: <pkloss@gmail.com> (profile "Peter", Default profile, sync ON)
   • Extensions (10, identical across stable/beta/dev — arrive via sync): Claude, React DevTools,
     Apollo Client Devtools, Lighthouse, Postman Interceptor, 1Password, ColorPick Eyedropper,
     Color Picker for Chrome, Google Docs Offline, Chrome Web Store Payments
@@ -379,7 +407,9 @@ user.name default: "Peter Kloss" (assumed, Peter hasn't corrected).
   Both are brew casks at minimum; Raycast has settings export/sync; CleanShot needs license key.
 - PARKED TOPIC (Peter): auto-compose the macOS Dock with chosen apps in a SPECIFIC ORDER once
   app list stabilizes (tool: dockutil — research when reached).
+
 ## Group 3: repos — DECIDED 2026-08-26 (Peter's explicit spec)
+
 Clone from github.com/acmelabs-15 into `{devDir}/ACMElabs/`:
   skills, ask-user-question, plugin-kit, code-review, code-simplifier
 Structure envsetup must produce:
@@ -398,17 +428,22 @@ Personal (loriensleafs) repos: NONE selected — Peter's spec listed only the 5 
   settings apply (marketplace path must exist).
 
 ### Reference clones — DECIDED 2026-08-26
+
 Into {devDir}/reference/ (dir name TBD-confirm), with OWNER-PREFIXED directory names to avoid
 collisions (Peter's rule; his examples):
   basicmachines-co/basic-memory   → basic-memory
   addyosmani/agent-skills         → addy-osmani-agent-skills
   mattpocock/skills               → matt-pocock-skills
   rjmurillo/ai-agents             → rj-murillo-ai-agents
+
 ### Selection-aware settings generation (Peter, mid-turn 2026-08-26)
+
 If a user UNCHECKS an ACMElabs repo at setup time, the generated Claude settings.json must
 OMIT that plugin from enabledPlugins (and the generated marketplace.json omits it too).
 Settings/marketplace generation is driven by the actual selection, not a static template.
+
 ## Group 4: fonts — DECIDED 2026-08-26
+
 - JetBrains Mono Nerd Font (also in his pinned zip list — single source at build, dedupe)
 - Fira Code Nerd Font
 - Google Sans (fonts.google.com/specimen/Google+Sans — install method research at build)
@@ -420,24 +455,31 @@ Settings/marketplace generation is driven by the actual selection, not a static 
 Build-time research: brew font casks vs his pinned v3.5.1 zips (version-pinning policy says
 honor pins; casks track latest — decide per font, present to Peter), font install location
 (~/Library/Fonts), dedupe JetBrainsMono.
+
 ## Group 5: macOS settings — in progress
-### Finder — DECIDED 2026-08-26: ALL NINE:
+
+### Finder — DECIDED 2026-08-26: ALL NINE
+
 show hidden files; show all extensions; path bar; status bar; folders-on-top; new windows →
 home; search current folder; no extension-change warning; show ~/Library.
 **#10 ADDED (Peter, during Ghostty pass): default view style = COLUMN view always
 (FXPreferredViewStyle=clmv).**
-### Desktop Quick Actions via Apple Shortcuts (Peter, 2026-08-26) — right-click any file/dir:
+
+### Desktop Quick Actions via Apple Shortcuts (Peter, 2026-08-26) — right-click any file/dir
+
   1. Copy full absolute path to clipboard
   2. Open Ghostty at the dir (file → its containing dir)
   3. Open in Cursor
 **DECIDED 2026-08-26: Automator .workflow Services (silent drop-ins to ~/Library/Services)** —
 Peter chose silent over Shortcuts-app visibility after research showed Shortcuts import is
 GUI-only (1 click per shortcut). Same right-click Quick Actions menu either way.
-### Dock — DECIDED 2026-08-26 (Peter's spec; NOTHING beyond what's listed):
+
+### Dock — DECIDED 2026-08-26 (Peter's spec; NOTHING beyond what's listed)
+
 - Position bottom; recents OFF; trash + minimized windows shown normally (NO minimize-into-icon,
   NO auto-hide, NO size/animation changes).
 - Dock apps (ONLY these): Finder, Apps, System Settings, Ghostty, Chrome, Cursor, Typora,
-  + the 3 Chrome PWAs (Gmail, Google Calendar, Google Drive).
+  - the 3 Chrome PWAs (Gmail, Google Calendar, Google Drive).
 - **Ghostty in Dock must use the native macOS Terminal.app icon** — the Icon\r/NSWorkspace
   technique from this session (2026-08-25) is now a REQUIRED setup step. Note: cask upgrades
   wipe it; sync/doctor should re-detect+reapply. The icon is READ FROM THE TARGET MACHINE at
@@ -448,18 +490,27 @@ GUI-only (1 click per shortcut). Same right-click Quick Actions menu either way.
 - Claude desktop ADDED to Dock.
 - Order APPROVED with additions — proposed final (pending nod): Finder · Apps · System Settings ·
   Ghostty · Cursor · Typora · Claude · Chrome · Mail · Calendar · Drive · Notes.
+
 ### Keyboard/input — DECIDED 2026-08-26: ONLY reverse scroll direction (disable "natural
+
 scrolling", com.apple.swipescrolldirection=false). ALL other input tweaks declined (key repeat,
 accent menu, autocorrect, tab focus, tap-to-click, three-finger drag — none).
+
 ### Dock order APPROVED (no objection raised): Finder · Apps · System Settings · Ghostty ·
+
 Cursor · Typora · Claude · Chrome · Mail · Calendar · Drive · Notes.
+
 ### Screenshots: macOS-level settings SKIPPED (CleanShot X owns screenshots; its config pass
+
 covers save location/format). Misc catch-all: DECLINED ALL (battery %, hot corners, night
 shift, sounds, password-after-sleep, etc.) — **GROUP 5 IS CLOSED 2026-08-26.**
 
 # ─── Phase A: per-app configs ───
+
 ## Phase A: per-app config passes
+
 ### Ghostty — DECIDED 2026-08-26
+
 Setup-screen adjustable defaults (approved): font = JetBrains Mono Nerd Font (font MUST be
 installed before Ghostty config applies — first real cross-item dependency edge); font-size 13;
 theme default = **"One Dark Two"** (from his existing config, surfaced on screen); shell
@@ -472,8 +523,10 @@ Rule: everything in his existing file goes INTO the generated config; only the a
 screen-items are user-adjustable at setup time (rest applied silently).
 
 ### Cursor — DECIDED 2026-08-26 (installer OWNS config; sync not relied on)
+
 Context: his real Cursor setup was lost when Highspot (former employer) remotely wiped his work
 machine — explains /Users/peter.kloss paths in reference files and why this machine is stock.
+
 - Theme: One Dark Pro (ext: zhuangtongfa.material-theme) — pairs with Ghostty One Dark Two
 - Icons: Material Icon Theme (ext: pkief.material-icon-theme)
 - Editor font: (assume JetBrains Mono NF to match Ghostty — confirm in extensions question)
@@ -493,30 +546,38 @@ machine — explains /Users/peter.kloss paths in reference files and why this ma
   settings at build). Editor font: JetBrains Mono NF (no objection raised).
 
 ### VS Code — DECIDED 2026-08-26: MIRROR CURSOR exactly (same theme/icons/font/extensions/
+
 settings incl. Claude Code IDE ext; single shared config definition in the manifest, applied
 to both editors).
 
-### superwhisper — DECIDED 2026-08-26 (captured from this machine)
-Defaults: push-to-talk = hold RIGHT-COMMAND (carbonKeyCode 54/modifiers 256);
-alwaysShowMiniRecorder=1; showApplicationInDock=0; showExperimentalModels=1; mode=default;
-account pkloss@gmail.com. Stage C: sign-in + mic/accessibility permissions (guided,
-tool-verified). Modes/custom vocab live in sqlite (not templated — rebuilt in-app).
+### superwhisper — DECIDED 2026-08-26 (re-captured from this machine 2026-08-26)
+
+Defaults (now a user-editable Zod schema, not a hardcoded list):
+push-to-talk = hold RIGHT-OPTION (carbonKeyCode 61/modifiers 2048 — Peter changed it from
+right-⌘ since the first capture); alwaysShowMiniRecorder=1; showApplicationInDock=0;
+showExperimentalModels=1; recordingViewEnabled=0; mode=default; account <pkloss@gmail.com>.
+pushToTalk enum maps friendly names → carbonKeyCode/modifiers (right/left-option, right-command,
+right-control). Stage C: sign-in + mic/accessibility permissions (guided, tool-verified).
+Modes/custom vocab live in sqlite (not templated — rebuilt in-app).
 **License key (Peter): «superwhisper license — in .secrets.local.json (untracked) until age store exists» — SECRETS STORY item #3**
 (with Typora license + Anthropic API key). Research at build: how superwhisper license
 activation is applied programmatically.
 
 ### Typora — DECIDED 2026-08-26
+
 License auto-applied (key in secrets story). Theme: **Vercel** (theme.typora.io/theme/Vercel/,
 by tecladochen, actively maintained; installer drops CSS into theme folder + auto-installs its
 font deps Geist + Inter → ADD to Group 4 fonts). Autosave OFF. Everything else default.
 Research at build: Typora license activation mechanism + theme folder path + CSS install.
 
-### Claude desktop / Zoom / Discord — DECIDED 2026-08-26: install + Stage C sign-in only.
+### Claude desktop / Zoom / Discord — DECIDED 2026-08-26: install + Stage C sign-in only
+
 Zoom additionally: mic/screen-share permissions in final checklist. Peter asked whether Claude
 Code settings carry to Claude desktop — answered: NO, separate config systems; account sign-in
 covers shared account features; desktop MCP config is its own file (nothing specced needs it).
 
 ### Raycast — DECIDED 2026-08-26
+
 Install + first-launch onboarding; **Raycast takes ⌘Space, Spotlight's shortcut disabled**
 (installer automates both); clipboard history hotkey ⌥V; starter extensions via deeplinks:
 Brew search, GitHub, Kill Process. NO cloud sync / .rayconfig for now (adopt an export in
@@ -524,6 +585,7 @@ Brew search, GitHub, Kill Process. NO cloud sync / .rayconfig for now (adopt an 
 Spotlight disable + raycast deeplink install format.
 
 ### CleanShot X — DECIDED 2026-08-26 (Peter PURCHASED during session)
+
 **License key: «cleanshot license — in .secrets.local.json (untracked) until age store exists» — SECRETS STORY item #4.**
 Config (approved as proposed): take over system screenshot shortcuts (⇧⌘3/4/5); save to
 ~/Screenshots; quick-access overlay after capture; PNG; no window shadows; freeze-screen on
@@ -531,11 +593,14 @@ area select; NO auto-copy to clipboard; launch at login. Research at build: Clea
 domain (pl.maketheweb.cleanshotx?) writable keys + programmatic license activation.
 
 ### Podman — DECIDED 2026-08-26
+
 VM defaults (adjustable): 4 CPUs / 8GB mem / 100GB disk; docker compat helper + socket +
 `docker`→`podman` shell alias (alias line owned by dotfiles step); machine start ON DEMAND
 (not at login); NO Podman Desktop GUI.
 **PHASE A COMPLETE (2026-08-26): all 13 apps specced.**
+
 ## Claude Code customization step (flagship)
+
 Reference files: /Users/peterkloss/Desktop/claude-reference-files/ (settings.json + hooks/{notify.ts,subagent-statusline.ts})
   → copy these INTO the repo as templates; Desktop copy is not durable.
 Settings exposed to user (from Peter's list): model, fallbackModel, effortLevel,
@@ -571,7 +636,9 @@ Requirements from Peter:
     points at a missing agent. Peter accepts this deliberately (may add the file himself later).
   • Repo clone lives at scratchpad/acmelabs-claude this session; statusline.sh (bash+jq,
     pill-style) is the conversion source.
+
 ## statusline — CONVERTED to pure Bun 2026-08-26
+
 src/items/claude-code/assets/statusline.ts replaces statusline.sh (deleted). Port verified
 byte-identical modulo runtime terminal-width detection (each process probes its own TTY
 ancestry). jq dependency gone. settings.template.json statusLine.command → `bun ~/.claude/statusline.ts`.
@@ -580,13 +647,17 @@ binary (which itself needs no bun); it never installs bun — bun is installed l
 as a regular item (Claude hooks need it).
 
 # ─── Architecture (researched & decided) ───
+
 ## Manifest + journal architecture — APPROVED 2026-08-26 (research-backed, see RESEARCH §11)
+
 manifest.json (XDG config via env-paths; Zod-versioned w/ migrations, verzod-style) = decisions;
 journal.jsonl (XDG state; append-only step events) = execution truth + resume + audit trail;
 one file per ITEM declaring detect/install/configure/verify/deps/ceremonies + Zod config schema;
 execution order = toposort of declared deps. Packages: age-encryption (typage — OFFICIAL age TS
 impl, bun-compatible) for secrets; env-paths; Zod 4; NO `conf` (would split schema systems).
+
 ## Secrets — DECIDED 2026-08-26 (research-reversed from private-repo lean)
+
 **age-ENCRYPTED secrets file committed to the (public-safe) repo** — the chezmoi-validated
 community pattern. Flow: clack password prompt for ONE passphrase per new machine (passphrase
 lives in Google PM) → decrypt in memory → Anthropic API key → macOS Keychain (`security`);
@@ -598,8 +669,10 @@ The 4 current secrets are recorded in this PLAN under their app sections (MOVE i
 store at build time, then SCRUB from PLAN.md before the plan ever leaves this machine).
 
 # ─── Build log (chronological) ───
+
 ## Core spine — BUILT 2026-08-26 (25 tests green, typecheck clean)
-- src/paths/ — XDG dirs (~/.config/envsetup, ~/.local/state/envsetup) honoring XDG_* overrides.
+
+- src/paths/ — XDG dirs (~/.config/envsetup, ~/.local/state/envsetup) honoring XDG_*overrides.
   DEVIATION from earlier decision: env-paths DROPPED — on macOS it returns Library/* (GUI-app
   convention) while dev CLIs (git, gh, ghostty, claude) use ~/.config; we follow the dev-CLI
   norm with a 20-line module instead.
@@ -611,9 +684,11 @@ store at build time, then SCRUB from PLAN.md before the plan ever leaves this ma
   configSchema + defaultConfig, defineItem typing helper), deterministic Kahn toposort
   (cycle + unknown-dep errors), ItemRegistry with executionOrder(selection) that ignores
   deps outside the run.
-- Tests follow Peter's sibling-__tests__/<name>.test.ts convention.
+- Tests follow Peter's sibling-**tests**/<name>.test.ts convention.
 - Claude hook assets excluded from project typecheck (they're payloads, not source).
+
 ## Stage A UI — BUILT 2026-08-26 (36 tests green + PTY smoke pass)
+
 - src/ui/unified-select-state.ts — PURE state machine (unit-tested): sectioned rows, locked
   "on"/"installed" states, hint annotations, LIVE dependency filtering (requires: [] — an
   option is visible iff every requirement is selected/locked/installed; hidden dependents keep
@@ -625,7 +700,9 @@ store at build time, then SCRUB from PLAN.md before the plan ever leaves this ma
 - src/ui/demo.ts — runnable interactive demo: `bun src/ui/demo.ts` (Peter can try it).
 - test/spikes/ui-demo.exp — PTY smoke test proving live dep-filtering + radio end-to-end
   (toggles Ghostty off/on, verifies ghostty-config vanishes/returns, radio picks medium).
+
 ## First items + real doctor — BUILT 2026-08-26 (48 tests green)
+
 - src/exec/run.ts — injectable Runner (Bun.spawn wrapper); ItemContext now carries `run` so
   every item is unit-testable with mocked commands.
 - src/items/factories/brew.ts — brewFormula/brewCask factories (auto homebrew dep, version
@@ -635,11 +712,13 @@ store at build time, then SCRUB from PLAN.md before the plan ever leaves this ma
   (official installers with PATH-edit suppression — dotfiles own PATH lines), node-lts (via
   fnm: install --lts + default lts-latest).
 - src/items/all.ts — buildRegistry(): required spine (clt, brew, bun, uv, gh, go, fnm, node)
-  + Peter's CLI picks (jq, delta, lazygit, dust). Apps/casks arrive next.
+  - Peter's CLI picks (jq, delta, lazygit, dust). Apps/casks arrive next.
 - `envsetup doctor` is REAL: live detection over the registry with versions. Verified on this
   machine (correctly found CLT/brew/bun/gh, correctly flagged missing uv/go/fnm/node/jq/...).
 - Fixed citty quirk: root run() fires even after a subcommand — guarded by rawArgs check.
+
 ## Group 2 apps + fonts registered — BUILT 2026-08-26 (50 tests green, 31 items in registry)
+
 - brewCask factory gained .app-bundle fallback detection: manually-installed apps read as
   installed with version from Info.plist, marked "(not brew-managed)" — verified live
   (Chrome 152, Typora 1.14.9 — Peter installed Typora himself mid-project).
@@ -651,7 +730,9 @@ store at build time, then SCRUB from PLAN.md before the plan ever leaves this ma
   before use. Google Sans (non-code) + Peter's fonts repo (dankmono/hack/ligahack) still
   pending: repo needs auth flow; config-only items (ghostty config/icon, chrome, dock,
   defaults, quick actions, PWAs) arrive with the orchestrator.
+
 ## Stage B orchestrator — BUILT 2026-08-26 (59 tests green)
+
 src/orchestrator/orchestrator.ts — UI-agnostic engine (events interface; clack layer attaches
 at bootstrap wiring): topo-ordered execution over the selection; per-step journaling;
 detection short-circuit (installed & satisfies → skipped-installed); DECIDED failure policy
@@ -662,20 +743,24 @@ steps; configure() runs after install with schema-validated manifest config (def
 fallback; invalid config fails the step — clamping is the prompt layer's job).
 Full test coverage: happy path, skip-installed, retry, dependent-skipping, abort, resume
 (same-runId continuation), config validation paths, transitive dependents.
-## Bootstrap flow — WIRED 2026-08-26 (E2E dry-run passes on this machine)
+
+## Bootstrap flow — WIRED 2026-08-26
+
 `envsetup` (bare) now runs the real Stage A: detection scan (7s for 31 items) → identity +
 Dev-dir prompts (hardcoded defaults) → unified selection screen fed by LIVE detection
 (installed items render locked-✓ with versions; required-missing locked-on) → summary note →
 confirm ("nothing has touched the system yet" honored) → manifest written → orchestrator with
 clack spinner rendering (per-step ✓/✗/↷ outcomes) → triage note on failures / abort message
-on required failure. `--dry-run` stops after the manifest + prints execution order (safe to
-run on any machine). Resume: unfinished journal + manifest → offer resume, same runId.
-Manifest semantics fix: already-installed items record selected=true (machine definition,
-not install work-list — doctor/sync depend on this). identity.email = pending-noreply
-placeholder until Stage C auth resolves the real address.
-E2E: test/spikes/bootstrap-dry.exp — full PTY drive of the dry-run flow (proven green).
-Config-prompt hook point marked in bootstrap for per-app screens (arrive with app items).
+on required failure. (Dry-run was REMOVED — bare `envsetup` is the full one-shot install; use
+`doctor` for a safe read-only diff. See the removal note in the build log.) Resume: unfinished
+journal + manifest → offer resume, same runId. Manifest semantics fix: already-installed items
+record selected=true (machine definition, not install work-list — doctor/sync depend on this).
+identity.email starts as the pending-noreply placeholder; git-email.configure() resolves the
+real GitHub noreply address in Stage C and writes it back into the manifest (see the 2026-08-26
+fix note below). Config-prompt hook point marked in bootstrap for per-app screens.
+
 ## Config-only items — BUILT 2026-08-26 (69 tests green; registry now 38 items)
+
 - macos-defaults: all 10 decided Finder/scroll settings via `defaults write` + ~/Library
   chflags nohidden + Finder restart; detect = every value matches (idempotent skip).
 - ghostty-config: generates the decided config (One Dark Two, JetBrainsMono NF 13, shell
@@ -696,8 +781,11 @@ Still pending: Chrome customization + PWAs (policy research/empirical gate), Typ
 superwhisper/Raycast/Podman/VS Code/Cursor config appliers, repos/marketplace, auth+secrets.
 
 # ─── UI iteration history (kept verbatim; final forms above/below) ───
+
 ## Peter's dry-run feedback — FIXED 2026-08-26 (all five findings)
+>
 > ⚠️ SUPERSEDED — later rounds refined further; final UI forms in 'Third UI feedback round' + 'DESIGN REVISION' + 'Progress-UX rework'.
+
 1. Dev directory → clack `path` prompt (directory autocomplete, ~/Dev default).
 2. Identity/location prompts wrapped in p.group (single onCancel).
 3. "Couldn't reach Required section": root cause was locked rows being cursor-SKIPPED plus a
@@ -708,10 +796,13 @@ superwhisper/Raycast/Podman/VS Code/Cursor config appliers, repos/marketplace, a
    as researched) — name nonempty, GitHub username charset, devDir absolute-or-~ path.
    Empty-input probe verified the error renders in-prompt.
 5. Raw ZodError escape at saveManifest → caught, friendly message, clean cancel.
+
 ## Unified prompt REBUILT on clack docs pattern — 2026-08-26
+>
 > ⚠️ SUPERSEDED — hide-behavior described here was replaced by disable-in-place; component later renamed group-multi-select.ts (see Third round).
 Peter pointed at ~/Dev/clack/examples/docs (his local clack clone with worked examples, incl.
 custom/dynamic-group-multiselect.ts). Rebuilt accordingly:
+
 - Now extends stock GroupMultiSelectPrompt (not raw Prompt) + event listeners — reuses built-in
   navigation/group logic per the example.
 - **Downstream options DISABLE in place** (strikethrough + "needs X + Y" reason hint, auto-
@@ -727,14 +818,17 @@ custom/dynamic-group-multiselect.ts). Rebuilt accordingly:
   bootstrap E2E stays green. Horizontal radio also switched to clack's exported symbols.
 Resource noted: ~/Dev/clack/examples/docs (basic/advanced/new-features/custom) — consult before
 building further UI.
+
 ## Peter's second round of UI feedback — FIXED 2026-08-26
+>
 > ⚠️ SUPERSEDED — the custom path prompt built here was DELETED in the third round (vendored clack provides stock path w/ tab).
+
 1. TAB path completion: root-caused — published @clack/prompts 1.7.0 ADVERTISES "Tab: complete"
    but core's completeOnTab is unreleased (clack main only, no prerelease dist-tag). Built
    src/ui/path-prompt.ts: our own AutocompletePrompt-based path input with the tab behavior
    ported from unreleased main via public/protected surface. SWAP back to stock p.path() when
    clack releases (watch @clack/core > 1.4.3 / prompts > 1.7.0). Verified: typing partial path
-   + Tab completes in the real bootstrap E2E.
+   - Tab completes in the real bootstrap E2E.
 2. "Required section acts like broken single-select": all its rows are locked so space did
    nothing and the header checkbox could never fill. Fixed by (a) Peter's call — items that are
    installed AND current no longer appear in the UI at all (straight into manifest; empty
@@ -743,9 +837,12 @@ building further UI.
 3. Label styling drifted from stock (the docs example itself deviates): stock clack renders an
    option label WHITE ONLY WHEN FOCUSED — selection is shown by the checkbox alone. Verified
    against packages/prompts/src/group-multi-select.ts state table; fixed.
+
 ## Third UI feedback round — FIXED 2026-08-26 (vendored clack from main)
+
 Root cause of the styling drift (Peter's screenshots): my prompts were full custom renders
 instead of extensions retaining stock look. Fix at the root:
+
 - **Vendored clack built from Peter's clone (main @ 2026-08-15)**: vendor/clack-{core,prompts}-
   *-main-20260815.tgz committed; package.json `overrides` pins @clack/core to the tarball
   (bun otherwise nests published 1.4.3 under prompts — types break). SWAP to npm when clack
@@ -762,7 +859,9 @@ instead of extensions retaining stock look. Fix at the root:
   example screenshots) planned when installs stream real output.
 
 # ─── Historical planning snapshots (superseded; kept for context) ───
-## Status (2026-08-26): Phases A + C COMPLETE. Phase B DONE — this repo (loriensleafs/env-setup,
+
+## Status (2026-08-26): Phases A + C COMPLETE. Phase B DONE — this repo (loriensleafs/env-setup
+>
 > ⚠️ SUPERSEDED — replaced by CURRENT STATUS at top.
 PUBLIC) is now the project home; PLAN.md + research live in docs/. License keys scrubbed from
 docs into .secrets.local.json (untracked) pending the age-encrypted store build.
@@ -791,9 +890,12 @@ PHASES:
     manifest/journal schema, bun compile + GitHub Actions release pipeline, install.sh shim,
     GitHub device-flow OAuth app (auth-placement question), PWA install mechanics,
     default-browser mechanics, dockutil, Shortcuts deployment, statusline bun conversion.
+
 ## Item lists (TO BE BUILT WITH PETER — current knowledge)
+>
 > ⚠️ SUPERSEDED — early-session snapshot; the registry in src/items/all.ts is now the source of truth.
 Known from this machine so far:
+
 - Casks: ghostty, cursor, superwhisper (+ Chrome stable/beta/dev present but installed manually)
 - Claude Code via native installer (~/.local/bin/claude), NOT brew
 - Ghostty custom icon saga: custom icns + NSWorkspace.setIcon Icon\r technique;
@@ -804,8 +906,11 @@ Known from this machine so far:
 - Repos to clone: TBD (ACMElabs is one — plugin marketplace depends on it; tanstack/table as reference-clone example)
 - Fonts: TBD
 - macOS defaults: show hidden files in Finder confirmed wanted; rest TBD
+
 ## Research queue (comprehensive dives Claude will do; results get recorded here)
+>
 > ⚠️ SUPERSEDED — all items researched or absorbed into RESEARCH-clack-citty-bun.md / build-time notes.
+
 - [x] clack v1.7 full API — DONE, see RESEARCH-clack-citty-bun.md
 - [ ] (superseded line) clack v1.7 full API: group/groupMultiselect/tasks/taskLog/progress/spinner/stream;
       what task+progress compatibility actually looks like; custom prompts via @clack/core
@@ -818,12 +923,117 @@ Known from this machine so far:
 - [ ] Font installation via brew font casks
 - [ ] gh auth login flow orchestration (needed before cloning private repos)
 - [ ] Claude Code headless install + settings templating + plugin marketplace bootstrapping order
+
 ## Session log
+
 - 2026-08-25/26: Ghostty icon fix (NSWorkspace.setIcon), installed cursor+superwhisper casks,
   distribution options discussed, Option B chosen, full workflow spec from Peter captured above.
   Earlier ~/mac-setup Brewfile scaffolding (pre-dating this plan) is superseded.
+- 2026-08-26 (audit pass): three parallel audits (incomplete-impl / dependencies / zshrc) + fixes:
+  - PER-ITEM ZSHRC CO-LOCATION: new `ZshContribution` on the Item interface + `zsh()` per item;
+    `items/defs/shell-block.ts` assembles the managed block from all items (env→FPATH→compinit→
+    init→aliases, deduped). Fixes REAL bugs: compinit was never invoked (all completions dead),
+    uv completions missing, fnm now `--shell zsh`, dead `.cargo/bin` line removed. `doctor` now
+    reports per-item zsh gaps. dotfiles.ts is now `makeDotfiles(allItems)`.
+  - FINDER-FAVORITES: detect() was hardcoded false (doctor always showed it missing) — added a
+    `--list` mode to the Swift helper (LSSharedFileListItemCopyResolvedURL) + real detect/verify.
+  - DEPENDENCY WIRING: registered `terminal-notifier` (Claude notify hook needs it) + dep on
+    claude-settings; finder-favorites & ghostty-icon now dep xcode-clt (swiftc/swift); quick-actions
+    ordering-deps ghostty+cursor; dock ordering-deps its apps/PWAs (complete first-pass Dock);
+    new `delta-config` item wires delta as git pager (core.pager, diffFilter, navigate, line-numbers,
+    merge.conflictstyle=zdiff3) — deps ["delta","git-identity"].
+  - CURSOR/CODE CLI: editor-config resolves the CLI from the app bundle (deterministic, no Cursor/
+    VS Code `code`-shim confusion) and symlinks it into ~/.local/bin so `cursor`/`code <path>` work
+    in the terminal. detect() now requires the CLI to resolve.
+  - MIGRATIONS: confirmed auto-invoked in store.ts (zero user action); documented the full
+    "how to add a migration" recipe in migrations.ts (empty map at v1 is correct, not a stub).
+  - DOCKER_HOST (RESOLVED): the podman socket path is per-machine (only known after `machine
+    init`), so podman-machine.configure() now runs `podman machine inspect` once and writes
+    `export DOCKER_HOST=unix://<sock>` to ~/.config/envsetup/podman-env.zsh; the zsh block sources
+    that file cheaply (no per-shell subprocess). Docker-API tools (Testcontainers, IDE plugins)
+    then just work; the docker=podman alias still covers the CLI.
+  - identity.email (FIXED): git-email.configure() now writes the resolved GitHub noreply address
+    back into manifest.identity.email + saveManifest (was left as "pending-noreply-resolution").
+  - terminal-notifier: still needs a first-run macOS Notification permission (a TCC prompt that
+    can't be pre-granted; it appears the first time the notify hook fires). The hook falls back to
+    a plain osascript banner until then.
+
+## NEXT FEATURE — config-conflict consent (designed 2026-08-26, NOT yet built; blocks v0.1.0 release)
+
+Problem: config-only items have no `install()`, so the orchestrator never skips them — their
+`configure()` re-runs on EVERY sync/bootstrap and silently overwrites config, even a customization
+the user made ON PURPOSE. Peter's decision: a detected config *conflict* on an already-installed,
+right-version item must become a USER DECISION, not an automatic re-apply.
+
+Design (to build):
+
+1. **Detection: three states, not two.** `detect()` must distinguish absent / satisfied / DRIFTED
+   (installed + right version, but config differs). Foundation = drift-aware `detect()` on every
+   config item (compare what `configure()` writes, per the dotfiles full-block / chrome-config
+   per-element patterns). DONE this pass: delta-config, superwhisper-config (also fixed a
+   hardcoded-"1"/"0" bug), git-identity, typora-config, ghostty-config. STILL TODO (part of this
+   feature): claude-settings (verify all 4 hook files + settings.json hooks/plugins/marketplace
+   path/statusline), editor-config (all 12 EDITOR_SETTINGS keys, not just colorTheme),
+   podman-machine (DOCKER_HOST env file matches the machine socket), cleanshot-config (14 settings
+   - 3 shortcut blobs), acmelabs-marketplace (re-enumerate cloned plugin repos), chrome-pwas
+   (Info.plist CrAppModeShortcutURL host). Leave ghostty-icon presence-only (can't cheaply verify
+   pixels). Surface the drift state on DetectResult (e.g. `configDrift?: boolean` or new
+   `satisfies` semantics for config-only items).
+2. **Bootstrap: a new group.** Alongside "will install" (absent) and locked-✓ (satisfied), add a
+   "configured differently" group listing drifted items with a per-item choice: KEEP MINE (skip
+   configure) vs RE-APPLY OURS (run configure). Needs its own visual treatment (not "installing").
+3. **Orchestrator gate.** Stop unconditionally running `configure()` for config-only items. Only
+   run it when the item is absent OR the user chose re-apply. Thread the per-item decision through
+   the plan/manifest.
+4. **Impact analysis.** When the user keeps their config, evaluate/communicate what depends on it
+   (dependents in the registry) so a kept customization that breaks a downstream item is surfaced.
+Until this ships, sync still auto-applies config (documented existing behavior); the drift-aware
+detects added this pass only improve doctor/bootstrap REPORTING, they don't change the overwrite.
+
+## Dev tooling & commit pipeline — 2026-08-26
+
+All dev tooling is PROJECT-scoped (this repo), pure-Bun/no-Node runtime, and configured to run
+under `bunx`/`bun`:
+
+- **Biome** (Rust binary) — formatter + linter for JS/TS/JSON. Config: `biome.json` (2-space,
+  double quotes, semicolons, trailing-commas all, lineWidth 100; `noControlCharactersInRegex` off
+  because the statusline/hook code strips ANSI). Scripts: `format`, `lint`, `lint:fix`, `fix`.
+- **markdownlint-cli2** (runs under Bun) — Markdown lint/fix. Config: `.markdownlint-cli2.jsonc`
+  (MD013/MD025/MD033/MD041/MD049 relaxed for long-form planning docs). Scripts: `md:lint`,
+  `md:fix`, and `fix` (biome + markdown together).
+- **Lefthook** (Go binary) — git hooks, installed via the package.json `prepare` script
+  (`lefthook install`). `lefthook.yml`: pre-commit auto-fixes staged files with Biome +
+  markdownlint (stage_fixed) and runs a whole-project `tsc --noEmit`, blocking only on
+  un-auto-fixable lint/type errors; pre-push runs biome + tsc + markdownlint + `bun test`.
+- **git-cliff** (Rust binary) — changelog from conventional commits. Config `cliff.toml`
+  (Keep a Changelog + SemVer). `bun run changelog` → CHANGELOG.md (generated; markdownlint-ignored).
+- **CI** `.github/workflows/ci.yml` — mirrors the hooks server-side (biome + tsc + markdownlint +
+  tests on macos-14) plus a `gitleaks` secret-scan job (per the secrets audit).
+- `.gitignore` hardened: `.env`, `.env.*` (keep `.env.example`), bare `secrets.json` (only the
+  encrypted `secrets.json.age` is ever tracked).
+- Umbrella scripts: `bun run check` (biome + tsc + markdownlint), `bun run fix` (auto-fix all),
+  `bun run typecheck`.
+
+### Claude Code auto-format hook — installed BY the CLI (not a repo .claude/)
+
+The formatter is a global Claude Code capability the CLI installs, NOT a committed project hook.
+The `claude-settings` item deploys `hooks-format.ts` → ~/.claude/hooks/format.ts and adds a
+**FileChanged** hook to settings.template.json (matcher = source-extension globs). On any file
+change Claude sees, the script formats that file with the CURRENT project's own Biome/markdownlint
+config, located via `$CLAUDE_PROJECT_DIR` (not cwd). It's inert in projects without a matching
+config, skips deletes, resolves the project-relative `file_path`, and is loop-safe (Biome/
+markdownlint only write when something changed, so the FileChanged re-fire converges after one
+pass; Claude Code also debounces 500ms). Chosen over PostToolUse (Peter's call) for tool-agnostic
+coverage — it also catches Bash-driven rewrites. Requires Claude Code v2.1+.
+
+- Node.js purity RE-VERIFIED this pass: pure Bun end-to-end (node: builtins are Bun-native; every
+  script uses bun/bunx; install.sh curls the Bun-compiled binary; shebangs are `#!/usr/bin/env bun`).
+- Secrets RE-AUDITED: working tree CLEAN (no keys/tokens/PII); only a non-usable 8-char license
+  fragment persists in git HISTORY (commits 75cde92/dcb9469, scrubbed in f3e37bf) — owner's call
+  whether to rewrite history; low risk.
 
 ## Config screens + release — 2026-08-26
+
 Schema-driven per-app config screens in bootstrap: prompts derive from each item's Zod schema
 via z.toJSONSchema (boolean → radio-group, bounded number → validated text, small enum →
 radio, string → text; humanized labels); answers land in manifest.items[id].config after
@@ -832,8 +1042,9 @@ PTY-verified: podman cpus edited 4→6 through the real screen. Release: v0.0.1 
 GH Actions pipeline (bun compile darwin-arm64+x64, ad-hoc codesign, release assets).
 
 ## Open-items sweep — 2026-08-26 (Peter-driven completion round)
+
 - secrets `show` verified by Peter; .secrets.local.json DELETED (licenses exist only encrypted
-  + in his password manager). `secrets unlock` flow live-validated (decrypted cache at
+  - in his password manager). `secrets unlock` flow live-validated (decrypted cache at
   ~/.config/envsetup/secrets.json is the working store per design).
 - Google Sans: now OFL-licensed on fonts.google.com — font-google-sans item installs the 18
   static TTFs via the official download/list manifest (XSSI-prefix handled). Verified live.
@@ -846,7 +1057,9 @@ GH Actions pipeline (bun compile darwin-arm64+x64, ad-hoc codesign, release asse
   round-trip-verified); ceremonies collapsed to one verify step (screen-recording grant).
 
 ## Web apps FINAL design — 2026-08-26 (policy DROPPED; Peter's synthesis probe settled it)
+
 Peter manually installed Gmail as a Chrome app to enable investigation. Findings:
+
 - Bundles: ~/Applications/Chrome Apps.localized/<Name>.app — thin app_mode_loader keyed by
   CrAppModeShortcutID; **bundle FILENAME controls the Dock label** (Peter-verified live,
   incl. launching from a renamed bundle).
@@ -862,11 +1075,14 @@ Drive/Notes. WebAppInstallForceList research retained in RESEARCH doc as the zer
 alternative if Peter ever accepts the managed badge.
 
 ## Final open-items status
+
 - clack npm swap: still blocked upstream (checked today: 1.7.0/1.4.3 unchanged).
 - Fresh-machine validation: awaits hardware. Everything else from the open list: CLOSED.
 
 ## Web apps SOLVED — 2026-08-26 (AX automation, no policy)
+
 Full breakthrough after extended AX spelunking (Gemini session cracked the two hard parts):
+
 - Install driver: src/items/chrome/assets/install-web-app.swift drives ⋮ → Cast, Save, and
   Share → Install… via accessibility. Key techniques: SPATIAL ⋮-button detection (rightmost
   button in the Reload button's toolbar row — beats desc-matching), DELTA submenu scraping
@@ -886,17 +1102,28 @@ Full breakthrough after extended AX spelunking (Gemini session cracked the two h
 Requires: Accessibility permission (like superwhisper) — Stage C.
 
 ## Round of additions — 2026-08-26 (Peter's follow-ups)
+
 - SECRETS: `envsetup secrets reveal` added (prompts passphrase, prints FULL values); `show`
   stays masked. `reveal` is the "show me my secrets" command.
 - DRY-RUN clarified: bare `envsetup` ALREADY runs the full install one-shot (verified — dryRun
   defaults false → real orchestrator). `--dry-run` is an opt-in preview only (what we used for
   tests). No behavior change; kept as a useful preview.
 - BetterDisplay ADDED (betterdisplay.pro): brew cask + betterdisplaycli companion; license
-  key in secret store (better-display); app-level defaults (startAtLogin,
-  showMenuBarItem, checkForUpdates) via Zod-schema config screen. Its config is huge and
-  PER-DISPLAY — not presettable without the actual displays and Peter's Highspot config is
-  gone — so per-display tuning is a guided ceremony (capture later like CleanShot). License =
-  clipboard ceremony.
+  key in secret store (better-display); app-level defaults via Zod-schema config screen.
+  SETTINGS EVALUATION 2026-08-26: the real bulk of config is the 33 `menuLevel*` keys
+  (string enum less=top-menu / more=submenu / hide). Exposed as a 3-way `menuProfile`
+  (default = 9 top/17 submenu/7 hidden, agreed w/ Peter — DisplaysAndVirtualScreens+Groups in
+  submenu, Volume in submenu, Settings/Quit/CheckForUpdates on top; minimal = only
+  Brightness/Resolution/Settings/Quit on top; everything = all on top bar virtual-screen noise).
+  All 33 written via `defaults` before first launch. Global keys (captured empirically by
+  toggle-and-diff — NOT grep-able from the binary): dockIcon (string enum never/auto/always;
+  Peter=never), hideMenuIcon (bool, INVERTED — show=false), dockInsertRecentsOnStartupWhenHidden
+  (bool = "briefly show Dock icon on startup"; Peter=off). Sparkle SU keys (SUEnableAutomaticChecks
+  /SUAutomaticallyUpdate/SUSendProfileInfo) are real (framework present). start-at-login is
+  SMAppService (NO defaults key) → registered as a classic login item via System Events osascript.
+  Note: earlier `showMenuBarItem`/`startAtLogin` defaults writes were phantom keys (no-ops) — fixed.
+  Per-display config (brightness/HiDPI/resolution) still NOT presettable → guided capture ceremony.
+  License = clipboard ceremony.
 - DOTFILES expanded to cover EVERYTHING: brew shellenv, bun/uv(.local)/Go(GOPATH)/Cargo PATH,
   fnm --use-on-cd, bun completions, brew zsh site-functions (FPATH), docker→podman alias — all
   guarded so a missing tool can't break startup. detect() is the VALIDATION Peter asked for
@@ -908,6 +1135,7 @@ Requires: Accessibility permission (like superwhisper) — Stage C.
 Registry now larger; 96 tests green.
 
 ## Finder favorites SOLVED — 2026-08-26 (corrected after a wrong "it's dead" call)
+
 Prematurely declared LSSharedFileList dead on macOS 26 after our Swift helper segfaulted.
 Peter pushed for real web research, which found cause + fix (maintained mysides-swift,
 7onnie/mysides): the crash was OUR binding, not the API. LSSharedFileListInsertItemURL's
@@ -921,15 +1149,18 @@ no crash). sfltool add-item is GONE on macOS 26; mysides brew formula disabled; 
 LESSON: don't declare an approach impossible from one failed attempt — research first.
 
 ## Cleanup round — 2026-08-26
+
 - DRY-RUN removed entirely (index/bootstrap/sync). Bare `envsetup` = full one-shot install
   (always was). `--show-installed` and `--defaults` kept. Scratch test/spikes/ deleted (no
-  references; real tests live in src/**/__tests__ per convention).
+  references; real tests live in src/**/**tests** per convention).
 - VENDOR kept (tab-complete needs clack main; npm still 1.7.0/1.4.3) but now documented:
   vendor/README.md gives the exact convert-to-npm steps + the release signal to watch
   (@clack/core > 1.4.3 with completeOnTab).
 
 ## Dependency audit + permissions reality — 2026-08-26 (Peter's follow-ups)
+
 DEP AUDIT (brew auto-installs formula/cask deps; risk is only NON-brew methods):
+
 - betterdisplaycli brew formula needs FULL Xcode.app (compiles from source) → switched to the
   PREBUILT signed binary (curl the v1.0.1 release zip → /opt/homebrew/bin). App works without it.
 - pnpm/yarn: not installed; node-lts now runs `corepack enable` (bundled with Node via fnm) so
@@ -945,8 +1176,8 @@ one pass, deep-linking the exact System Settings panes (superwhisper mic/accessi
 cleanshot screen-recording, + new accessibility-grant for envsetup's own Chrome/Finder AX
 automation) instead of scattered first-run surprises.
 
-
 ## BetterDisplay licensing — NO scriptable path (researched 2026-08-26)
+
 Verified on the installed app: BetterDisplay uses Paddle online licensing. There is NO CLI
 license command (betterdisplaycli only does display control), NO license key in its defaults
 domain (only showProLicenseError), and NO URL-scheme activation. Unlike CleanShot (plain
@@ -954,8 +1185,8 @@ defaults activationKey), it CAN'T be pre-seeded. The better-display-license cere
 the key to the clipboard, opens the app, and guides pasting into Settings →
 license (activates online). That is the ceiling for this app.
 
-
 ## Secrets UX + auto-licensing confirmation — 2026-08-26
+
 - CONFIRMED: apps with a scriptable license are fully automatic — CleanShot's activationKey is
   written from the store via `defaults` in cleanshot-config (no paste). Only online-validated
   apps (BetterDisplay/Paddle, Typora, superwhisper) need the clipboard+paste ceremony.
@@ -964,6 +1195,7 @@ license (activates online). That is the ceiling for this app.
   copy <key> · unlock.
 
 ## Secrets integrity — 2026-08-26
+
 - AUDIT (Peter noticed the BetterDisplay key was never stored): NO full license key is in the
   repo tree or git history — verified 0 files / 0 commits for all four. Repo-creation scrub
   worked; full Typora/superwhisper/CleanShot keys only went to the untracked .secrets.local.json

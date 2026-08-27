@@ -1,0 +1,60 @@
+# envsetup — agent guide
+
+Loaded automatically by Claude Code (`CLAUDE.md`) and other agents (`AGENTS.md`, a symlink to
+this file). Keep it short and high-signal.
+
+`envsetup` — a one-command interactive **macOS** environment-setup CLI (Bun + TypeScript).
+Bootstraps a fresh Mac (apps, runtimes, fonts, repos, macOS settings, app configs) and keeps
+it in shape with `doctor`/`sync`.
+
+**Source of truth: [docs/PLAN.md](docs/PLAN.md)** — every design decision and its rationale
+lives there. Read it before non-trivial work. Research foundation:
+[docs/RESEARCH-clack-citty-bun.md](docs/RESEARCH-clack-citty-bun.md). Contribution & release
+workflow: [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Hard rules (do not violate)
+
+- **Pure Bun. No Node.** Use `bun`/`bunx`, `Bun.*` APIs, and `node:` builtins (Bun implements
+  them). Never add a dependency on the `node`/`npm`/`npx` runtime, and never introduce Python
+  for anything we ship. Shell is glue only (`install.sh`, Automator wrappers exec `bun`).
+- **`@clack/*` is vendored** (`vendor/*.tgz`, pinned in `package.json`). Do NOT replace with
+  the npm versions — npm's releases lack the `completeOnTab` tab-completion the UI relies on.
+- **Secrets never touch tracked files.** License keys / API keys live ONLY in the age-encrypted
+  `secrets.json.age` (+ the user's password manager). Never put a key — even a partial/truncated
+  one — in source, docs, tests, or a commit message.
+- **Tests:** `<name>.test.ts` in a `__tests__/` dir beside the file under test (`bun:test`).
+- **Before finishing code:** `bun run check` (Biome + tsc + markdownlint) must pass; `bun run
+  fix` auto-fixes. Lefthook enforces this at commit/push, but don't rely on it.
+
+## Architecture (the essentials)
+
+- **Items** (`src/items/**`): each installable/configurable thing implements the `Item`
+  interface (`src/items/item.ts`) — `detect` / `install` / `configure` / `verify`, plus `deps`,
+  `ceremonies`, `configSchema` (Zod), and an optional `zsh()` contribution. Create items with
+  `defineItem`. The registry is assembled in `src/items/all.ts`.
+- **`zsh()` contributions** are co-located per item and assembled into the managed `~/.zshrc`
+  block by `src/items/defs/shell-block.ts` (env → FPATH → compinit → init → aliases). Add shell
+  needs to the item, not to a central block.
+- **Manifest** (`src/manifest/`): Zod-versioned, migrated automatically on load via
+  `migrations.ts` (see its header for the "how to add a migration" recipe). **Journal** (JSONL)
+  drives resumable runs. **Orchestrator** runs items in toposorted dependency order.
+- **Ceremonies** are deliberate attended steps (sign-ins, permission dialogs) surfaced in the
+  connect phase — they are by design, not stubs.
+
+## Commands
+
+```bash
+bun run dev [subcommand]   # run the CLI from source (bare = interactive bootstrap)
+bun run check              # Biome + tsc + markdownlint (CI/pre-push gate)
+bun run fix                # auto-fix Biome + markdown
+bun run test               # bun:test suite
+bun run compile            # standalone binary → dist/envsetup
+bun run changelog          # regenerate CHANGELOG.md (git-cliff)
+```
+
+## Safety when running it
+
+`envsetup` mutates the real macOS system. Bare `envsetup` (bootstrap) and `sync` **install
+software and change settings** — never run them to "test." `doctor` is read-only (diffs the
+machine against its manifest). To drive/smoke the CLI safely, use the run skill:
+`.claude/skills/run-envsetup/` (`bun .claude/skills/run-envsetup/smoke.mjs`).

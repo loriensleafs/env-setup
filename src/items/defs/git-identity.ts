@@ -13,10 +13,19 @@ export const gitIdentity = defineItem({
   deps: ["xcode-clt"],
   detect: async (ctx) => {
     const name = await ctx.run(["git", "config", "--global", "user.name"]);
-    const format = await ctx.run(["git", "config", "--global", "gpg.format"]);
-    return {
-      installed: name.exitCode === 0 && name.stdout.trim() !== "" && format.stdout.trim() === "ssh",
-    };
+    if (name.exitCode !== 0 || name.stdout.trim() === "") return { installed: false };
+    // Verify the fixed signing config too (drift-aware) — not just that a name exists.
+    const fixed: [string, string][] = [
+      ["gpg.format", "ssh"],
+      ["commit.gpgsign", "true"],
+      ["user.signingkey", `${homedir()}/.ssh/id_ed25519_sign.pub`],
+      ["init.defaultBranch", "main"],
+    ];
+    for (const [key, expected] of fixed) {
+      const r = await ctx.run(["git", "config", "--global", key]);
+      if (r.stdout.trim() !== expected) return { installed: false };
+    }
+    return { installed: true };
   },
   configure: async (ctx) => {
     const name = ctx.manifest.identity.name;

@@ -1,4 +1,4 @@
-import { defineItem, type Item, type ItemContext } from "../item.ts";
+import { defineItem, type Item, type ItemContext, type ZshContribution } from "../item.ts";
 
 export const BREW = "/opt/homebrew/bin/brew";
 
@@ -10,6 +10,8 @@ export interface BrewSpec {
   required?: boolean;
   /** Extra deps beyond homebrew itself. */
   deps?: string[];
+  /** This tool's ~/.zshrc needs (e.g. Go's GOPATH, fnm's env hook). */
+  zsh?: ZshContribution;
   /**
    * Casks only: the installed .app bundle path. Detection falls back to this
    * so manually-installed apps (not brew-managed) still read as installed,
@@ -24,7 +26,9 @@ async function brewDetect(
   name: string,
 ): Promise<{ installed: boolean; version?: string }> {
   const args =
-    kind === "formula" ? [BREW, "list", "--versions", name] : [BREW, "list", "--cask", "--versions", name];
+    kind === "formula"
+      ? [BREW, "list", "--versions", name]
+      : [BREW, "list", "--cask", "--versions", name];
   const r = await ctx.run(args);
   if (r.exitCode !== 0) return { installed: false };
   const version = r.stdout.trim().split(/\s+/)[1];
@@ -39,6 +43,7 @@ export function brewFormula(spec: BrewSpec): Item {
     kind: "brew-formula",
     required: spec.required,
     deps: ["homebrew", ...(spec.deps ?? [])],
+    ...(spec.zsh ? { zsh: () => spec.zsh } : {}),
     detect: (ctx) => brewDetect(ctx, "formula", name),
     install: async (ctx) => {
       const r = await ctx.run([BREW, "install", name]);
@@ -71,7 +76,8 @@ export function brewCask(spec: BrewSpec): Item {
     },
     install: async (ctx) => {
       const r = await ctx.run([BREW, "install", "--cask", name]);
-      if (r.exitCode !== 0) throw new Error(`brew install --cask ${name} failed: ${r.stderr.trim()}`);
+      if (r.exitCode !== 0)
+        throw new Error(`brew install --cask ${name} failed: ${r.stderr.trim()}`);
     },
     verify: async (ctx) => (await brewDetect(ctx, "cask", name)).installed,
   });

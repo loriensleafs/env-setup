@@ -41,7 +41,9 @@ function bail(message: string): never {
 
 export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
   if (!process.stdout.isTTY) {
-    console.error("envsetup bootstrap needs an interactive terminal (non-interactive mode arrives later)");
+    console.error(
+      "envsetup bootstrap needs an interactive terminal (non-interactive mode arrives later)",
+    );
     process.exit(1);
   }
 
@@ -139,7 +141,8 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
   // safety comes from the requires-cascade: unselecting a dependency disables
   // its dependents with a visible reason.
   const shown = new Set(
-    registry.all()
+    registry
+      .all()
       .filter((item) => {
         if (opts.showInstalled) return true;
         const d = detection.get(item.id) ?? { installed: false };
@@ -147,11 +150,20 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
       })
       .map((item) => item.id),
   );
-  const groups: SelectGroups = { Required: [], Apps: [], "CLI tools": [], Fonts: [], Repos: [], "System & config": [] };
+  const groups: SelectGroups = {
+    Required: [],
+    Apps: [],
+    "CLI tools": [],
+    Fonts: [],
+    Repos: [],
+    "System & config": [],
+  };
   for (const item of registry.all()) {
     if (!shown.has(item.id)) continue;
     const d = detection.get(item.id) ?? { installed: false };
-    const hint = d.installed ? `installed${d.version ? ` ${d.version}` : ""} — needs update` : undefined;
+    const hint = d.installed
+      ? `installed${d.version ? ` ${d.version}` : ""} — needs update`
+      : undefined;
     // Registry deps feed the UI cascade — only deps that are themselves shown
     // (absent ones are installed, i.e. already satisfied).
     const requires = (item.deps ?? []).filter((dep) => shown.has(dep));
@@ -254,7 +266,6 @@ export async function executePlan(
       .filter(([, s]) => s.selected)
       .map(([id]) => id);
 
-
   const order = registry.executionOrder(selection);
   const runStart = Date.now();
   const installLog = p.taskLog({ title: `Installing ${order.length} items`, limit: 6 });
@@ -296,7 +307,9 @@ export async function executePlan(
   if (report.failed.length > 0) {
     installLog.error(`${report.failed.length} of ${order.length} items failed (${runElapsed}s)`);
     for (const f of report.failed) p.log.error(`${f.id}: ${f.error}`);
-    p.outro(`${report.succeeded.length} installed, ${report.failed.length} failed — re-run to retry failures`);
+    p.outro(
+      `${report.succeeded.length} installed, ${report.failed.length} failed — re-run to retry failures`,
+    );
   } else {
     installLog.success(`Installed ${report.succeeded.length} items in ${runElapsed}s`);
     p.outro(color.green("all done"));

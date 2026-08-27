@@ -20,7 +20,9 @@ export const githubAuth = defineItem({
     const r = await ctx.run(["/opt/homebrew/bin/gh", "auth", "status"]);
     if (r.exitCode === 0) return;
     if (!process.stdout.isTTY) {
-      throw new Error("GitHub sign-in needed — run envsetup in a terminal to approve in the browser");
+      throw new Error(
+        "GitHub sign-in needed — run envsetup in a terminal to approve in the browser",
+      );
     }
     await githubAuthCeremony(ctx.run);
   },

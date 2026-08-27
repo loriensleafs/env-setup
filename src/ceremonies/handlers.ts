@@ -29,7 +29,9 @@ function licenseCeremony(secretKey: string, appName: string, appPath: string): C
     async run(ctx) {
       const key = await getSecret(secretKey);
       if (key === null) {
-        p.log.warn(`no ${appName} license in the secret store — run \`envsetup secrets unlock\` first, or enter it manually`);
+        p.log.warn(
+          `no ${appName} license in the secret store — run \`envsetup secrets unlock\` first, or enter it manually`,
+        );
       } else {
         await clipboard(key);
         p.log.info(`${appName} license copied to clipboard`);
@@ -41,16 +43,27 @@ function licenseCeremony(secretKey: string, appName: string, appPath: string): C
 }
 
 export const HANDLERS: Record<string, CeremonyHandler> = {
-  "typora-license": licenseCeremony(SECRET_KEYS.typoraLicense, "Typora", "/Applications/Typora.app"),
+  "typora-license": licenseCeremony(
+    SECRET_KEYS.typoraLicense,
+    "Typora",
+    "/Applications/Typora.app",
+  ),
   "cleanshot-verify": {
     async run(ctx) {
       p.log.info("CleanShot was licensed + configured from the manifest — verifying it took");
       await ctx.run(["open", "/Applications/CleanShot X.app"]);
-      p.note("Grant SCREEN RECORDING when it asks.\nIf it still shows a trial, the key is in the secret store: `envsetup secrets show`.", "CleanShot");
+      p.note(
+        "Grant SCREEN RECORDING when it asks.\nIf it still shows a trial, the key is in the secret store: `envsetup secrets show`.",
+        "CleanShot",
+      );
       return confirmDone("CleanShot activated with screen-recording granted?");
     },
   },
-  "superwhisper-signin": licenseCeremony(SECRET_KEYS.superwhisperLicense, "superwhisper", "/Applications/superwhisper.app"),
+  "superwhisper-signin": licenseCeremony(
+    SECRET_KEYS.superwhisperLicense,
+    "superwhisper",
+    "/Applications/superwhisper.app",
+  ),
 
   "superwhisper-permissions": {
     async run(ctx) {
@@ -58,8 +71,14 @@ export const HANDLERS: Record<string, CeremonyHandler> = {
         "superwhisper needs Microphone and Accessibility access.\nBoth panes open now — flip the toggles for superwhisper.",
         "permissions",
       );
-      await ctx.run(["open", "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone"]);
-      await ctx.run(["open", "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"]);
+      await ctx.run([
+        "open",
+        "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone",
+      ]);
+      await ctx.run([
+        "open",
+        "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
+      ]);
       return confirmDone("both permissions granted?");
     },
   },
@@ -67,9 +86,7 @@ export const HANDLERS: Record<string, CeremonyHandler> = {
   "chrome-default-browser": {
     async run(ctx) {
       p.log.info("Chrome will ask macOS to become the default — approve the system dialog");
-      await ctx.run([
-        "open", "-a", "Google Chrome", "--args", "--make-default-browser",
-      ]);
+      await ctx.run(["open", "-a", "Google Chrome", "--args", "--make-default-browser"]);
       return confirmDone("default-browser dialog approved?");
     },
   },
@@ -84,7 +101,10 @@ export const HANDLERS: Record<string, CeremonyHandler> = {
 
   "claude-login": {
     async run(ctx) {
-      p.note("Run `claude` in a terminal — it walks through sign-in on first launch.", "Claude Code");
+      p.note(
+        "Run `claude` in a terminal — it walks through sign-in on first launch.",
+        "Claude Code",
+      );
       await ctx.run(["open", "-a", "Ghostty"]);
       return confirmDone("Claude Code signed in?");
     },
@@ -141,10 +161,14 @@ export const HANDLERS: Record<string, CeremonyHandler> = {
     async run(ctx) {
       const key = await getSecret(SECRET_KEYS.betterDisplayLicense);
       if (key === null) {
-        p.log.warn("no BetterDisplay license in the store — run `envsetup secrets unlock` first, or paste it manually");
+        p.log.warn(
+          "no BetterDisplay license in the store — run `envsetup secrets unlock` first, or paste it manually",
+        );
       } else {
         const pb = Bun.spawn(["pbcopy"], { stdin: "pipe" });
-        pb.stdin.write(key); await pb.stdin.end(); await pb.exited;
+        pb.stdin.write(key);
+        await pb.stdin.end();
+        await pb.exited;
         p.log.info("BetterDisplay license copied to clipboard");
       }
       p.note(
@@ -179,9 +203,15 @@ export const HANDLERS: Record<string, CeremonyHandler> = {
         ].join("\n"),
         "Permissions \u2014 one pass",
       );
-      await ctx.run(["open", "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"]);
+      await ctx.run([
+        "open",
+        "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
+      ]);
       const acc = await confirmDone("Accessibility enabled for all of the above?");
-      await ctx.run(["open", "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture"]);
+      await ctx.run([
+        "open",
+        "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture",
+      ]);
       const rec = await confirmDone("Screen Recording enabled for CleanShot + Zoom?");
       return acc && rec;
     },

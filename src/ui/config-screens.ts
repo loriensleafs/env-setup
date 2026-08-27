@@ -5,7 +5,10 @@ import { radioGroup } from "./radio-group.ts";
 
 /** fontSize → "Font size"; memoryMb → "Memory mb". */
 export function humanize(key: string): string {
-  const words = key.replace(/([A-Z])/g, " $1").toLowerCase().trim();
+  const words = key
+    .replace(/([A-Z])/g, " $1")
+    .toLowerCase()
+    .trim();
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
 

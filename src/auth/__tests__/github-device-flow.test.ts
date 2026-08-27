@@ -48,8 +48,12 @@ describe("device flow", () => {
   });
 
   test("denial and expiry give clear errors", async () => {
-    await expect(pollForToken(device, fetchSeq([{ error: "access_denied" }]), async () => {})).rejects.toThrow(/denied/);
-    await expect(pollForToken(device, fetchSeq([{ error: "expired_token" }]), async () => {})).rejects.toThrow(/expired/);
+    await expect(
+      pollForToken(device, fetchSeq([{ error: "access_denied" }]), async () => {}),
+    ).rejects.toThrow(/denied/);
+    await expect(
+      pollForToken(device, fetchSeq([{ error: "expired_token" }]), async () => {}),
+    ).rejects.toThrow(/expired/);
   });
 
   test("noreply email format", () => {
