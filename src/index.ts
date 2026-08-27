@@ -3,7 +3,7 @@ import { defineCommand, runMain } from "citty";
 const main = defineCommand({
   meta: {
     name: "envsetup",
-    version: "0.0.1",
+    version: "0.1.0",
     description: "One-command Mac environment setup",
   },
   subCommands: {

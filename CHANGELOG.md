@@ -4,7 +4,24 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.0] - 2026-08-27
+
+### Bug Fixes
+- Four defects found by the doc-verified compatibility research (6488ea5)
+
+### Build & CI
+- Add Biome, markdownlint, lefthook, git-cliff, CI + gitignore hardening (42fc91e)
+
+### Documentation
+- Add CLAUDE.md/AGENTS.md/CONTRIBUTING.md, refresh README + PLAN (4bc4163)
+- Reset-on-drift plan + verified compatibility research appendix (e940f8a)
+
+### Features
+- Per-item zshrc, delta/DOCKER_HOST, cursor/code CLI, FileChanged format hook, drift-aware detects (e5388ff)
+- Reset-on-drift — drifted config re-enters the list as an opt-in reset (8df81bd)
+
+### Miscellaneous
+- Add run-envsetup skill (safe smoke driver) (8760264)
 
 ### Other
 - Open-items sweep: Google Sans item, real CleanShot applier from captured defaults (ec73a78)
@@ -21,6 +38,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - List (names) + copy <key> to clipboard; confirm CleanShot auto-licenses (264fdac)
 - Scrub partial key fragment; add 'secrets set' to store one secret (f3e37bf)
 - Add BetterDisplay license to the encrypted secret store (44895a6)
+- Merge pull request #1 from loriensleafs/release/v0.1.0 (42061a3)
+- Merge pull request #2 from loriensleafs/feat/config-conflict-consent (4de90c3)
 
 ## [0.0.2] - 2026-08-26
 
