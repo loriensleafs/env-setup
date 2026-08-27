@@ -990,6 +990,68 @@ Design (to build):
 Until this ships, sync still auto-applies config (documented existing behavior); the drift-aware
 detects added this pass only improve doctor/bootstrap REPORTING, they don't change the overwrite.
 
+### REVISED DIRECTION (Peter, 2026-08-26): compatibility, not "consent for every difference"
+
+Design conversation converged AWAY from "flag every drift + keep/re-apply" toward a narrower,
+Zod-driven COMPATIBILITY model. Key principles:
+
+- **A non-default value is NOT a problem.** Each config has a default plus (often) other
+  acceptable values. If the user set a different-but-valid value, we leave it alone — no prompt,
+  no overwrite. We do NOT auto-reset or auto-change their tweak, ever.
+- **The only thing that matters is INCOMPATIBILITY**, of two kinds, both modeled as edges on the
+  existing dependency graph (which already drives the group-multiselect cascade). This is the
+  "negative dependency" / constraint-graph idea — same propagation engine, opposite sign:
+  - **Internal** — a combination of an item's OWN config values that can't coexist. Expressed as
+    a Zod `.superRefine` on that item's schema; the Zod issue message is surfaced verbatim.
+  - **Cross-item** — a config value of item A that's incompatible with item B (which the user also
+    wants). Expressed as a declared `conflictsWith` edge (value/option → option/item).
+- **Uniform rule — "our default" is not special.** Every setting has a DEFINED value, whether
+  that's our default or the user's choice; both are treated identically. So a value being
+  incompatible with one of OUR defaults is handled exactly like being incompatible with something
+  the user defined. Two resolutions, and we NEVER auto-fix:
+  - **Already-defined conflict → MUST ADDRESS:** if a new choice conflicts with anything already
+    defined (a default OR a prior user choice), we do NOT change either side — it's flagged as an
+    ERROR (clack ■ square, not ◆ diamond) the user must manually resolve (change one side) to
+    proceed.
+  - **Not-yet-defined + incompatible → DISABLED:** an option/item not yet selected that's
+    incompatible with something already defined becomes disabled — the user can't select it.
+    Reversible: change the upstream value and it re-enables.
+- **Surfacing:** normal configurable settings render as today (◆); a config in an
+  incompatible/error state renders as ■ with the reason; a downstream item disabled by an upstream
+  choice shows disabled with an explanation and can be skipped or fixed by going back.
+- **Implementation sketch:** extend the item/config model with `conflictsWith` constraint edges +
+  a propagation pass (mirrors `deps`/cascade in group-multi-select.ts); add `.superRefine` to
+  config schemas for internal rules; map Zod issues → ■ error UI. The written config is whatever
+  survives validation — we never inject values the user didn't choose.
+
+### STATUS: SUPERSEDED then BUILT — see docs/CONFIG-COMPAT-PLAN.md
+
+FINAL DIRECTION (Peter, 2026-08-27): the conflict-consent design above was dropped as
+over-complicated. The shipped model is **reset-on-drift**: an item leaves the install list only
+when installed at the wanted version AND (if we define defaults) its config exactly matches;
+anything drifted stays listed, marked "installed — settings differ (select to reset)", default
+UNCHECKED — selecting it is the consent. NO conflict checking. Built 2026-08-27:
+`DetectResult.differs`, bootstrap `presentOption`, doctor's ≠ drift marker, and drift-aware
+`detect()` on every item with defaults (delta, superwhisper, git-identity, typora, ghostty,
+editor-config, cleanshot [blob compare via exported plist — `defaults read` truncates -data],
+acmelabs-marketplace, chrome-pwas, claude-settings deep-compare, podman DOCKER_HOST file,
+better-display full app-level compare + idempotent install guard). The verified compatibility
+research (4 defects in shipped defaults + refuted claims) is preserved in CONFIG-COMPAT-PLAN.md's
+appendix; the defects are ordinary bugs to fix separately.
+
+CORRECTION (2026-08-27, after Peter pushed back): an earlier note here claimed "ZERO real
+incompatibility exists in the config set." That claim was based only on scanning the four items
+that HAVE Zod schemas — it ignored the far larger schemaless default surface (the full Claude Code
+settings template, Chrome flags, CleanShot, Raycast, macOS defaults, git config, zshrc). A real
+evaluation of every default surface found MULTIPLE real incompatibilities — several already
+implemented as implicit one-off welds (Raycast⌘Space+Spotlight-off welded in one configure();
+buildSettings' PLUGIN_REPO_MAP plugin filtering), and several live foot-guns nothing guards
+(BetterDisplay menuBarIcon=false + dockVisibility=never → no UI entry point; claude-settings
+defaultMode:auto requires its env flag; git commit.gpgsign=true requires the ssh-keys item's key;
+Ghostty global ⌘` shadows macOS next-window). The full findings table + the settled reactive
+group-select design live in docs/CONFIG-COMPAT-PLAN.md. The feature is NOT speculative — it
+replaces existing ad-hoc welds with declared schema rules. Blocks v0.1.0 per Peter.
+
 ## Dev tooling & commit pipeline — 2026-08-26
 
 All dev tooling is PROJECT-scoped (this repo), pure-Bun/no-Node runtime, and configured to run
