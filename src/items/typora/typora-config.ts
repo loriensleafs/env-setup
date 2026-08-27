@@ -41,9 +41,27 @@ export const typoraConfig = defineItem({
     const zip = "/tmp/envsetup-typora-vercel.zip";
     const dl = await ctx.run(["curl", "-fsSL", "-o", zip, THEME_ZIP]);
     if (dl.exitCode !== 0) throw new Error("Vercel theme download failed");
-    const uz = await ctx.run(["unzip", "-o", zip, "-d", THEMES]);
+    // The release zip nests everything under typora-vercel-theme-vX/ (verified
+    // 2026-08-27 — extracting straight into THEMES left vercel.css buried and
+    // verify() failing). Extract to a temp dir, then move the css + its asset
+    // dir to where Typora looks.
+    const tmp = "/tmp/envsetup-typora-theme";
+    await ctx.run(["rm", "-rf", tmp]);
+    const uz = await ctx.run(["unzip", "-o", zip, "-d", tmp]);
     if (uz.exitCode !== 0) throw new Error(`theme unzip failed: ${uz.stderr.trim()}`);
-    await ctx.run(["rm", "-f", zip]);
+    const found = await ctx.run([
+      "/bin/sh",
+      "-c",
+      `find ${tmp} -maxdepth 3 -name vercel.css -type f | head -1`,
+    ]);
+    const cssPath = found.stdout.trim();
+    if (cssPath === "") throw new Error("vercel.css not found in the theme zip");
+    const srcDir = cssPath.slice(0, cssPath.lastIndexOf("/"));
+    await ctx.run(["cp", cssPath, `${THEMES}/vercel.css`]);
+    // The css references a sibling vercel/ asset folder (fonts, icons).
+    await ctx.run(["rm", "-rf", `${THEMES}/vercel`]);
+    await ctx.run(["cp", "-R", `${srcDir}/vercel`, `${THEMES}/vercel`]);
+    await ctx.run(["rm", "-rf", zip, tmp]);
     for (const [key, args] of [
       ["theme", ["-string", "Vercel"]],
       ["useDarkTheme", ["-bool", "false"]],
