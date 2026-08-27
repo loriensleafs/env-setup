@@ -31,7 +31,7 @@ if (process.stdout.isTTY && !process.stdout.columns) {
 const main = defineCommand({
   meta: {
     name: "envsetup",
-    version: "0.1.2",
+    version: "0.1.3",
     description: "One-command Mac environment setup",
   },
   subCommands: {
