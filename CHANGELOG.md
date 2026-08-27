@@ -1,0 +1,65 @@
+# Changelog
+
+All notable changes to this project are documented here.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Other
+- Open-items sweep: Google Sans item, real CleanShot applier from captured defaults (ec73a78)
+- Web apps: ceremony + verified rename design; drop force-install policy (6401e80)
+- Web apps: AX-driven install + filename rename (no policy, no managed badge) (5e499d4)
+- Add BetterDisplay, Finder favorites, comprehensive dotfiles, secrets reveal (75cde92)
+- Remove dry-run; delete scratch test/spikes; document vendored clack (5469d02)
+- Finder favorites: fix the segfault (OpaquePointer sentinel), compile-then-run (efe2d41)
+- Record Finder favorites fix + lesson in plan (e446d74)
+- Dep audit fixes (prebuilt betterdisplaycli, corepack, git dep) + permission reality (92d716c)
+- Consolidate permission ceremony: all Accessibility + Screen Recording in one pass (6bff2b6)
+- Actually consolidate the accessibility/screen-recording ceremony (prior edit no-op'd) (c777bcc)
+- BetterDisplay license: precise clipboard+paste ceremony (no scriptable path) (dcb9469)
+- List (names) + copy <key> to clipboard; confirm CleanShot auto-licenses (264fdac)
+- Scrub partial key fragment; add 'secrets set' to store one secret (f3e37bf)
+- Add BetterDisplay license to the encrypted secret store (44895a6)
+
+## [0.0.2] - 2026-08-26
+
+### Other
+- Record v0.0.1 release + verified curl bootstrap (ce333cb)
+- Bump actions: checkout v7, gh-release v3 (Node 24 runtimes) (6021675)
+- Add workflow scope to device flow; auth --force re-authentication (339207f)
+
+## [0.0.1] - 2026-08-26
+
+### Other
+- Scaffold envsetup: bun + clack + citty + zod foundation (4d67d0a)
+- Feature-first layout per research (f323c06)
+- Record sibling-__tests__ testing convention (ce02c1b)
+- Core spine: paths, manifest, journal, item framework (bbe66aa)
+- Convert Claude statusline to pure Bun (b31f9d2)
+- Drop bundled ghostty icns; Terminal icon is read from the OS at runtime (013fbda)
+- Stage A UI: unified selection prompt + horizontal radio (bea943b)
+- First items + live doctor detection (6db521f)
+- Register Group 2 apps + fonts; .app fallback detection; font-zip factory (5320da6)
+- Stage B orchestrator: journaled, resumable, policy-encoded engine (006aee9)
+- Wire bootstrap: scan → select → confirm → manifest → orchestrate (8bac397)
+- Address dry-run feedback: path prompt, navigable viewport, zod validation (3cbb7ec)
+- Rebuild unified select on clack's dynamic-group-multiselect pattern (7a62d24)
+- UI fixes: real tab path completion, installed items excluded, stock styling (db68fd2)
+- Vendor clack from main; faithful example-based group multiselect; stock path prompt (068c5c7)
+- Everything toggleable: drop locked-on, cascade safety from registry deps (29721d0)
+- Progress UX: per-section scan spinners, taskLog-group execution, --show-installed (9c37ac6)
+- Scan via parallel stream.step per section (f11c668)
+- Single taskLog group with transient parallel messages (d3275cc)
+- Announce-then-evaluate messages, collapse to 'Ready in Xs' (e977297)
+- Config-only items: defaults, ghostty config+icon, git identity, dock, quick actions (03015d4)
+- Rename horizontal-radio to radio-group (63b4858)
+- Chrome items + PLAN.md restructure (zero-loss, containment-verified) (d8c49e1)
+- Per-app config appliers: typora, superwhisper, cleanshot, editors, podman, raycast (43d9474)
+- Repos, generated ACMElabs marketplace, flagship claude-settings applier (9d4ed0d)
+- GitHub device flow under envsetup's app identity + SSH keys + noreply email (6c9d2f0)
+- Commit re-encrypted secrets store; record auth+secrets as live-validated (aba1993)
+- Personal fonts, dotfiles block, connect ceremony runner, doctor diffing, real sync (879eb74)
+- Schema-driven per-app config screens + --defaults flag (c738ec9)
+
+

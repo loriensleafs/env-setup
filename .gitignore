@@ -3,3 +3,10 @@ dist/
 .secrets.local.json
 *.local
 .DS_Store
+
+# Secrets — never commit plaintext. Only secrets.json.age (encrypted) is tracked.
+.env
+.env.*
+!.env.example
+secrets.json
+

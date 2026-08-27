@@ -1,0 +1,39 @@
+# Lefthook — git hook runner (single Go binary, no Node runtime).
+# Installed automatically by `bun install` via the package.json "prepare" script
+# (`lefthook install`), which writes .git/hooks/*. Run `bunx lefthook install`
+# manually if hooks aren't firing.
+#
+# pre-commit: auto-fix formatting/lint on the staged files and re-stage them;
+#   block the commit only on issues that can't be auto-fixed (real lint errors
+#   or type errors). pre-push: full verification + tests before code leaves.
+
+pre-commit:
+  parallel: true
+  commands:
+    biome:
+      # JS/TS/JSON: format + safe lint fixes, then re-stage what changed.
+      glob: "*.{js,jsx,ts,tsx,json,jsonc}"
+      run: bunx biome check --write --no-errors-on-unmatched {staged_files}
+      stage_fixed: true
+    markdown:
+      # Markdown: auto-fix and re-stage.
+      glob: "*.md"
+      run: bunx markdownlint-cli2 --fix {staged_files}
+      stage_fixed: true
+    typecheck:
+      # Runs the WHOLE-project typecheck whenever any TS file is staged
+      # (tsc needs the project, not single files). Blocks on type errors.
+      glob: "*.{ts,tsx}"
+      run: bun tsc --noEmit
+
+pre-push:
+  parallel: true
+  commands:
+    lint:
+      run: bunx biome check .
+    typecheck:
+      run: bun tsc --noEmit
+    markdown:
+      run: bunx markdownlint-cli2
+    test:
+      run: bun test

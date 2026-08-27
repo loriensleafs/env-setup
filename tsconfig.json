@@ -5,16 +5,8 @@
     "moduleResolution": "bundler",
     "strict": true,
     "noEmit": true,
-    "types": [
-      "bun-types"
-    ],
+    "types": ["bun-types"],
     "allowImportingTsExtensions": true
   },
-  "include": [
-    "src",
-    "spikes"
-  ],
-  "exclude": [
-    "src/items/*/assets"
-  ]
+  "include": ["src", "spikes"]
 }
