@@ -4,6 +4,18 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-08-27
+
+### Bug Fixes
+- Curl|sh left stdin at the exhausted pipe — prompts EOF-cancelled instantly (c9d133b)
+
+### Documentation
+- Reset-on-drift in CLAUDE/README/CONTRIBUTING, post-v0.1.0 release example (5248192)
+
+### Other
+- Merge pull request #3 from loriensleafs/docs/refresh-agent-docs (8a75e8a)
+- Merge pull request #4 from loriensleafs/fix/curl-pipe-stdin (1be2ff7)
+
 ## [0.1.0] - 2026-08-27
 
 ### Bug Fixes
