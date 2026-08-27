@@ -142,20 +142,63 @@ export const betterDisplay = defineItem<BetterDisplayConfig>({
       "--versions",
       "betterdisplay",
     ]);
-    if (r.exitCode === 0) return { installed: true, version: r.stdout.trim().split(/\s+/)[1] };
-    const plist = await ctx.run([
-      "defaults",
-      "read",
-      `${APP}/Contents/Info`,
-      "CFBundleShortVersionString",
-    ]);
-    return plist.exitCode === 0
-      ? { installed: true, version: `${plist.stdout.trim()} (not brew-managed)` }
-      : { installed: false };
+    let version: string | undefined;
+    if (r.exitCode === 0) {
+      version = r.stdout.trim().split(/\s+/)[1];
+    } else {
+      const plist = await ctx.run([
+        "defaults",
+        "read",
+        `${APP}/Contents/Info`,
+        "CFBundleShortVersionString",
+      ]);
+      if (plist.exitCode !== 0) return { installed: false };
+      version = `${plist.stdout.trim()} (not brew-managed)`;
+    }
+    // App present — drift-aware: EVERY app-level default we write must match
+    // the effective config, else it's a differ (opt-in reset in the list).
+    const config = betterDisplaySchema.parse(ctx.manifest.items["better-display"]?.config ?? {});
+    const b = (v: boolean) => (v ? "1" : "0");
+    const expected: [string, string][] = [
+      ...Object.entries(menuLevels(config.menuProfile)).map(
+        ([feature, level]) => [`menuLevel${feature}`, level] as [string, string],
+      ),
+      ["dockIcon", config.dockVisibility],
+      ["hideMenuIcon", b(!config.menuBarIcon)],
+      ["dockInsertRecentsOnStartupWhenHidden", b(config.briefDockIconOnStartup)],
+      ["SUEnableAutomaticChecks", b(config.autoUpdate)],
+      ["SUAutomaticallyUpdate", b(config.autoUpdate)],
+      ["SUSendProfileInfo", b(config.sendUsageInfo)],
+    ];
+    for (const [key, want] of expected) {
+      const read = await ctx.run(["defaults", "read", DOMAIN, key]);
+      if (read.exitCode !== 0 || read.stdout.trim() !== want) {
+        return { installed: false, differs: true, version };
+      }
+    }
+    // start-at-login is deliberately not probed here: the System Events query
+    // can raise an Automation permission prompt in the middle of a silent scan.
+    return { installed: true, version };
   },
   install: async (ctx) => {
-    const r = await ctx.run(["/opt/homebrew/bin/brew", "install", "--cask", "betterdisplay"]);
-    if (r.exitCode !== 0) throw new Error(`brew install betterdisplay failed: ${r.stderr.trim()}`);
+    // Re-entered for drifted config too — skip the cask when it's present.
+    const have = await ctx.run([
+      "/opt/homebrew/bin/brew",
+      "list",
+      "--cask",
+      "--versions",
+      "betterdisplay",
+    ]);
+    const appPresent =
+      have.exitCode === 0 ||
+      (await ctx.run(["defaults", "read", `${APP}/Contents/Info`, "CFBundleShortVersionString"]))
+        .exitCode === 0;
+    if (!appPresent) {
+      const r = await ctx.run(["/opt/homebrew/bin/brew", "install", "--cask", "betterdisplay"]);
+      if (r.exitCode !== 0)
+        throw new Error(`brew install betterdisplay failed: ${r.stderr.trim()}`);
+    }
+    if (await Bun.file("/opt/homebrew/bin/betterdisplaycli").exists()) return;
     const zip = "/tmp/envsetup-betterdisplaycli.zip";
     const dl = await ctx.run([
       "curl",

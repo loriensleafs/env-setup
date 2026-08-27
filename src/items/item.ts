@@ -17,6 +17,15 @@ export interface DetectResult {
   version?: string;
   /** Whether the installed version satisfies the manifest pin/policy. */
   satisfies?: boolean;
+  /**
+   * Config-drift signal (items with config defaults): the thing IS installed
+   * and configuration is PRESENT, but its values differ from our effective
+   * defaults. Always paired with `installed: false` so the item re-enters the
+   * install list — where bootstrap marks it "installed — settings differ" and
+   * leaves it UNCHECKED (selecting it is the user's opt-in to reset). Absent
+   * config (never set up) stays a plain `installed: false`.
+   */
+  differs?: boolean;
 }
 
 export interface ItemContext {

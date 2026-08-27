@@ -17,16 +17,18 @@ const GIT_CONFIG: [string, string][] = [
   ["merge.conflictstyle", "zdiff3"],
 ];
 
-async function allKeysMatch(ctx: {
+async function readKeys(ctx: {
   run: (c: string[]) => Promise<{ stdout: string }>;
-}): Promise<boolean> {
-  const checks = await Promise.all(
-    GIT_CONFIG.map(async ([key, value]) => {
-      const r = await ctx.run(["git", "config", "--global", key]);
-      return r.stdout.trim() === value;
-    }),
-  );
-  return checks.every(Boolean);
+}): Promise<{ matches: boolean; anyPresent: boolean }> {
+  let matches = true;
+  let anyPresent = false;
+  for (const [key, value] of GIT_CONFIG) {
+    const r = await ctx.run(["git", "config", "--global", key]);
+    const current = r.stdout.trim();
+    if (current !== "") anyPresent = true;
+    if (current !== value) matches = false;
+  }
+  return { matches, anyPresent };
 }
 
 export const deltaConfig = defineItem({
@@ -34,9 +36,12 @@ export const deltaConfig = defineItem({
   title: "delta git integration (pager, navigate, line numbers)",
   kind: "config-only",
   deps: ["delta", "git-identity"], // needs the binary + git identity established first
-  // detect and verify are the same: EVERY written key must match (drift-aware),
-  // not just core.pager — otherwise doctor misses a reverted navigate/line-numbers.
-  detect: async (ctx) => ({ installed: await allKeysMatch(ctx) }),
+  // Drift-aware: EVERY written key must match, not just core.pager. `differs`
+  // = some git config is present but doesn't match (vs never configured).
+  detect: async (ctx) => {
+    const s = await readKeys(ctx);
+    return { installed: s.matches, ...(!s.matches && s.anyPresent ? { differs: true } : {}) };
+  },
   configure: async (ctx) => {
     for (const [key, value] of GIT_CONFIG) {
       const r = await ctx.run(["git", "config", "--global", key, value]);
@@ -44,5 +49,5 @@ export const deltaConfig = defineItem({
     }
     ctx.log("delta wired as git pager (n/N to navigate diffs)");
   },
-  verify: (ctx) => allKeysMatch(ctx),
+  verify: async (ctx) => (await readKeys(ctx)).matches,
 });

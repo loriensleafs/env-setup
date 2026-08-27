@@ -55,8 +55,12 @@ export const superwhisperConfig = defineItem<SuperwhisperConfig>({
   // Drift-aware: compares EVERY written key against the effective config (from
   // the manifest, or the schema defaults) — including the push-to-talk hotkey,
   // the item's primary feature. Reads the manifest config so a user override
-  // (e.g. showInDock:true) is honored rather than hardcoded.
-  detect: async (ctx) => ({ installed: await matchesConfig(ctx, effectiveConfig(ctx)) }),
+  // (e.g. showInDock:true) is honored rather than hardcoded. `differs` = some
+  // keys exist but don't match (vs never configured).
+  detect: async (ctx) => {
+    const s = await readState(ctx, effectiveConfig(ctx));
+    return { installed: s.matches, ...(!s.matches && s.anyPresent ? { differs: true } : {}) };
+  },
   configure: async (ctx, config) => {
     for (const [key, expected] of expectedReads(config)) {
       const flag = key === "KeyboardShortcuts_pushToTalk" ? "-string" : "-bool";
@@ -68,7 +72,7 @@ export const superwhisperConfig = defineItem<SuperwhisperConfig>({
       `push-to-talk: hold ${config.pushToTalk.replace("-", " ")}; sign-in + permissions happen in the connect phase`,
     );
   },
-  verify: (ctx) => matchesConfig(ctx, effectiveConfig(ctx)),
+  verify: async (ctx) => (await readState(ctx, effectiveConfig(ctx))).matches,
 });
 
 /** The config the manifest records for this item, or the schema defaults. */
@@ -94,13 +98,16 @@ function expectedReads(config: SuperwhisperConfig): [string, string][] {
   ];
 }
 
-async function matchesConfig(
+async function readState(
   ctx: { run: (c: string[]) => Promise<{ exitCode: number; stdout: string }> },
   config: SuperwhisperConfig,
-): Promise<boolean> {
+): Promise<{ matches: boolean; anyPresent: boolean }> {
+  let matches = true;
+  let anyPresent = false;
   for (const [key, expected] of expectedReads(config)) {
     const r = await ctx.run(["defaults", "read", DOMAIN, key]);
-    if (r.exitCode !== 0 || r.stdout.trim() !== expected) return false;
+    if (r.exitCode === 0) anyPresent = true;
+    if (r.exitCode !== 0 || r.stdout.trim() !== expected) matches = false;
   }
-  return true;
+  return { matches, anyPresent };
 }

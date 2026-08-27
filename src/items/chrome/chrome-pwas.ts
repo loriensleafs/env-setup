@@ -231,15 +231,28 @@ export const chromePwas = defineItem({
   ceremonies: [
     { id: "chrome-pwas-install", title: "Install the 4 Google web apps (drives Chrome)" },
   ],
-  detect: async () => {
+  detect: async (ctx) => {
+    // Drift-aware: every bundle must exist AND actually be the web app we
+    // intend (its CrAppModeShortcutURL host) — a same-named bundle pointing
+    // elsewhere is drift, not done. Partial installs (some of the 4) are drift.
+    let anyPresent = false;
+    let matches = true;
     for (const p of PWAS) {
-      if (
-        !(await Bun.file(join(CHROME_APPS_DIR, `${p.name}.app`, "Contents", "Info.plist")).exists())
-      ) {
-        return { installed: false };
+      const bundle = join(CHROME_APPS_DIR, `${p.name}.app`);
+      if (!(await Bun.file(join(bundle, "Contents", "Info.plist")).exists())) {
+        matches = false;
+        continue;
       }
+      anyPresent = true;
+      const url = await ctx.run([
+        "defaults",
+        "read",
+        join(bundle, "Contents", "Info"),
+        "CrAppModeShortcutURL",
+      ]);
+      if (url.exitCode !== 0 || !url.stdout.includes(p.host)) matches = false;
     }
-    return { installed: true };
+    return { installed: matches, ...(!matches && anyPresent ? { differs: true } : {}) };
   },
   // Install happens in the ceremony (needs Chrome + Accessibility + real profile).
 });

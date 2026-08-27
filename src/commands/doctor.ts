@@ -3,7 +3,7 @@ import * as p from "@clack/prompts";
 import color from "picocolors";
 import { run } from "../exec/run.ts";
 import { buildRegistry } from "../items/all.ts";
-import type { ItemContext } from "../items/item.ts";
+import type { DetectResult, ItemContext } from "../items/item.ts";
 import { loadManifest } from "../manifest/store.ts";
 import { MANIFEST_VERSION, type Manifest } from "../manifest/schema.ts";
 import { zshGaps } from "../items/defs/shell-block.ts";
@@ -31,7 +31,7 @@ export default defineCommand({
     const registry = buildRegistry();
     const s = p.spinner();
     s.start("scanning");
-    const detections = new Map<string, { installed: boolean; version?: string }>();
+    const detections = new Map<string, DetectResult>();
     await Promise.all(
       registry.all().map(async (item) => {
         detections.set(
@@ -60,8 +60,14 @@ export default defineCommand({
     for (const item of registry.all()) {
       const selected = effective.items[item.id]?.selected ?? false;
       const d = detections.get(item.id) ?? { installed: false };
-      if (selected && !d.installed) drift.push(`${color.red("✗")} ${item.title}`);
-      else if (!selected && d.installed)
+      if (selected && !d.installed) {
+        // Config drift (installed, values differ) reads differently from absent.
+        drift.push(
+          d.differs
+            ? `${color.yellow("≠")} ${item.title} ${color.dim("(settings differ)")}`
+            : `${color.red("✗")} ${item.title}`,
+        );
+      } else if (!selected && d.installed)
         extras.push(
           `${color.yellow("+")} ${item.title}${d.version ? color.dim(` ${d.version}`) : ""}`,
         );

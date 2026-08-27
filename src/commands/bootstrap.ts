@@ -34,6 +34,25 @@ function sectionFor(item: Item): string {
   return "Apps";
 }
 
+/**
+ * How a detection result presents in the selection list (Peter's simplified
+ * model, 2026-08-27):
+ * - installed but version-flagged → "needs update" hint, checked as usual;
+ * - installed with DRIFTED config (`differs`) → marked and UNCHECKED: selecting
+ *   it is the user's opt-in to reset the config to our defaults. Unselected,
+ *   the machine's config is untouched;
+ * - plain not-installed → no hint, checked (a normal fresh install).
+ */
+export function presentOption(d: DetectResult): { hint?: string; initialSelected?: false } {
+  if (d.installed) {
+    return { hint: `installed${d.version ? ` ${d.version}` : ""} — needs update` };
+  }
+  if (d.differs === true) {
+    return { hint: "installed — settings differ (select to reset)", initialSelected: false };
+  }
+  return {};
+}
+
 function bail(message: string): never {
   p.cancel(message);
   process.exit(0);
@@ -161,17 +180,14 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
   for (const item of registry.all()) {
     if (!shown.has(item.id)) continue;
     const d = detection.get(item.id) ?? { installed: false };
-    const hint = d.installed
-      ? `installed${d.version ? ` ${d.version}` : ""} — needs update`
-      : undefined;
     // Registry deps feed the UI cascade — only deps that are themselves shown
     // (absent ones are installed, i.e. already satisfied).
     const requires = (item.deps ?? []).filter((dep) => shown.has(dep));
     groups[sectionFor(item)]?.push({
       id: item.id,
       label: item.title,
-      hint,
       requires: requires.length > 0 ? requires : undefined,
+      ...presentOption(d),
     });
   }
   for (const [section, items] of Object.entries(groups)) {

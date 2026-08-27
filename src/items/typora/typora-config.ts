@@ -22,15 +22,17 @@ export const typoraConfig = defineItem({
   ceremonies: [{ id: "typora-license", title: "Enter Typora license (key on clipboard)" }],
   detect: async (ctx) => {
     const css = await Bun.file(join(THEMES, "vercel.css")).exists();
+    // Theme file absent = never configured by us.
     if (!css) return { installed: false };
-    // Drift-aware: verify all three written defaults, not just the theme.
+    // Drift-aware: verify all three written defaults, not just the theme. The
+    // theme file exists, so a mismatch is a real differ, not absence.
     for (const [key, expected] of [
       ["theme", "Vercel"],
       ["useDarkTheme", "0"],
       ["enableAutoSave", "0"],
     ] as const) {
       const r = await ctx.run(["defaults", "read", "abnerworks.Typora", key]);
-      if (r.stdout.trim() !== expected) return { installed: false };
+      if (r.stdout.trim() !== expected) return { installed: false, differs: true };
     }
     return { installed: true };
   },
