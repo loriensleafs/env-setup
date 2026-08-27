@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] - 2026-08-27
+
+### Bug Fixes
+- Four defects from the first real end-to-end bootstrap run (03fe76b)
+
+### Other
+- Merge pull request #7 from loriensleafs/fix/first-real-run-defects (80b2729)
+
 ## [0.1.3] - 2026-08-27
 
 ### Bug Fixes
