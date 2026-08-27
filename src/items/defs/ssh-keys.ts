@@ -35,10 +35,33 @@ export const sshKeys = defineItem({
   title: "SSH keys (auth + signing) + GitHub upload",
   kind: "system",
   deps: ["github-auth"],
-  detect: async () => {
+  detect: async (ctx) => {
     const auth = await Bun.file(AUTH_KEY).exists();
     const sign = await Bun.file(SIGN_KEY).exists();
-    return { installed: auth && sign };
+    if (!auth || !sign) return { installed: false };
+    // Files exist — but "done" includes the GitHub registration (the upload
+    // 401'd on the first real run and a files-only detect would never retry
+    // it). Per-step detection runs AFTER github-auth, so the token is fresh.
+    const token = await storedToken(ctx.run);
+    if (token === null) return { installed: true }; // can't verify — don't churn
+    try {
+      const material = async (path: string) =>
+        (await Bun.file(`${path}.pub`).text()).trim().split(/\s+/).slice(0, 2).join(" ");
+      const registered = async (endpoint: string, key: string) => {
+        const r = await fetch(`https://api.github.com/user/${endpoint}`, {
+          headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" },
+        });
+        if (!r.ok) return null; // stale token / API issue — unverifiable
+        const list = (await r.json()) as { key: string }[];
+        return list.some((k) => k.key.trim() === key);
+      };
+      const authOk = await registered("keys", await material(AUTH_KEY));
+      const signOk = await registered("ssh_signing_keys", await material(SIGN_KEY));
+      if (authOk === null || signOk === null) return { installed: true }; // unverifiable
+      return authOk && signOk ? { installed: true } : { installed: false, differs: true }; // keys exist locally, not on GitHub
+    } catch {
+      return { installed: true }; // offline — trust the files
+    }
   },
   install: async (ctx: ItemContext) => {
     const machine = hostname().replace(/\.local$/, "");

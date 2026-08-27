@@ -3,13 +3,12 @@ import { join } from "node:path";
 import { mkdir } from "node:fs/promises";
 import { defineItem } from "../item.ts";
 import { expandHome } from "../repos/repo-factory.ts";
+import { ASSET_PATHS } from "./assets-embed.ts";
 
 const CLAUDE_DIR = join(homedir(), ".claude");
 
-// Template + hook payloads ship inside the item's assets dir; resolved
-// relative to this source file (works under bun run; compiled binary embeds
-// via Bun.file on the bundled path).
-const ASSETS = join(import.meta.dir, "assets");
+// Template + hook payloads are EMBEDDED via file-type imports (assets-embed.ts)
+// so they exist inside the compiled binary too (import.meta.dir does not).
 
 /** Plugin-name → repo-item id (selection-aware settings, Peter's rule). */
 export const PLUGIN_REPO_MAP: Record<string, string> = {
@@ -91,7 +90,7 @@ export const claudeSettings = defineItem({
     } catch {
       return { installed: false, differs: true };
     }
-    const template = (await Bun.file(join(ASSETS, "settings.template.json")).json()) as Record<
+    const template = (await Bun.file(ASSET_PATHS["settings.template.json"]).json()) as Record<
       string,
       unknown
     >;
@@ -110,14 +109,14 @@ export const claudeSettings = defineItem({
     ] as const) {
       const deployed = Bun.file(join(CLAUDE_DIR, target));
       if (!(await deployed.exists())) return { installed: false, differs: true };
-      if ((await deployed.text()) !== (await Bun.file(join(ASSETS, asset)).text())) {
+      if ((await deployed.text()) !== (await Bun.file(ASSET_PATHS[asset]).text())) {
         return { installed: false, differs: true };
       }
     }
     return { installed: true };
   },
   configure: async (ctx) => {
-    const template = (await Bun.file(join(ASSETS, "settings.template.json")).json()) as Record<
+    const template = (await Bun.file(ASSET_PATHS["settings.template.json"]).json()) as Record<
       string,
       unknown
     >;
@@ -142,22 +141,22 @@ export const claudeSettings = defineItem({
     await Bun.write(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
     await Bun.write(
       join(CLAUDE_DIR, "hooks", "notify.ts"),
-      await Bun.file(join(ASSETS, "hooks-notify.ts")).text(),
+      await Bun.file(ASSET_PATHS["hooks-notify.ts"]).text(),
     );
     await Bun.write(
       join(CLAUDE_DIR, "hooks", "subagent-statusline.ts"),
-      await Bun.file(join(ASSETS, "hooks-subagent-statusline.ts")).text(),
+      await Bun.file(ASSET_PATHS["hooks-subagent-statusline.ts"]).text(),
     );
     // FileChanged formatter: auto-formats any changed file with each project's
     // own Biome / markdownlint config (found via $CLAUDE_PROJECT_DIR). Global
     // hook, per-project config — inert in projects without a matching config.
     await Bun.write(
       join(CLAUDE_DIR, "hooks", "format.ts"),
-      await Bun.file(join(ASSETS, "hooks-format.ts")).text(),
+      await Bun.file(ASSET_PATHS["hooks-format.ts"]).text(),
     );
     await Bun.write(
       join(CLAUDE_DIR, "statusline.ts"),
-      await Bun.file(join(ASSETS, "statusline.ts")).text(),
+      await Bun.file(ASSET_PATHS["statusline.ts"]).text(),
     );
     ctx.log(
       "settings, hooks (notify + format) and statusline in place — sign-in happens in the connect phase",

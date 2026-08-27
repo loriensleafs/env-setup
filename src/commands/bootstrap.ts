@@ -308,9 +308,14 @@ export async function executePlan(
 
   const order = registry.executionOrder(selection);
   const runStart = Date.now();
-  const installLog = p.taskLog({ title: `Installing ${order.length} items`, limit: 6 });
+  // Append-only rendering: one spinner for the CURRENT step, completed steps
+  // as plain log lines. (The earlier taskLog groups re-rendered the whole
+  // block once it grew past the viewport, duplicating finished lines —
+  // observed live on the first real bootstrap run.)
+  p.log.step(`Installing ${order.length} items`);
+  const stepSpinner = p.spinner();
   let stepIndex = 0;
-  let group: ReturnType<typeof installLog.group> | null = null;
+  let spinning = false;
   const report = await orchestrate({
     registry,
     manifest,
@@ -321,18 +326,26 @@ export async function executePlan(
     events: {
       onStepStart: (_id, title) => {
         stepIndex++;
-        group = installLog.group(`${title} (${stepIndex}/${order.length})`);
+        stepSpinner.start(`${title} (${stepIndex}/${order.length})`);
+        spinning = true;
       },
-      onStepLog: (_id, message) => group?.message(message),
+      onStepLog: (_id, message) => {
+        if (spinning) stepSpinner.message(message);
+        else p.log.info(message);
+      },
       onStepEnd: (id, outcome: StepOutcome) => {
-        if (outcome.kind === "succeeded") group?.success(`${id} installed`);
-        else if (outcome.kind === "skipped-installed") group?.success(`${id} already installed`);
-        else if (outcome.kind === "skipped-completed") group?.success(`${id} done in previous run`);
+        const stop = (msg: string) => {
+          if (spinning) stepSpinner.stop(msg);
+          else p.log.info(msg);
+          spinning = false;
+        };
+        if (outcome.kind === "succeeded") stop(`${id} installed`);
+        else if (outcome.kind === "skipped-installed") stop(`${id} already installed`);
+        else if (outcome.kind === "skipped-completed") stop(`${id} done in previous run`);
         else if (outcome.kind === "skipped-dependency") {
-          // No group was opened for skipped steps — surface as a log line.
+          // No spinner was started for skipped steps — surface as a log line.
           p.log.warn(`${id} skipped: ${outcome.because} failed`);
-        } else group?.error(`${id} failed: ${outcome.error}`);
-        group = null;
+        } else stop(color.red(`${id} failed: ${outcome.error}`));
       },
     },
   });
@@ -340,18 +353,18 @@ export async function executePlan(
 
   // --- Triage summary -----------------------------------------------------
   if (report.aborted) {
-    installLog.error(`required item ${report.aborted.id} failed: ${report.aborted.error}`);
+    p.log.error(`required item ${report.aborted.id} failed: ${report.aborted.error}`);
     p.outro(color.red("run aborted — re-run the same command to resume after fixing the issue"));
     return;
   }
   if (report.failed.length > 0) {
-    installLog.error(`${report.failed.length} of ${order.length} items failed (${runElapsed}s)`);
+    p.log.error(`${report.failed.length} of ${order.length} items failed (${runElapsed}s)`);
     for (const f of report.failed) p.log.error(`${f.id}: ${f.error}`);
     p.outro(
       `${report.succeeded.length} installed, ${report.failed.length} failed — re-run to retry failures`,
     );
   } else {
-    installLog.success(`Installed ${report.succeeded.length} items in ${runElapsed}s`);
+    p.log.success(`Installed ${report.succeeded.length} items in ${runElapsed}s`);
     p.outro(color.green("all done"));
   }
 }
