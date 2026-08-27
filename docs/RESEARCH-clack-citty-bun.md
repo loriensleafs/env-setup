@@ -1,11 +1,13 @@
 # Research: clack + citty + Bun CLI foundation
+
 _Compiled 2026-08-26 for envsetup. Method: full source read of cloned repos (bombshell-dev/clack
 @ prompts 1.7.0 / core 1.4.3, unjs/citty @ 0.2.2), web research, and empirical spikes run on
 this machine under Bun 1.4.0 (runtime AND `bun build --compile` binary)._
 
 ## 1. SPIKE RESULTS (empirical, this machine, Bun 1.4.0)
+
 | Test | bun runtime | compiled binary (64MB) |
-|---|---|---|
+| --- | --- | --- |
 | 18 sequential text prompts | PASS | PASS |
 | multiselect | PASS | PASS |
 | **custom @clack/core prompt (horizontal radio)** | PASS | PASS |
@@ -17,6 +19,7 @@ Spike code: scratchpad/clack-spike/{spike.ts,cli.ts,cli2.ts} — port into repo 
 (2026-08-26 follow-up per Peter: citty runtime coverage gap closed — subcommands, --version,
 --help, enum/boolean/alias/default parsing and invalid-enum rejection all verified under
 `bun cli.ts` directly, not only compiled.)
+
 - The custom HorizontalRadio (~25 lines extending `Prompt` from @clack/core) proves the
   custom-prompt path: constructor takes `render()` returning the frame string; `this.on('cursor',
   key => ...)` handles left/right; `value` set on cursor move; `.prompt()` returns value/CANCEL.
@@ -31,6 +34,7 @@ Spike code: scratchpad/clack-spike/{spike.ts,cli.ts,cli2.ts} — port into repo 
   120"`, match on UNIQUE per-prompt markers (generic markers false-match residual frames).
 
 ## 2. @clack/prompts 1.7.0 — full component catalog (from source; README covers most)
+
 Prompts: `text` (placeholder/initialValue/validate), `password` (mask), `confirm`, `date`
 (min/max, segment navigation), `select` (options w/ label/hint/disabled), `selectKey`
 (single-key choice), `multiselect` (initialValues/required/maxItems), `groupMultiselect`
@@ -46,6 +50,7 @@ error/message w/ custom symbol), `stream.*` (log from async iterables), `note`, 
 available via `({results}) =>`, onCancel), `isCancel()` guard.
 
 ## 3. @clack/core 1.4.3 — the custom-prompt platform
+
 - `Prompt<TValue>` base: constructor(opts, trackValue); `render()` returns full frame (diffed
   line-by-line for redraw); events: 'cursor' (semantic up/down/left/right/space/enter actions),
   'key', 'value', 'userInput', 'confirm', 'finalize', 'submit', 'cancel'; state machine
@@ -67,8 +72,10 @@ available via `({results}) =>`, onCancel), `isCancel()` guard.
   architecture; the radio was the minimal proof).
 
 ## 4. Community best practices (web research)
+
 Sources: pkgpulse Ink-vs-clack-vs-Enquirer 2026, jamesperkins.dev, blacksrc.com, several
 Claude-skill clack references.
+
 - clack is "the modern default" for prompt-driven CLIs; Ink (React) only for full-screen TUIs —
   our flow is prompt-driven ⇒ clack correct.
 - ALWAYS `isCancel()` after every prompt (Ctrl+C returns a symbol, not an exception).
@@ -78,7 +85,9 @@ Claude-skill clack references.
   prompts (also needed for resume/CI). Standardized exit codes; graceful SIGINT.
 
 ## 5. citty 0.2.2 — evaluation
+
 From source + README + pkgpulse 2026 CLI-framework comparisons:
+
 - Zero-dep, built on `util.parseArgs` (Bun implements natively — verified by compiled spike).
 - `defineCommand({meta, args, subCommands, setup/cleanup, plugins})`, `runMain` w/ auto
   --help/--version, lazy async subcommands (bun compile statically bundles them — fine),
@@ -91,11 +100,13 @@ From source + README + pkgpulse 2026 CLI-framework comparisons:
   <1kB, but no subcommand routing/help gen; we'd hand-roll what citty gives free.)
 
 ## 6. Pure-Bun analysis (Peter's mandate: no Node at all)
+
 Two meanings, both satisfied — with one honest nuance:
+
 - No Node.js RUNTIME: guaranteed. Compiled binary embeds Bun; nothing invokes node.
 - Bun-native APIs in OUR code: use Bun.file/Bun.write, Bun.spawn, Bun Shell ($`cmd`),
   bun:sqlite if needed, Bun.env. No node:fs/child_process in code we write.
-- NUANCE: clack + citty INTERNALLY import node:* builtins (readline, process, util.parseArgs).
+- NUANCE: clack + citty INTERNALLY import node:*builtins (readline, process, util.parseArgs).
   Under Bun these resolve to Bun's own native implementations — no Node involved — this is how
   every npm package runs on Bun and is unavoidable for any third-party dep. Spike proves they
   work compiled. If literal zero-node:*-even-in-deps were required, clack itself would be
@@ -105,6 +116,7 @@ Two meanings, both satisfied — with one honest nuance:
   bunfig.toml minimal; single package.json, src/ layout, `bun test` for tests.
 
 ## 7. Zod 4 for config evolvability (Peter's ask)
+
 - Zod 4 stable; implements Standard Schema ⇒ plugs DIRECTLY into clack `validate` (§3).
 - Pattern for envsetup: every item's config = a Zod schema (types + clamps/ranges + defaults
   via .default() + .catch() for salvage); manifest = z.object versioned with a `manifestVersion`
@@ -115,6 +127,7 @@ Two meanings, both satisfied — with one honest nuance:
 - Zod 4 syntax note for AI-assisted editing: z.email() etc. top-level, not z.string().email().
 
 ## 8. Implications for envsetup architecture
+
 - UI stack: @clack/prompts + @clack/core (custom unified selection prompt + horizontal radio) —
   validated end-to-end compiled.
 - Command routing: citty (bootstrap default command; doctor/sync subcommands; --resume flag).
@@ -126,7 +139,9 @@ Two meanings, both satisfied — with one honest nuance:
 - Testing: expect-driven PTY harness (pattern established in spike).
 
 ## 9. Secrets management (researched 2026-08-26, second pass at Peter's insistence — verdict CHANGED)
+
 Community consensus (GitGuardian, withblue.ink, git-secret HN discussions, chezmoi docs):
+
 - Plaintext secrets in git — EVEN PRIVATE REPOS — is explicitly discouraged: secrets persist in
   history forever, repos sprawl via clones/forks/backups, and third-party services granted repo
   access can read them. My earlier option-A lean contradicted this; corrected.
@@ -141,6 +156,7 @@ Community consensus (GitGuardian, withblue.ink, git-secret HN discussions, chezm
   scrypt+AES via Bun's crypto if a dep is undesirable — decision at build time.
 
 ## 10. Zod config evolvability (validating §7 with community patterns)
+
 - verzod (AndrewBastin/verzod): a small library doing EXACTLY the §7 pattern — entities with
   multiple Zod-schema versions + is-latest check + migrate-to-latest. Candidate dep, or
   hand-roll the same discriminated-union + migration-function pattern (community-documented:
@@ -149,6 +165,7 @@ Community consensus (GitGuardian, withblue.ink, git-secret HN discussions, chezm
   migrations are pure functions oldN→N+1 chained to latest; .default() for additive fields.
 
 ## 11. Architecture packages (researched 2026-08-26, Peter's push)
+
 - **age implementation: `age-encryption` (npm) — typage, the OFFICIAL TypeScript age
   implementation by Filippo Sottile (age's own author)**. Explicitly compatible with Bun
   (ES2023, noble-crypto based, Web Crypto). Settles §9's build question — no hand-rolled crypto.
@@ -165,6 +182,7 @@ Community consensus (GitGuardian, withblue.ink, git-secret HN discussions, chezm
   decide at build (bias: inline, zero-dep).
 
 ## 12. Mechanics design-risk research (2026-08-26)
+
 - Chrome Preferences are HMAC-PROTECTED (protection.macs + super_mac, machine-seeded) — naive
   JSON edits to tracked prefs get reset by Chrome. Legit routes: enterprise managed-preferences
   policies on macOS: `ExtensionSettings` with toolbar_pin:"force_pinned" (pins the Claude
