@@ -65,15 +65,15 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
     );
     process.exit(1);
   }
-  // stdout can be a terminal while stdin is not — the `curl … | sh` case, where
-  // stdin is the exhausted script pipe and every prompt would EOF-cancel.
-  // install.sh re-attaches /dev/tty; this guard turns any remaining case into a
-  // clear message instead of a silent instant exit at the first prompt.
+  // stdout can be a terminal while stdin is not — the `curl … | sh` case. The
+  // CLI entry replaces piped stdin with a self-opened /dev/tty stream
+  // (src/index.ts), so reaching here without a tty stdin means there is no
+  // terminal to acquire at all. Fail with a clear message, not a silent
+  // EOF-cancel at the first prompt.
   if (!process.stdin.isTTY) {
     console.error(
-      "envsetup bootstrap can't read your keyboard (stdin is not a terminal).\n" +
-        "If you piped the installer (`curl … | sh`), re-run it — install.sh attaches\n" +
-        "the terminal itself — or run the envsetup binary directly.",
+      "envsetup bootstrap can't read your keyboard (no terminal available on stdin\n" +
+        "and /dev/tty could not be opened). Run it from an interactive terminal.",
     );
     process.exit(1);
   }
