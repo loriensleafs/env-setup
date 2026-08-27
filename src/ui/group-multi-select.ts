@@ -103,6 +103,8 @@ export function selectionResult(groups: SelectGroups, selection: Set<string>): s
 export interface GroupMultiselectOptions {
   message: string;
   groups: SelectGroups;
+  /** Prompt input stream (thread promptInput() — see src/ui/terminal.ts). */
+  input?: NodeJS.ReadStream;
 }
 
 interface CoreOption {
@@ -124,6 +126,7 @@ export async function groupMultiselect(opts: GroupMultiselectOptions): Promise<s
   }
 
   const prompt = new GroupMultiSelectPrompt<CoreOption>({
+    input: opts.input,
     options: coreGroups,
     initialValues: [...memory],
     selectableGroups: true,

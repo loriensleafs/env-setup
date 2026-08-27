@@ -15,6 +15,8 @@ export interface RadioGroupOptions<V extends string> {
   message: string;
   options: RadioOption<V>[];
   initialValue?: V;
+  /** Prompt input stream (thread promptInput() — see src/ui/terminal.ts). */
+  input?: NodeJS.ReadStream;
 }
 
 /** Inline radio group for 2–4 options: (●) low   ( ) medium   ( ) high */
@@ -28,6 +30,7 @@ export async function radioGroup<V extends string>(
 
   const prompt = new Prompt<V>(
     {
+      input: opts.input,
       render() {
         const row = opts.options
           .map((o, i) => {

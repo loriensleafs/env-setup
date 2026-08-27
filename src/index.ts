@@ -1,35 +1,16 @@
-import { openSync } from "node:fs";
-import tty from "node:tty";
 import { defineCommand, runMain } from "citty";
+import { closePromptInput } from "./ui/terminal.ts";
 
 /**
- * Terminal self-healing for the `curl … | sh` path (empirically verified
- * 2026-08-27, see docs/PLAN.md):
+ * 0-width-terminal guard (empirically verified 2026-08-27): some PTYs (CI,
+ * expect defaults) report a tty with 0 columns, which sends clack's
+ * erase-lines math to infinity — the process balloons to ~16GB and dies with
+ * "RangeError: Out of memory" (reproduced). If stdout claims a tty with no
+ * columns, ask the terminal via `stty size`, else pin a sane 80×24.
  *
- * 1. Piping the installer leaves stdin as the exhausted script pipe, and a
- *    shell-level `</dev/tty` re-attach DOESN'T work under Bun — input from a
- *    redirect-opened tty never arrives (reproduced for bun-run AND compiled,
- *    read-only and read-write). Opening /dev/tty OURSELVES as a tty.ReadStream
- *    DOES deliver input, so when stdin isn't a terminal but stdout is, we
- *    replace process.stdin with our own terminal stream (clack reads
- *    process.stdin at prompt time). Destroyed after runMain so non-interactive
- *    commands still exit cleanly.
- * 2. A 0-width terminal (some CI/expect PTYs) makes clack's erase-lines math
- *    go infinite and OOM the process at ~16GB (reproduced). If stdout claims
- *    to be a tty with no columns, ask the terminal via `stty size`, else pin
- *    a sane 80×24.
+ * (Interactive input under `curl … | sh` is handled separately: every prompt
+ * threads `input: promptInput()` — see src/ui/terminal.ts for why.)
  */
-let ttyStdin: tty.ReadStream | undefined;
-if (!process.stdin.isTTY && process.stdout.isTTY) {
-  try {
-    ttyStdin = new tty.ReadStream(openSync("/dev/tty", "r+"));
-    ttyStdin.pause();
-    Object.defineProperty(process, "stdin", { value: ttyStdin, configurable: true });
-  } catch {
-    // Truly headless (no controlling terminal): leave stdin as-is; the
-    // interactive commands' guards produce a clear message.
-  }
-}
 if (process.stdout.isTTY && !process.stdout.columns) {
   let cols = 0;
   let rows = 0;
@@ -86,5 +67,5 @@ const main = defineCommand({
 
 await runMain(main);
 // Release the self-opened terminal so the event loop can drain (otherwise a
-// non-interactive command that never read stdin would hang at exit).
-ttyStdin?.destroy();
+// command that opened /dev/tty for prompts would hang at exit).
+closePromptInput();

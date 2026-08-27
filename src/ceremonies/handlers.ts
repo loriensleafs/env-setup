@@ -1,4 +1,5 @@
 import * as p from "@clack/prompts";
+import { promptInput } from "../ui/terminal.ts";
 import color from "picocolors";
 import type { Runner } from "../exec/run.ts";
 import { getSecret, SECRET_KEYS } from "../secrets/secrets.ts";
@@ -20,7 +21,7 @@ async function clipboard(text: string): Promise<void> {
 }
 
 async function confirmDone(message: string): Promise<boolean> {
-  const done = await p.confirm({ message });
+  const done = await p.confirm({ message, input: promptInput() });
   return !p.isCancel(done) && done === true;
 }
 

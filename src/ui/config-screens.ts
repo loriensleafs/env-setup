@@ -2,6 +2,7 @@ import * as p from "@clack/prompts";
 import { z } from "zod";
 import type { Item } from "../items/item.ts";
 import { radioGroup } from "./radio-group.ts";
+import { promptInput } from "./terminal.ts";
 
 /** fontSize → "Font size"; memoryMb → "Memory mb". */
 export function humanize(key: string): string {
@@ -45,6 +46,7 @@ export async function promptItemConfig(
 
     if (prop.type === "boolean") {
       const v = await radioGroup({
+        input: promptInput(),
         message: label,
         options: [{ value: "yes" }, { value: "no" }],
         initialValue: initial === false ? "no" : "yes",
@@ -60,6 +62,7 @@ export async function promptItemConfig(
           ? ` (${prop.minimum ?? "…"}–${prop.maximum ?? "…"})`
           : "";
       const v = await p.text({
+        input: promptInput(),
         message: `${label}${bounds}`,
         initialValue: String(initial ?? ""),
         validate: (value) => {
@@ -78,6 +81,7 @@ export async function promptItemConfig(
     // strings (incl. enums small enough for the radio)
     if (prop.enum && prop.enum.length >= 2 && prop.enum.length <= 4) {
       const v = await radioGroup({
+        input: promptInput(),
         message: label,
         options: prop.enum.map((e) => ({ value: String(e) })),
         initialValue: String(initial ?? prop.enum[0]),
@@ -87,6 +91,7 @@ export async function promptItemConfig(
       continue;
     }
     const v = await p.text({
+      input: promptInput(),
       message: label,
       initialValue: String(initial ?? ""),
       validate: (value) => ((value ?? "").trim() === "" ? `${label} is required` : undefined),
