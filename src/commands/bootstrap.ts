@@ -11,6 +11,7 @@ import { loadManifest, saveManifest } from "../manifest/store.ts";
 import { orchestrate, type StepOutcome } from "../orchestrator/orchestrator.ts";
 import { journalPath } from "../paths/paths.ts";
 import { groupMultiselect } from "../ui/group-multi-select.ts";
+import { interactiveCapable, promptInput } from "../ui/terminal.ts";
 import { promptItemConfig } from "../ui/config-screens.ts";
 import type { SelectGroups } from "../ui/group-multi-select.ts";
 
@@ -70,7 +71,7 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
   // (src/index.ts), so reaching here without a tty stdin means there is no
   // terminal to acquire at all. Fail with a clear message, not a silent
   // EOF-cancel at the first prompt.
-  if (!process.stdin.isTTY) {
+  if (!interactiveCapable()) {
     console.error(
       "envsetup bootstrap can't read your keyboard (no terminal available on stdin\n" +
         "and /dev/tty could not be opened). Run it from an interactive terminal.",
@@ -86,6 +87,7 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
   if (priorManifest && priorResume.runId && !priorResume.finished) {
     const resume = await p.confirm({
       message: `An earlier run didn't finish (${priorResume.completedSteps.size} steps done). Resume it?`,
+      input: promptInput(),
     });
     if (p.isCancel(resume)) bail("cancelled");
     if (resume) {
@@ -136,12 +138,14 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
     {
       name: () =>
         p.text({
+          input: promptInput(),
           message: "Your name (git commits)",
           initialValue: "Peter Kloss",
           validate: nonEmpty("name"),
         }),
       githubUser: () =>
         p.text({
+          input: promptInput(),
           message: "GitHub username",
           initialValue: "loriensleafs",
           validate: z
@@ -151,6 +155,7 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
         }),
       devDir: () =>
         p.path({
+          input: promptInput(),
           message: "Dev directory (repos clone here — may not exist yet)",
           directory: true,
           initialValue: `${homedir()}/Dev`,
@@ -206,7 +211,11 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
     if (items.length === 0) delete groups[section];
   }
 
-  const picks = await groupMultiselect({ message: "What should this machine get?", groups });
+  const picks = await groupMultiselect({
+    message: "What should this machine get?",
+    groups,
+    input: promptInput(),
+  });
   if (p.isCancel(picks)) bail("cancelled");
   const selection = picks as string[];
 
@@ -236,7 +245,10 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
       .join("\n"),
     "plan",
   );
-  const go = await p.confirm({ message: "Proceed? (nothing has touched the system yet)" });
+  const go = await p.confirm({
+    message: "Proceed? (nothing has touched the system yet)",
+    input: promptInput(),
+  });
   if (p.isCancel(go) || !go) bail("nothing was changed");
 
   // --- Manifest -----------------------------------------------------------

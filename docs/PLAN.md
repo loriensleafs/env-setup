@@ -1267,3 +1267,17 @@ license (activates online). That is the ceiling for this app.
 - FIX: `envsetup secrets set <key>` prompts passphrase + hidden value, updates secrets.json.age
   in place. Use it to add better-display without recreating .secrets.local.json.
 - RULE reinforced: NEVER put a license key (even partial) in a tracked file or commit message.
+
+## curl|sh interactivity — ROOT-CAUSED + FIXED 2026-08-27 (v0.1.3)
+
+Bun cannot deliver input from a shell-redirect-opened tty (`exec bin </dev/tty` — frozen, all
+variants) NOR through a defineProperty-replaced `process.stdin` (clack's readline still lands on
+the original pipe; prompts freeze, busy-spin). What works (spike-proven): opening /dev/tty
+in-process as a `tty.ReadStream` and passing it EXPLICITLY as each prompt's `input` — now
+threaded via `src/ui/terminal.ts` (`promptInput()`) through every clack call + custom prompts.
+Also fixed: 0-width PTYs sent clack's erase-lines to infinity → ~16GB OOM (RangeError) — startup
+pins columns/rows via `stty size` else 80×24. Validation was upgraded to a STRONG oracle
+(submit → next prompt must appear) after kernel-echo produced a false "alive" — weak-oracle
+lesson recorded. KNOWN ISSUE (pre-existing, non-blocking): compiled binaries (`bun build
+--compile`) burn ~160% CPU idling at any clack prompt; bun-run idles at 0% — bun-compiled
+runtime quirk, track upstream.

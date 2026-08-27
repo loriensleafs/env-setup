@@ -1,6 +1,7 @@
 import { join } from "node:path";
 import { mkdir } from "node:fs/promises";
 import * as p from "@clack/prompts";
+import { promptInput } from "../ui/terminal.ts";
 import { defineCommand } from "citty";
 import { decryptSecrets, encryptSecrets } from "../secrets/age-store.ts";
 import { configDir } from "../paths/paths.ts";
@@ -14,10 +15,10 @@ function bail(msg: string): never {
 }
 
 async function askPassphrase(confirm: boolean): Promise<string> {
-  const pass = await p.password({ message: "Secrets passphrase" });
+  const pass = await p.password({ message: "Secrets passphrase", input: promptInput() });
   if (p.isCancel(pass) || pass === "") bail("cancelled");
   if (confirm) {
-    const again = await p.password({ message: "Confirm passphrase" });
+    const again = await p.password({ message: "Confirm passphrase", input: promptInput() });
     if (p.isCancel(again) || again !== pass) bail("passphrases don't match");
   }
   return pass as string;
@@ -72,7 +73,7 @@ export default defineCommand({
       } catch {
         bail("wrong passphrase (or corrupted file)");
       }
-      const value = await p.password({ message: `Value for "${keyArg}"` });
+      const value = await p.password({ message: `Value for "${keyArg}"`, input: promptInput() });
       if (p.isCancel(value) || value === "") bail("cancelled");
       secrets[keyArg] = value as string;
       await Bun.write(AGE_FILE, await encryptSecrets(secrets, pass));
