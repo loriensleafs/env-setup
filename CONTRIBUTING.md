@@ -86,7 +86,7 @@ bun test                             # bun:test suite
 
 7. **Record it — after every commit, not at the end.** `bun run session append --session SES-NNN`
    (your file) appends an entry skeleton (`Summary` / `Why` and one line per touched file, every kind of file) for
-   each commit the ledger does not yet account for — a fix-up gets no entry (add `- Also: <sha> — …` to the
+   each commit the session log does not yet account for — a fix-up gets no entry (add `- Also: <sha> — …` to the
    entry it belongs to instead) and a commit with nothing to record says so with the trailer
    `Session-entry: none` (ADR-021); fill every
    placeholder (template in [docs/sessions/README.md](docs/sessions/README.md)); `bun run session current --session SES-NNN` lists what is left; `bun run session

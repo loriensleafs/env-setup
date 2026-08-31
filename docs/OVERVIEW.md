@@ -127,7 +127,7 @@ small separate commands, merge commits). The facts below are the ones a rule can
   `--plan`) and now lives inside the skill (`.claude/skills/session/scripts/`, pure half
   `session-lib.ts` with tests; `/run-session-tool` drives it; `scripts/` is gone); the skill gained
   `close` (`end` = leave). SES-001…004 closed (SES-004 by the first real `/session close`); SES-005 left to its
-  conversation. **Entry grain** (ADR-021, `77aa614`): the ledger holds value only — a fix-up is vouched for by
+  conversation. **Entry grain** (ADR-021, `77aa614`): the session log holds value only — a fix-up is vouched for by
   its parent's `Also:` line, a valueless commit carries `Session-entry: none`; every commit still resolves.
 - **Parked, not on `main`:** the visual-grouping patch ([PLAN-001](plan/PLAN-001-visual-grouping.md))
   as a WIP commit on local branch `wip/visual-grouping` (unverified, never run under a PTY).

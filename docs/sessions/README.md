@@ -67,7 +67,7 @@ does by hand.
   must know something. `bun run session check` fails while anything is missing or unfilled.
   Commit as `docs(session): …` — those commits are skipped by the script, so they never need an
   entry of their own.
-- **The ledger holds value only** (ADR-021). A commit that adds nothing a reader would want —
+- **The session log holds value only** (ADR-021). A commit that adds nothing a reader would want —
   a fix-up to the previous commit, a formatting pass, a fixture — gets **no entry**. Two ways to
   say so, both read by the gate: a fix-up is vouched for by the entry it belongs to, with a line
   `- Also: <sha> — <what it fixed>` under that entry's `Why` (delete the skeleton the tool

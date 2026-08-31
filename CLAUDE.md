@@ -41,7 +41,7 @@ never have to. Every doc is `<TYPE>-<NNN>-<kebab-title>.md` in its directory; ea
 
 `entry` appends and fills the commit's entry and updates everything the change made stale in the
 same step (OVERVIEW, ADR, PRD, plan, analysis, `CONTEXT.md`, a directory's `CLAUDE.md`), then
-commits it as `docs(session): …`. The ledger holds value only (ADR-021): a fix-up gets no entry
+commits it as `docs(session): …`. The session log holds value only (ADR-021): a fix-up gets no entry
 (its parent's `Also:` line vouches for it) and a commit with nothing to record carries the trailer
 `Session-entry: none`; `end` checks the log, Status and the tree and leaves the
 session open with a handoff; `close` writes the Outcome, runs `bun run session close`, and

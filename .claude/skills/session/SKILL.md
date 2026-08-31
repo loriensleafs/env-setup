@@ -131,7 +131,7 @@ Entry progress:
    for (`Summary` / `Why` placeholders, one line per touched file with its +/− counts;
    `current --session SES-NNN` lists them by line). A skeleton for a commit you did not make is
    a finding: fill what `git show <sha>` supports, say in its Notes that it was not verified, or
-   ask. **The ledger holds value only** (ADR-021): a skeleton for a fix-up of an earlier commit
+   ask. **The session log holds value only** (ADR-021): a skeleton for a fix-up of an earlier commit
    is deleted, and that earlier entry gets `- Also: <sha> — <what it fixed>` under its `Why`; a
    commit with nothing to record should have carried the trailer `Session-entry: none` when it
    was made (the tool then appends nothing) — write that trailer yourself on such commits.

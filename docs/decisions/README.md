@@ -30,7 +30,7 @@ away) and cite the session entry (sha).
 | [018](ADR-018-nested-claude-md-placement.md) | Nested CLAUDE.md only where a directory has unwritten conventions; path rules for file types; run skills only with a real driver | accepted |
 | [019](ADR-019-session-skill-invocation-and-name.md) | One model-invoked `/session` skill (start · entry · end · close; typed-only `/session-*` aliases) named for its leading word; the check gate guards its side effects | accepted |
 | [020](ADR-020-session-model.md) | A session is a bounded stream of work with `Status: open \| closed` and a `Plan:` line, not a conversation; a conversation joins or opens one before its first commit | accepted |
-| [021](ADR-021-entry-grain.md) | The ledger holds value only: an entry per change worth reading about; a fix-up is vouched for by its parent's `Also:` line, a valueless commit carries `Session-entry: none`; every commit still accounted for | accepted |
+| [021](ADR-021-entry-grain.md) | The session log holds value only: an entry per change worth reading about; a fix-up is vouched for by its parent's `Also:` line, a valueless commit carries `Session-entry: none`; every commit still accounted for | accepted |
 
 ## Rules
 
