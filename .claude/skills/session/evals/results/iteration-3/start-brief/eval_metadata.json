@@ -1,0 +1,15 @@
+{
+  "eval_id": 1,
+  "eval_name": "start-brief",
+  "prompt": "I'm picking envsetup back up. Where are we, and what should I do first?",
+  "expectations": [
+    "brief.md is under 1,600 characters (wc -c) and states the released version v0.1.9",
+    "brief.md names what is on main but unreleased and the parked branch wip/visual-grouping",
+    "brief.md contains a line starting with 'read in full:' that names docs/OVERVIEW.md, CONTEXT.md and the newest SES file, and transcript.md shows each of those was read to its last line (a second read with offset where the tool truncated)",
+    "The brief's Session line states one of the three outcomes and the disk agrees: `none` → no new docs/sessions file and session-file.md says so; `opened` → exactly one new SES-NNN with `- Status: open` and its Goal filled; `joined` → an existing open session whose Goal is this work (SES-004's and SES-005's are not) — so `joined` here is a failure",
+    "git-state.txt shows HEAD unchanged from the fixture tip and nothing modified under docs/sessions/ other than the new file and README.md (the regenerated index) — in particular SES-005-rehydration.md is untouched",
+    "brief.md reports the state of the tree and the sessions as findings (branch name; which sessions are open — SES-004 and SES-005 in this fixture — and that SES-005's placeholders belong to another conversation) rather than fixing anything, and proposes a concrete next item with a first step",
+    "transcript.md shows no push, no PR, no commit"
+  ],
+  "expected_output": "A brief (under 1,600 characters) in the skill's template — released version, unreleased on main, parked branches, open/unverified items, the proposed next item and its first step, a Session line, a 'read in full:' line. The message is a question, so the Session line may say none (nothing to record yet) — then no file is created; if the run opens one instead, exactly one new docs/sessions/SES-NNN with Status: open and its Goal set; either way nothing else on disk changes except the regenerated sessions index."
+}

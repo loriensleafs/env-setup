@@ -1,0 +1,67 @@
+# 2026-08-30 21:43 · record eval
+
+- Goal: Fix the stale set-favorites.swift asset and record it.
+- Status: open
+- Plan: —
+- Outcome: _(fill in)_
+- Open at end: _(fill in)_
+
+## Narrative
+
+Peter asked for the fix to the stale `set-favorites.swift` asset (`fa48ee0`) to be recorded before
+he opens the PR — `/session entry` with `--session SES-006`. `bun run session append` produced two
+skeletons, not one: `fa48ee0`, and `66b083d` (the ADR-020 session-model commit), which a prior
+conversation had landed on `feat/session-model` without any session recording it. Treated as a
+finding: filled from `git show 66b083d` and re-verified where cheap (its 13 session-lib tests, the
+tool's subcommands); its Notes say what was not. `fa48ee0`'s claim was verified with the finder
+driver (byte-identical to the constant, both typecheck) rather than taken from the message. The
+three docs that still called the asset stale (`src/items/finder/CLAUDE.md`, the run-src-items-finder
+skill, OVERVIEW Next-up 5) were updated in the same step. PR not opened here — Peter's step.
+
+## Changes (one entry per commit, in order)
+
+### 2026-08-30 · feat(session): sessions are streams of work with status; tool moves into the skill as a subcommand CLI · 66b083d
+
+- Summary: Implements ADR-020 — a session becomes a bounded stream of work with `Status: open | closed` and a `Plan:` line, spanning conversations; the session tool moves from `scripts/` into the skill as a subcommand CLI (`list`, `new`, `append`, `check`, `close`, `current`, all with `--session`) with a tested pure half; the skill gains `close` (`end` = leave) and `start` joins, opens or states none; every doc that described the one-session-per-conversation model is rewritten.
+- Why: A session was one conversation, so "newest = current" let another conversation's file get swept into a gate (SES-005) and a stream of work spanning conversations had no single home. Recorded in SES-006 as a finding — it landed on this branch before SES-006 opened and no session mentioned it.
+- Files:
+  - `.claude/commands/session-close.md` (+9/−0) — new typed-only alias: invokes the `session` skill in `close` mode (`disable-model-invocation: true`)
+  - `.claude/commands/session-end.md` (+1/−1) — description reworded: `end` = leave, handoff in Open at end, the session stays open
+  - `.claude/commands/session-start.md` (+1/−1) — description reworded: read every open session, then join / open / state none
+  - `.claude/skills/run-envsetup/SKILL.md` (+1/−1) — gate line becomes `bun run session check --session SES-NNN` (see /run-session-tool)
+  - `.claude/skills/run-session-tool/SKILL.md` (+58/−0) — new run skill for the moved tool: each subcommand with its real output, the two-open-sessions refusal, the test by file path, gotchas (Bun's discovery skips `.claude/`)
+  - `.claude/skills/session/CLAUDE.md` (+15/−0) — new nested CLAUDE.md: the tool's invariants (skips docs(session), `--no-renames`, status line, target selection, what `check` vs `close` count)
+  - `.claude/skills/session/SKILL.md` (+115/−61) — `start` joins / opens / states none; `end` becomes leave; new `close` mode; injected `list` line; allowed-tools gains `git show` + `gh pr list`; skill-reviewer's five majors applied
+  - `.claude/skills/session/evals/evals.json` (+11/−10) — expected outputs and expectations moved to the subcommand CLI and the Session line of the brief; eval 3 re-pointed at `close`; iteration-3 fixture note
+  - `.claude/skills/session/scripts/__tests__/session-lib.test.ts` (+132/−0) — 13 tests: header parsing, session selection, the status edit, template, index row
+  - `.claude/skills/session/scripts/session-lib.ts` (+131/−0) — new pure half: header parsing, selection by status and `--session`, the status edit
+  - `.claude/skills/session/scripts/session.ts` (+339/−0) — the tool, moved from `scripts/`: subcommands replace flags (old `--flag` spellings still parse); target = named session else the single open one, never a guess; `close` runs the gate first
+  - `CLAUDE.md` (+22/−16) — Rehydrating reads every open session and joins or opens; Recording gains `close`; Commands block lists the subcommands
+  - `CONTEXT.md` (+28/−9) — new "The session log" section: Session, Conversation, Open / Closed; Reset and Shell block moved up beside Effective config
+  - `CONTRIBUTING.md` (+15/−9) — step 1 join-or-open; step 7 subcommand spellings and end vs close; release step 6 `bun run session check`
+  - `README.md` (+3/−3) — Working-on-it line and the `bun run session` table row name the four modes and the subcommands
+  - `docs/OVERVIEW.md` (+15/−8) — Documents table rows for the skill, sessions and nested CLAUDE.md (`scripts/` → `.claude/skills/session/`); Status gains the Session-model bullet and ADR range …020; resume step 2 says join or open
+  - `docs/decisions/ADR-018-nested-claude-md-placement.md` (+3/−1) — `scripts` marked retired with ADR-020; its invariants moved to the skill's CLAUDE.md
+  - `docs/decisions/ADR-019-session-skill-invocation-and-name.md` (+4/−1) — status note: revised by ADR-020 (end = leave, `close` added, `start` joins)
+  - `docs/decisions/ADR-020-session-model.md` (+81/−0) — new ADR: a session is a bounded stream of work with Status and Plan, not a conversation; join or open before the first commit
+  - `docs/decisions/README.md` (+2/−1) — 019 row lists `close`; 020 row added
+  - `docs/plan/README.md` (+3/−0) — rule: plans and sessions point at each other (`Plan:` line ↔ ticks citing entry shas)
+  - `docs/sessions/CLAUDE.md` (+6/−4) — the four modes; the tool owns the status line too; never append to a closed session or edit another conversation's
+  - `docs/sessions/README.md` (+44/−23) — session defined as a stream; index shows status; join-or-open, own-session and leave-vs-close rules; template gains Status and Plan; release-marker rule
+  - `docs/sessions/SES-001-foundation.md` (+1/−0) — `Status: closed`
+  - `docs/sessions/SES-002-curl-sh-interactivity-and-first-bootstrap-fixes.md` (+1/−0) — `Status: closed`
+  - `docs/sessions/SES-003-real-bootstrap-runs-v0.1.5-to-v0.1.9.md` (+1/−0) — `Status: closed`
+  - `docs/sessions/SES-004-docs-rehydration.md` (+2/−0) — `Status: open`, `Plan: —`
+  - `package.json` (+2/−2) — `test` also runs the session-lib test by path; `session` points at the moved tool
+  - `scripts/.claude/skills/run-scripts/SKILL.md` (+0/−36) — deleted; replaced by /run-session-tool
+  - `scripts/CLAUDE.md` (+0/−9) — deleted; its invariants live in `.claude/skills/session/CLAUDE.md`
+  - `scripts/session.ts` (+0/−294) — deleted; moved into the skill
+- Notes: Not made in this conversation — `bun run session append --session SES-006` swept it in because no session file mentioned it. Filled from `git show 66b083d` (the diff read for every file except the five large new/rewritten ones — `session.ts`, `session-lib.ts`, its test, `SKILL.md`, ADR-020 — whose phrases come from the commit message and the current files). Verified here: `bun test ./.claude/skills/session/scripts/__tests__/session-lib.test.ts` → 13 pass; `bun run session list` / `append` / `check --session SES-006` behave as /run-session-tool documents. Not verified here: the eval claims in `evals.json`. If this entry belongs to another stream (SES-004's docs work), it is Peter's call to move it; nothing else in this file depends on it.
+
+### 2026-08-30 · fix(finder): re-sync set-favorites.swift with the embedded SET\_FAVORITES\_SWIFT constant · fa48ee0
+
+- Summary: Re-syncs `assets/set-favorites.swift` with the embedded `SET_FAVORITES_SWIFT` constant the item actually compiles, so the asset is byte-identical to what runs and the driver's staleness warning is gone.
+- Why: Peter — OVERVIEW Next-up 5 (SES-004 driver finding, `ba38081`): the asset lagged the constant, so anyone reading or editing the file was reading code the item never shipped.
+- Files:
+  - `src/items/finder/assets/set-favorites.swift` (+21/−2) — gains the `--list` mode (`--list` as the first argument prints the current favorites' file paths one per line from a snapshot, flags 3 = NoUserInteraction | DoNotMountVolumes, then exits 0) and the `LSSharedFileListItemCopyResolvedURL` binding (`SFLItemURLFn` typealias + `itemURL` in the dlsym guard); argument parsing split into `args` / `listMode` / `paths`, the "no paths" exit only outside list mode
+- Notes: Verified in this conversation by `bun src/items/finder/.claude/skills/run-src-items-finder/driver.ts` → `SET_FAVORITES_SWIFT === assets/set-favorites.swift ✓`, `swiftc -typecheck` ✓ for the file and the constant; `wc -l` = 83 (the constant's length); `bun test src/items/finder/__tests__` → 2 pass. Neither helper was run (it rewrites the sidebar). The docs the fix made false — `src/items/finder/CLAUDE.md`, the run-src-items-finder skill's sample output and Gotchas, OVERVIEW Status / Next-up 5 — are updated in the `docs(session)` commit that records this entry. The `hooks-format.ts` half of Next-up 5 stays open.

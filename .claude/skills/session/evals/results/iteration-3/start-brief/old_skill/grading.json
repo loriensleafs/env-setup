@@ -1,0 +1,153 @@
+{
+  "expectations": [
+    {
+      "text": "brief.md is under 1,600 characters (wc -c) and states the released version v0.1.9",
+      "passed": true,
+      "evidence": "wc -c outputs/brief.md = 1203. First line: 'Released: v0.1.9 (2026-08-30, 2384b88)'. Verified in the fixture: `git rev-parse --short v0.1.9` = 2384b88, dated 2026-08-30 ('chore(release): v0.1.9')."
+    },
+    {
+      "text": "brief.md names what is on main but unreleased and the parked branch wip/visual-grouping",
+      "passed": true,
+      "evidence": "brief.md line 2: 'Unreleased on main: SES-004's docs system, /session skill, doctor/label code (bb46dcb…280d906) — ships in v0.1.10'; line 3: 'Parked: wip/visual-grouping — PLAN-001 patch, unverified (never run under a PTY)'. Fixture check: `git log v0.1.9..origin/main` is 66 commits from bb46dcb to 280d906/ae7c617, so the range is right; origin/wip/visual-grouping exists and OVERVIEW.md:132 calls it 'unverified, never run under a PTY'."
+    },
+    {
+      "text": "brief.md contains a line starting with 'read in full:' that names docs/OVERVIEW.md, CONTEXT.md and the newest SES file, and transcript.md shows each of those was read to its last line (a second read with offset where the tool truncated)",
+      "passed": true,
+      "evidence": "brief.md last line: 'read in full: CLAUDE.md, docs/OVERVIEW.md, sessions/README, SES-005, SES-004, SES-003, CONTEXT.md, …'. SES-005 is the newest SES file in the fixture (docs/sessions/ has SES-001…005). transcript.md step 5: 'docs/OVERVIEW.md lines 1–162 (162 lines, end reached)'; step 7: 'cat -n CONTEXT.md lines 1–225 (225 lines, end reached)'; step 6: the 135.5 KB overflow was persisted and read with Read in three pages ('Read lines 1–344', 'offset 345, limit 344', 'offset 689, limit 300 … end of file reached'), covering 'SES-005-rehydration.md lines 1–12 (end reached)'. Fixture wc -l agrees: OVERVIEW.md 162, CONTEXT.md 225, SES-005 12, SES-004 795. Caveat: the read-to-end evidence is the executor's own transcript, not a raw tool log."
+    },
+    {
+      "text": "The brief's Session line states one of the three outcomes and the disk agrees: `none` → no new docs/sessions file and session-file.md says so; `opened` → exactly one new SES-NNN with `- Status: open` and its Goal filled; `joined` → an existing open session whose Goal is this work (SES-004's and SES-005's are not) — so `joined` here is a failure",
+      "passed": false,
+      "evidence": "brief.md: 'Session file: docs/sessions/SES-004-docs-rehydration.md — joined; nothing written yet' and 'Question: record a5ff930 now (I join SES-004)?'. The stated outcome is `joined`. SES-004's Goal (fixture, and outputs/session-file.md line 3) is 'Make a fresh session able to pick up exactly where the last one stopped: a handoff overview, a complete record of what was done (with files), and a discipline that keeps it all current.' — the docs-system build stream, not this conversation's work (answering 'where are we, what first'). Applying the expectation's rule literally, `joined` is a failure. The disk itself is clean (no new file, SES-004 unmodified — outputs/session-file.md is byte-identical to the fixture's SES-004), so the run effectively did `none` on disk while declaring `joined` in the brief; the transcript's own decision note says 'No session file created … the brief states the join (SES-004 …) and writes nothing', i.e. it chose a join it never executed, and session-file.md does not say 'none'."
+    },
+    {
+      "text": "git-state.txt shows HEAD unchanged from the fixture tip and nothing modified under docs/sessions/ other than the new file and README.md (the regenerated index) — in particular SES-005-rehydration.md is untouched",
+      "passed": true,
+      "evidence": "git-state.txt: '=== git rev-parse --short HEAD === a5ff930' and '=== git status --short ===' followed by nothing (empty). Fixture verified now: HEAD a5ff930, `git status --short` empty, `git ls-files --others --exclude-standard` empty, `git diff --stat` empty, `git diff HEAD -- docs/sessions/SES-005-rehydration.md` empty; docs/sessions/ holds only the original 5 SES files + README.md + CLAUDE.md. No new file, no index regeneration, SES-005 untouched."
+    },
+    {
+      "text": "brief.md reports the state of the tree and the sessions as findings (branch name; which sessions are open — SES-004 and SES-005 in this fixture — and that SES-005's placeholders belong to another conversation) rather than fixing anything, and proposes a concrete next item with a first step",
+      "passed": true,
+      "evidence": "brief.md Findings line: 'branch feat/session-model, 1 ahead of origin/main (a5ff930, ADR-020); no local main; tree clean; gate NOT ready — a5ff930 has no entry; SES-004 + SES-005 both open (check needs --session); check + test green (124 pass)'. Open/unverified line: \"SES-005's placeholders are another conversation's\". Next line: 'Next: record a5ff930 into SES-004 — first step: bun run session append --session SES-004, fill, OVERVIEW cites it, docs(session) commit, PR + merge; then PLAN-001 from wip/visual-grouping on a new session'. The red gate (expected for this fixture) was reported, not repaired; fixture tree unchanged. All findings verified against the fixture: branch feat/session-model, exactly one commit ahead of origin/main (a5ff930), no local main, `bun run session list` → open: SES-004, SES-005, `bun run test` → 111 pass + 13 pass."
+    },
+    {
+      "text": "transcript.md shows no push, no PR, no commit",
+      "passed": true,
+      "evidence": "transcript.md contains no `git commit`, `git push`, `git add` or `gh pr` invocation (grep over the file returns none); every git command listed is read-only (branch, status, log, show, tag, remote, rev-parse). Fixture confirms: HEAD still a5ff930, `git log --oneline -5` unchanged, tree clean. Transcript step 19: 'Fixture repo untouched throughout: HEAD a5ff930, tree clean.'"
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 1,
+    "total": 7,
+    "pass_rate": 0.86
+  },
+  "execution_metrics": {
+    "note": "No metrics.json in outputs_dir; counts derived from transcript.md's step list (approximate).",
+    "tool_calls": {
+      "Bash": 18,
+      "Read": 3,
+      "Write": 2
+    },
+    "total_tool_calls": 23,
+    "total_steps": 19,
+    "errors_encountered": 0,
+    "output_chars": 134845,
+    "transcript_chars": 8984
+  },
+  "timing": {
+    "total_tokens": 187562,
+    "duration_ms": 244583,
+    "executor_duration_seconds": 244.6,
+    "total_duration_seconds": 244.6
+  },
+  "claims": [
+    {
+      "claim": "Released v0.1.9 on 2026-08-30 at 2384b88",
+      "type": "factual",
+      "verified": true,
+      "evidence": "`git rev-parse --short v0.1.9` = 2384b88; `git log -1 --date=short v0.1.9` = 2026-08-30 chore(release): v0.1.9."
+    },
+    {
+      "claim": "Branch feat/session-model is exactly 1 commit ahead of origin/main (a5ff930) and there is no local main",
+      "type": "factual",
+      "verified": true,
+      "evidence": "`git log --oneline origin/main..HEAD` = a5ff930 only; `git branch -a` lists only feat/session-model locally."
+    },
+    {
+      "claim": "Gate NOT ready — a5ff930 has no session entry; check needs --session because two sessions are open",
+      "type": "factual",
+      "verified": true,
+      "evidence": "git-state.txt: `bun run session check --session SES-004` → 'missing: a5ff930 …', 'session: NOT ready', exit=1; `bun run session list` in the fixture → 'open: SES-004, SES-005'. Red gate correctly reported in the brief's Findings line."
+    },
+    {
+      "claim": "check + test green (124 pass)",
+      "type": "factual",
+      "verified": true,
+      "evidence": "`bun run test` in the fixture: 111 pass / 0 fail then 13 pass / 0 fail = 124. `bun run check` exit 0 per transcript step 15 (not re-run by the grader)."
+    },
+    {
+      "claim": "Unreleased on main (bb46dcb…280d906) 'ships in v0.1.10'",
+      "type": "factual",
+      "verified": false,
+      "evidence": "The commit range is right (66 commits v0.1.9..origin/main, bb46dcb first, 280d906 last). OVERVIEW.md:118 and :137 name v0.1.10 for the install.sh fix and for PLAN-001's release; no doc states that the docs-system work as a whole 'ships in v0.1.10'. Loose inference, not contradicted."
+    },
+    {
+      "claim": "SES-005's placeholders are another conversation's",
+      "type": "factual",
+      "verified": true,
+      "evidence": "OVERVIEW.md:129 'SES-005 left to its …' and ADR-020 line 76 'SES-005 is left to its conversation (reads as open; no edit)'; SES-005 has Outcome/Open-at-end '_(fill in)_' placeholders and no Status line."
+    },
+    {
+      "claim": "Every file on the 'read in full' line was read to its last line; the truncated output was continued with Read offsets to the end",
+      "type": "process",
+      "verified": true,
+      "evidence": "transcript.md steps 5–12, 14 give per-file line ranges matching fixture wc -l for OVERVIEW (162), CONTEXT (225), SES-004 (795), SES-005 (12), README (114), SKILL.md (182); step 6 shows three Read pages to line 935. Evidence is the executor's own transcript only."
+    },
+    {
+      "claim": "Nothing in the fixture repo was modified; no session file created",
+      "type": "process",
+      "verified": true,
+      "evidence": "Fixture: status clean, no untracked files, no diff, HEAD a5ff930, docs/sessions/ unchanged; session-file.md is byte-identical to SES-004."
+    },
+    {
+      "claim": "This conversation 'joins' SES-004 because a5ff930's entry belongs to its stream",
+      "type": "quality",
+      "verified": false,
+      "evidence": "a5ff930's commit message does say SES-004 stays open and the missing entry would land there, but SES-004's Goal is the docs-system build, not this conversation's question; the expectation's rule (join only where the Goal is this work) makes the declared join wrong, and the run also did not execute a join (nothing appended). The brief's 'Session file: … — joined; nothing written yet' is self-contradictory as an outcome statement."
+    },
+    {
+      "claim": "The brief was trimmed to 1,203 chars to meet the old skill's ~1,200 bound",
+      "type": "process",
+      "verified": true,
+      "evidence": "wc -c brief.md = 1203; fixture SKILL.md line 72 states 'the whole reply under ~1,200 characters'; transcript steps 18–19 record the 1,285 → 1,203 rewrite."
+    }
+  ],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": [
+      "No user_notes.md present. The transcript's 'Decisions taken on the way' records that the run overrode the old SKILL.md's step 6 (`--new` once per conversation) in favour of the newer project docs (CLAUDE.md, sessions/README.md, ADR-020) and created no session file.",
+      "The old skill's injected gate line `bun run session -- --check | tail -4` produced a stack-trace tail; the run re-ran the gate bare and with --session per the tool's refusal message."
+    ]
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "expectation": "The brief's Session line states one of the three outcomes and the disk agrees …",
+        "reason": "This run declared `joined` while doing `none` on disk (nothing appended, no file). The expectation catches the wrong word, which is right, but a `none`-on-disk / `joined`-in-brief mismatch is a distinct failure mode worth naming explicitly: the Session line must match what the tool was actually asked to do (a join is `bun run session append --session SES-NNN` or at least a stated `--session` binding for future commits), not a promise."
+      },
+      {
+        "expectation": "brief.md contains a line starting with 'read in full:' … and transcript.md shows each of those was read to its last line",
+        "reason": "transcript.md is written by the executor after the fact; a run that asserts 'end reached' without doing it passes identically. The line-range/wc -l cross-check I did is the only independent oracle, and it only works because the executor volunteered line counts. Consider requiring the transcript to quote the last line of each file (checkable against the fixture) or grading from the raw tool log."
+      },
+      {
+        "reason": "No expectation names the red gate. The run context says a5ff930 lacking an entry is the expected state and the point is whether it was reported; this run did report it ('gate NOT ready — a5ff930 has no entry') but only expectation 6's generic 'state of the tree … as findings' covers it. Add: 'Findings line reports the gate as NOT ready naming a5ff930, and the run does not append/fill an entry to make it green.'"
+      },
+      {
+        "reason": "Expectation 1's 1,600-char bound is looser than the old skill's ~1,200 and the new skill's template; both arms will pass it trivially. If the new skill has a stated bound, grade against that so the length check discriminates."
+      }
+    ],
+    "overall": "The expectations discriminated well here: six pass on verified disk/transcript evidence and the one failure (declared join to a session whose Goal is not this work) is a genuine defect of the baseline behaviour, not a technicality. Main gap is that read-to-end evidence rests on the executor's self-report."
+  }
+}

@@ -4,13 +4,13 @@
     {
       "id": 1,
       "prompt": "I'm picking envsetup back up. Where are we, and what should I do first?",
-      "expected_output": "A brief (under 1,600 characters) in the skill's template — released version, unreleased on main, parked branches, open/unverified items, the proposed next item and its first step, a Session line saying which session was joined or opened (or none), a 'read in full:' line — and, since the work is new, one new docs/sessions/SES-NNN file with Status: open and its Goal set; nothing else on disk changed except the regenerated sessions index.",
+      "expected_output": "A brief (under 1,600 characters) in the skill's template — released version, unreleased on main, parked branches, open/unverified items, the proposed next item and its first step, a Session line, a 'read in full:' line. The message is a question, so the Session line may say none (nothing to record yet) — then no file is created; if the run opens one instead, exactly one new docs/sessions/SES-NNN with Status: open and its Goal set; either way nothing else on disk changes except the regenerated sessions index.",
       "files": [],
       "expectations": [
         "brief.md is under 1,600 characters (wc -c) and states the released version v0.1.9",
         "brief.md names what is on main but unreleased and the parked branch wip/visual-grouping",
         "brief.md contains a line starting with 'read in full:' that names docs/OVERVIEW.md, CONTEXT.md and the newest SES file, and transcript.md shows each of those was read to its last line (a second read with offset where the tool truncated)",
-        "session-file.md exists: exactly one new docs/sessions/SES-NNN file was created, it carries `- Status: open`, and its Goal line is filled (the brief's Session line says it was opened, not joined — no open session's Goal is this work)",
+        "The brief's Session line states one of the three outcomes and the disk agrees: `none` → no new docs/sessions file and session-file.md says so; `opened` → exactly one new SES-NNN with `- Status: open` and its Goal filled; `joined` → an existing open session whose Goal is this work (SES-004's and SES-005's are not) — so `joined` here is a failure",
         "git-state.txt shows HEAD unchanged from the fixture tip and nothing modified under docs/sessions/ other than the new file and README.md (the regenerated index) — in particular SES-005-rehydration.md is untouched",
         "brief.md reports the state of the tree and the sessions as findings (branch name; which sessions are open — SES-004 and SES-005 in this fixture — and that SES-005's placeholders belong to another conversation) rather than fixing anything, and proposes a concrete next item with a first step",
         "transcript.md shows no push, no PR, no commit"
@@ -43,6 +43,18 @@
         "overview.diff is 'no change', or changes only Status/Next up with a reason in transcript.md grounded in this conversation's own work (not in fixture scaffolding commits)",
         "docs/sessions/SES-005-rehydration.md is untouched (git-state.txt / commit shows no change to it) and no second session file was created",
         "transcript.md shows no push, no PR opened, no merge"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Done for today. The docs review still has the ADR pass to go, so this session isn't finished — leave it open and write the handoff.",
+      "expected_output": "The session's Goal is unmet, so this is `end` (leave): the log complete, Open at end written as the handoff (the ADR pass first), the Narrative whole, the handoff committed as docs(session), Status still open, Outcome still its placeholder, OVERVIEW checked, a clean tree, SES-005 untouched, and a closing note of at most 60 words ending with (SES-006 stays open).",
+      "files": [],
+      "expectations": [
+        "session-file.md has `- Status: open`, `- Outcome: _(fill in)_` still in place, and `Open at end` written (no placeholder) naming the ADR pass as what the next conversation picks up first",
+        "git-state.txt shows HEAD is a commit whose subject starts with docs(session): touching docs/sessions/SES-006-closing-eval.md (and the regenerated README.md index), and `bun run session check --session SES-006` printing session: complete (SES-006, open)",
+        "reply.md is at most 60 words, states what shipped and the first thing to do next time, and says the session stays open",
+        "transcript.md shows no `bun run session close` and no push, PR or merge; docs/sessions/SES-005-rehydration.md is untouched"
       ]
     }
   ],

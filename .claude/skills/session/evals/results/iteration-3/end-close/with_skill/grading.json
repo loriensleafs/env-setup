@@ -1,0 +1,125 @@
+{
+  "expectations": [
+    {
+      "text": "session-file.md has Outcome and Open at end written (no _(fill in)_ on either line), `- Status: closed`, and its Narrative mentions this closing; git-state.txt or transcript.md shows `bun run session close --session SES-006` printing `session: closed SES-006`",
+      "passed": true,
+      "evidence": "session-file.md line 4 `- Status: closed`; line 6 Outcome is a full paragraph ('The docs system was reviewed end to end ... No release, no PR.'); line 7 Open at end is written ('`66b083d` belongs to the session-model stream ... SES-004 and SES-005 stay open and untouched'). `grep -n 'fill in'` on the repo copy returns nothing; the repo file is byte-identical to session-file.md (diff → IDENTICAL). Narrative: 'Peter then said the review found nothing to fix and asked to close the session. At close, `bun run session append --session SES-006` did not print `up to date`...'. transcript.md step 12: '`bun run session close --session SES-006` → `session: closed SES-006 — still open: SES-004, SES-005`, exit 0'. Re-running `bun run session check --session SES-006` in the fixture prints `session: complete (SES-006, closed)` exit 0, consistent with the close having happened."
+    },
+    {
+      "text": "git-state.txt shows `bun run session check` printing session: complete and an empty git status --short",
+      "passed": true,
+      "evidence": "git-state.txt: '$ git status --short' followed by '(exit=0)' with no lines between; '$ bun run session check --session SES-006' → 'session: complete (SES-006, closed)' '(exit=0)'. Both reproduced in the fixture repo: `git status --short` empty, check prints `session: complete (SES-006, closed)` exit 0."
+    },
+    {
+      "text": "reply.md is at most 60 words and states what shipped in the conversation and the first thing to do next time",
+      "passed": true,
+      "evidence": "`wc -w reply.md` = 49. 'Shipped: no change toward the Goal — the review found nothing stale; `b365b42` docs(session): close SES-006 (...)' names the one commit made (matches `git log` HEAD b365b42). 'Next time: OVERVIEW Next-up 1 (PLAN-001 from `wip/visual-grouping`); this checkout sits on `feat/session-model`, not `main`. (SES-006 closed)' — docs/OVERVIEW.md lines 136-137 confirm Next up 1 is PLAN-001 from `wip/visual-grouping`, and `git branch --show-current` is feat/session-model."
+    },
+    {
+      "text": "overview.diff is 'no change', or changes only Status/Next up with a reason in transcript.md grounded in this conversation's own work (not in fixture scaffolding commits)",
+      "passed": true,
+      "evidence": "overview.diff contains exactly 'no change'. `git diff --stat 3e94d4f HEAD -- docs/OVERVIEW.md` in the fixture is empty; HEAD touches only docs/sessions/README.md and SES-006-closing-eval.md. transcript.md step 5 gives the reason: OVERVIEW never names SES-006 and its Status already carries the 'Session model (ADR-020)' bullet (confirmed at OVERVIEW line 129), so nothing was made false by this session."
+    },
+    {
+      "text": "docs/sessions/SES-005-rehydration.md is untouched (git-state.txt / commit shows no change to it) and no second session file was created",
+      "passed": true,
+      "evidence": "git-state.txt `git show --stat HEAD` lists only docs/sessions/README.md (2 +/-) and docs/sessions/SES-006-closing-eval.md (60). In the fixture `git diff --stat 3e94d4f HEAD -- docs/sessions/SES-005-rehydration.md docs/sessions/SES-004-docs-rehydration.md` is empty; `ls docs/sessions/` shows SES-001..SES-006 only, and `bun run session list` lists six sessions with SES-006 the last. README index diff changes only the SES-006 row (open → closed, goal filled)."
+    },
+    {
+      "text": "transcript.md shows no push, no PR opened, no merge",
+      "passed": true,
+      "evidence": "transcript.md closes with 'Not done, deliberately: no push, no PR ...'; no step runs git push, gh pr create, or git merge (gh pr list was skipped because origin is a local path). Fixture reflog holds only two commits after the clone; `origin/feat/session-model` still points at 66b083d, not b365b42, so nothing was pushed."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  },
+  "execution_metrics": {
+    "note": "no metrics.json in outputs_dir; chars measured from files",
+    "output_chars": 12397,
+    "transcript_chars": 7064
+  },
+  "timing": {
+    "total_tokens": 118917,
+    "duration_ms": 206508,
+    "total_duration_seconds": 206.5,
+    "executor_duration_seconds": 206.5
+  },
+  "claims": [
+    {
+      "claim": "The 66b083d skeleton was filled from `git show` with a phrase per file and its Notes flag it as not this conversation's commit, naming what was and was not verified",
+      "type": "quality",
+      "verified": true,
+      "evidence": "All 31 per-file lines carry a specific phrase (none say 'updated'/'changes'); every (+/−) count matches `git show --numstat --no-renames 66b083d` (e.g. SKILL.md 115/61, session.ts 339/0, scripts/session.ts 0/294). Notes: 'Not this conversation's commit ... Verified here: ... 13 pass, 0 fail ... Not verified here: the `/session-close` alias in a real conversation, `new --plan`, `bun run check`, and the evals.json changes.' This is exactly the SKILL.md entry step 1 handling ('fill what `git show <sha>` supports, say in its Notes that it was not verified, or ask')."
+    },
+    {
+      "claim": "session-lib tests: 13 pass, 0 fail",
+      "type": "factual",
+      "verified": true,
+      "evidence": "`bun test ./.claude/skills/session/scripts/__tests__/session-lib.test.ts` in the fixture → 13 pass, 0 fail, 22 expect() calls."
+    },
+    {
+      "claim": "66b083d was made one minute before SES-006 opened and no session had recorded it",
+      "type": "factual",
+      "verified": true,
+      "evidence": "git log --date=iso: 66b083d 21:42:40, 3e94d4f 21:43:44. Transcript step 7 `grep -rn 66b083d docs/` found only the new skeleton; consistent with the harness note that the commit had no entry."
+    },
+    {
+      "claim": "Outcome: 'The docs system was reviewed end to end (OVERVIEW, the sessions index and open sessions, CONTEXT.md, the session skill and its nested CLAUDE.md)'",
+      "type": "factual",
+      "verified": false,
+      "evidence": "The transcript shows OVERVIEW, docs/sessions/README.md, SES-006, SKILL.md and the skill's CLAUDE.md being read, but no read of CONTEXT.md and no read of the open sessions SES-004/SES-005 beyond the `list` line. The Narrative's own list of what the review read omits CONTEXT.md, so the Outcome overstates the review. The review is attributed to the prior (fictional) conversation the prompt asserts, so it is grounded in the user's statement rather than in this run — but the specific file list is not supported."
+    },
+    {
+      "claim": "OVERVIEW Status credits the session-model stream to SES-004 and never names SES-006; Next up 1 is PLAN-001 from wip/visual-grouping",
+      "type": "factual",
+      "verified": true,
+      "evidence": "OVERVIEW lines 112, 129 (SES-004 '(this docs stream) open; SES-005 left to its conversation'), 136-137 (PLAN-001, `wip/visual-grouping`); grep for SES-006 in OVERVIEW returns nothing."
+    },
+    {
+      "claim": "`gh pr list --state open` skipped because origin is a local path",
+      "type": "process",
+      "verified": true,
+      "evidence": "`git remote -v` → origin /Users/peterkloss/Dev/env-setup; SKILL.md end step 5 allows skipping when origin is not GitHub provided it is said, and git-state.txt says so."
+    },
+    {
+      "claim": "lefthook pre-commit ran (typecheck skip, biome skip, markdownlint 0 issues)",
+      "type": "process",
+      "verified": false,
+      "evidence": "Only stated in transcript step 14; no hook output is captured in outputs_dir. Unverifiable, and immaterial to the expectations."
+    },
+    {
+      "claim": "Staged by named file, committed as docs(session): close SES-006; tree clean; no AskUserQuestion available",
+      "type": "process",
+      "verified": true,
+      "evidence": "HEAD commit message 'docs(session): close SES-006' touching exactly the two named files; git status empty. The AskUserQuestion-unavailable statement cannot be checked but the run reported the stray-commit decision in Open at end, Notes, the commit body and reply, which is the 'or ask' alternative made visible."
+    }
+  ],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": []
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "reason": "The fixture guarantees `append` produces a skeleton for 66b083d, so the most discriminating behaviour in this eval — fill it from git show with per-file phrases matching numstat, flag it in Notes as not this conversation's commit with verified/unverified named, leave SES-004 alone — is checked by no expectation. The close gate only rejects `_(fill in)_`, so a run that wrote 'updated' on 31 lines and no Notes caveat would pass every current expectation. Add one: the 66b083d entry's Notes say it was not made in this conversation and name what was not verified, and no per-file line is a bare 'updated'/'changes'."
+      },
+      {
+        "expectation": "git-state.txt shows `bun run session check` printing session: complete and an empty git status --short",
+        "reason": "A bare `session: complete` from a check run without `--session` (or against SES-005) would pass. Require the literal `session: complete (SES-006, closed)` and the `--session SES-006` flag, which is also the skill's stated invariant."
+      },
+      {
+        "expectation": "session-file.md has Outcome and Open at end written ... and its Narrative mentions this closing",
+        "reason": "'Mentions this closing' passes on any sentence containing 'close'. I observed the Outcome asserting CONTEXT.md and the open sessions were reviewed when the transcript shows neither was read; an expectation that Outcome/Narrative claims are traceable to files the transcript shows read would have caught it."
+      },
+      {
+        "reason": "The eval prompt says 'the review found nothing to fix' yet the shared harness state makes a correct run record a 31-file feature commit it did not make. Either make that explicit in the prompt/expectations (as above) or have the fixture record 66b083d in SES-004 before SES-006 opens, so the with/without arms are measured on the closing itself."
+      }
+    ],
+    "overall": "All six expectations pass on verified evidence and none was satisfied superficially; but the set checks the tool-enforced surface (status flip, gate, clean tree, no push) and leaves the skill-specific judgment (stray-skeleton handling, grounded Outcome) uncovered. The run handled the 66b083d skeleton exactly as SKILL.md prescribes; its one lapse is an Outcome sentence listing CONTEXT.md as reviewed without reading it."
+  }
+}

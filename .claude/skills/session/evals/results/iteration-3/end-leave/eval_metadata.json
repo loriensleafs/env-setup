@@ -1,0 +1,11 @@
+{
+  "eval_id": 4,
+  "eval_name": "end-leave",
+  "prompt": "Done for today. The docs review still has the ADR pass to go, so this session isn't finished — leave it open and write the handoff.",
+  "expectations": [
+    "session-file.md has `- Status: open`, `- Outcome: _(fill in)_` still in place, and `Open at end` written (no placeholder) naming the ADR pass as what the next conversation picks up first",
+    "git-state.txt shows HEAD is a commit whose subject starts with docs(session): touching docs/sessions/SES-006-closing-eval.md (and the regenerated README.md index), and `bun run session check --session SES-006` printing session: complete (SES-006, open)",
+    "reply.md is at most 60 words, states what shipped and the first thing to do next time, and says the session stays open",
+    "transcript.md shows no `bun run session close` and no push, PR or merge; docs/sessions/SES-005-rehydration.md is untouched"
+  ]
+}

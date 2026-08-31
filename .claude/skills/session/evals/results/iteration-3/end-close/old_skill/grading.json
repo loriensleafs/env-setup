@@ -1,0 +1,125 @@
+{
+  "expectations": [
+    {
+      "text": "session-file.md has Outcome and Open at end written (no _(fill in)_ on either line), `- Status: closed`, and its Narrative mentions this closing; git-state.txt or transcript.md shows `bun run session close --session SES-006` printing `session: closed SES-006`",
+      "passed": true,
+      "evidence": "Fixture docs/sessions/SES-006-closing-eval.md (identical to outputs/session-file.md by diff): line 4 `- Status: closed`; line 6 `- Outcome: Nothing to change — the docs system was reviewed end to end and found current. ...`; line 7 `- Open at end: Nothing from this session. Two findings for the next conversation ...`; grep for `_(fill in)_` finds nothing. Narrative (line 11) says `Peter then called it done and asked to close it out. Closing, verified: bun run session append --session SES-006 → up to date; check was NOT ready only on this file's own three placeholders ... filled here`. transcript.md step 8: `Ran bun run session close --session SES-006 → session: closed SES-006 — still open: SES-004, SES-005, exit 0`. git-state.txt does not capture the close command itself; only transcript.md does, and the transcript is the executor's narrative rather than a raw log — but the fixture's `Status: closed` plus `check` printing `session: complete (SES-006, closed)` corroborate that close ran."
+    },
+    {
+      "text": "git-state.txt shows `bun run session check` printing session: complete and an empty git status --short",
+      "passed": true,
+      "evidence": "git-state.txt: `$ git status --short` followed by a blank line, and `$ bun run session check --session SES-006` → `session: complete (SES-006, closed)` / `exit=0`. Re-run in the fixture repo by the grader: `git status --short` empty; `bun run session check --session SES-006` → `session: complete (SES-006, closed)`."
+    },
+    {
+      "text": "reply.md is at most 60 words and states what shipped in the conversation and the first thing to do next time",
+      "passed": true,
+      "evidence": "`wc -w reply.md` = 56. Line 1: `Shipped: nothing to change — SES-006 closed (1e7ae62, docs(session), local only; gate session: complete (SES-006, closed), tree clean).` Line 2: `Next time (SES-006 closed): the checkout is on feat/session-model, not main — and SKILL.md at 90dc4dd lost its close mode and still injects the retired -- --check; both recorded in Open at end for the SES-004 docs stream.` Both halves are present. Note the 'next' half is phrased as two findings (state), not as one imperative action — a reader must infer 'deal with the branch / restore close in SKILL.md'; the expectation's 'first thing to do' is met only loosely."
+    },
+    {
+      "text": "overview.diff is 'no change', or changes only Status/Next up with a reason in transcript.md grounded in this conversation's own work (not in fixture scaffolding commits)",
+      "passed": true,
+      "evidence": "outputs/overview.diff contains exactly `no change`. Grader's `git diff 90dc4dd HEAD --stat -- docs/OVERVIEW.md` is empty. transcript.md step 6: `Decision: OVERVIEW Status / Next up are not made stale by a review that changed nothing — left unchanged.`"
+    },
+    {
+      "text": "docs/sessions/SES-005-rehydration.md is untouched (git-state.txt / commit shows no change to it) and no second session file was created",
+      "passed": true,
+      "evidence": "`git show --stat HEAD` (1e7ae62) lists only docs/sessions/README.md (2 +-) and docs/sessions/SES-006-closing-eval.md (8 ++++----). `git diff 90dc4dd HEAD --stat -- docs/sessions/SES-005-rehydration.md docs/sessions/SES-004-docs-rehydration.md` is empty; `git log -- SES-005` last touches it at fixture commit 5476479. `ls docs/sessions` shows SES-001..SES-006 only; `git status --short` is empty so no untracked file either. Transcript step 5 shows the run never ran `new`; `append --session SES-006` returned `up to date`."
+    },
+    {
+      "text": "transcript.md shows no push, no PR opened, no merge",
+      "passed": true,
+      "evidence": "transcript.md closing line: `Not done, by design: no push, no PR, no edit to SKILL.md or OVERVIEW ...`; step 9: `gh pr list skipped: origin is a local path`. Fixture reflog since clone: `e9a289d commit` → `90dc4dd commit (amend)` → `1e7ae62 commit` — no push/merge/pull entries; `git log --oneline` shows no new merge commit above 90dc4dd."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  },
+  "execution_metrics": {
+    "note": "no metrics.json in outputs_dir; transcript is an executor-written narrative so per-tool counts are not recoverable",
+    "output_chars": 9754,
+    "transcript_chars": 4624,
+    "errors_encountered": 0
+  },
+  "timing": {
+    "executor_duration_seconds": 137.1,
+    "total_duration_seconds": 137.1,
+    "total_tokens": 82094,
+    "source": "../timing.json: { total_tokens: 82094, duration_ms: 137056, total_duration_seconds: 137.1 }"
+  },
+  "claims": [
+    {
+      "claim": "Skill vs surrounding docs: the run followed the surrounding docs, not the fixture's SKILL.md. It read the pre-ADR-020 SKILL.md (modes start|entry|end, no close, injects `bun run session -- --check`), recognised it as stale against docs/sessions/README.md, the skill's CLAUDE.md, docs/OVERVIEW.md and root CLAUDE.md, and closed via the new subcommand CLI (`bun run session close --session SES-006`).",
+      "type": "process",
+      "verified": true,
+      "evidence": "Fixture SKILL.md: `argument-hint: \"start | entry | end\"`, sections `## start`, `## entry`, `## end` only, injection line `bun run session -- --check`. Grader ran that old line in the fixture: it throws from session.ts:339 and `bun run session` exits 1 (the run reported the `3 open sessions — say which with --session` message before SES-006 closed; the grader's `tail -4` captured only the stack trace and exit code). HEAD commit and fixture state show the `close` subcommand's effects (Status flipped, README index line regenerated to `closed — Review the docs system ...`). The run left SKILL.md unedited and recorded the discrepancy in Open at end instead — a defensible call given the user asked only to close, though it means the skill's own `## end` checklist was substituted rather than executed."
+    },
+    {
+      "claim": "Commit 66b083d was 'unrecorded at the start' and could have been swept into SES-006.",
+      "type": "factual",
+      "verified": false,
+      "evidence": "In this fixture 66b083d was already recorded before the run: fixture commit 5476479 `docs(session): record the session model change (66b083d)` added the entry at docs/sessions/SES-004-docs-rehydration.md:797. Consequently `bun run session` / `append --session SES-006` printed `session: up to date` (transcript steps 4–5), SES-006's `## Changes` section stayed empty, and no sweep occurred. Handling was correct (nothing to append), but the fixture premise that 66b083d was unrecorded does not hold, so this run exercises no sweep-avoidance behaviour."
+    },
+    {
+      "claim": "The prior review 'read the system in the /session start order and found nothing to change' (SES-006 Narrative).",
+      "type": "factual",
+      "verified": false,
+      "evidence": "The user message only says 'the review found nothing to fix'. The reading order is not in the prompt, the fixture session file, or any commit; the run had no transcript of the review conversation. This detail is inferred from the Goal and written into a permanent record as fact — an embellishment, minor but unverifiable."
+    },
+    {
+      "claim": "Commit 90dc4dd removed the `## close` section from SKILL.md and re-introduced the `-- --check` injection line.",
+      "type": "factual",
+      "verified": true,
+      "evidence": "`git show --stat 90dc4dd` touches .claude/skills/session/SKILL.md (176 lines); the fixture SKILL.md at HEAD has no `## close` heading and carries `bun run session -- --check 2>&1 | tail -4`; docs/OVERVIEW.md and .claude/skills/session/CLAUDE.md (per transcript steps 4 and 6) describe a close mode."
+    },
+    {
+      "claim": "Closing commit 1e7ae62 staged only the two named files and lefthook ran markdownlint with 0 issues.",
+      "type": "process",
+      "verified": true,
+      "evidence": "`git show --stat HEAD`: exactly docs/sessions/README.md and docs/sessions/SES-006-closing-eval.md, 5 insertions / 5 deletions; `git status --short` empty afterwards. The lefthook/markdownlint output itself is not captured in any output file — only asserted in transcript step 10 — but the commit's existence shows the hook did not block."
+    },
+    {
+      "claim": "No AskUserQuestion was needed: closing was what the user asked for and every step was local and reversible.",
+      "type": "quality",
+      "verified": true,
+      "evidence": "The one outward-facing class of action (push/PR) was not taken; the commit is local. Given CLAUDE.md §1 asks once for outward steps only, skipping the prompt is consistent."
+    },
+    {
+      "claim": "The two findings in Open at end are attributed to the SES-004 docs stream.",
+      "type": "quality",
+      "verified": true,
+      "evidence": "SES-004 is the open 'Docs for rehydration' stream (session list). Reasonable routing; but the Open at end line is a single 90-word bullet mixing 'nothing from this session' with two items it hands to another stream — a reader of the index gets the right pointer, at the cost of density."
+    }
+  ],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": [
+      "No user_notes.md was written. From the transcript: the run substituted the README/CLAUDE.md `close` procedure for the fixture SKILL.md's `## end` mode after finding the skill's injected `-- --check` line exits 1 under the subcommand CLI."
+    ]
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "expectation": "session-file.md has Outcome and Open at end written ... git-state.txt or transcript.md shows `bun run session close --session SES-006` printing `session: closed SES-006`",
+        "reason": "The only evidence that `close` ran is the executor's own prose transcript. An arm that hand-edited `Status: closed` and skipped the tool would read identically. Require the close command and its stdout be captured in git-state.txt (as the check command already is), or grade from a raw tool log."
+      },
+      {
+        "expectation": "reply.md is at most 60 words and states what shipped in the conversation and the first thing to do next time",
+        "reason": "Passed on a reply whose 'next' half lists two open findings as state rather than one action. If the intent is a hand-off instruction, phrase the expectation as 'names one concrete next action' so a findings dump does not pass."
+      },
+      {
+        "reason": "The grading brief treats 66b083d as 'unrecorded at the start', but fixture commit 5476479 already recorded it in SES-004 (line 797) and the tool reports `up to date`. Neither arm can demonstrate sweep-avoidance on this fixture; either drop 5476479 from the fixture or drop the sweep check from the brief."
+      },
+      {
+        "reason": "No expectation checks that Outcome / Narrative content is grounded in what the run could actually know. This run wrote 'the review read the system in the /session start order' — a detail not in the prompt or repo — into a permanent record. An expectation like 'Narrative asserts nothing about the prior review beyond the user's message and the repo' would catch fabricated hand-off detail."
+      },
+      {
+        "reason": "No expectation distinguishes 'followed SKILL.md' from 'followed the surrounding docs'. This is the baseline arm's whole point (old skill vs new docs), and the run silently substituted the docs' procedure. Since new-skill and old-skill arms are graded against identical expectations, all six pass for both and the comparison shows no signal; consider an expectation that the closing checklist actually executed matches the skill's own `end`/`close` steps, or capture which procedure was followed as a graded field."
+      }
+    ],
+    "overall": "All six expectations pass, but three of them lean on the executor's self-reported transcript and none discriminates the old-skill arm from the new one. The strongest evidence in this run (fixture Status flip, tool-regenerated index line, `check` → complete, clean tree, no push) is verifiable; the process claims (close command, lefthook) are not captured outside prose."
+  }
+}

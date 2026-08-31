@@ -177,12 +177,23 @@ function command(argv: string[]): Command {
   return word as Command;
 }
 
+/** A refusal is a one-line `session: …` message and exit 1, never a stack trace. */
+function refuse(error: unknown): never {
+  console.error(`session: ${error instanceof Error ? error.message : String(error)}`);
+  process.exit(1);
+}
+
 const argv = process.argv.slice(2);
 if (argv[0] === "--") argv.shift();
 const sessionArg = option(argv, "--session");
 const planArg = option(argv, "--plan");
-const cmd = command(argv);
-const all = await sessions();
+let cmd: Command;
+try {
+  cmd = command(argv);
+} catch (error) {
+  refuse(error);
+}
+const all = await sessions().catch(refuse);
 
 /** Commits on this branch that no session records (the log updates themselves excluded). */
 function missingCommits(): Commit[] {
@@ -336,4 +347,4 @@ const run: Record<Command, () => Promise<void>> = {
   close,
   current,
 };
-await run[cmd]();
+await run[cmd]().catch(refuse);
