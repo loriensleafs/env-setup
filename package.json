@@ -1,6 +1,6 @@
 {
   "name": "envsetup",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "One-command interactive Mac environment setup — bootstrap, doctor, sync",
   "type": "module",
   "private": true,
