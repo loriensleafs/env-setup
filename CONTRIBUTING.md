@@ -30,10 +30,13 @@ bun test                             # bun:test suite
 
 ## Making a change
 
-1. **Rehydrate, then start the session log.** `/session start` (alias `/session-start`) reads the docs system in order and
-   runs `bun run session -- --new <slug>` (creates `docs/sessions/SES-<next>-<slug>.md`); set its
-   title and `Goal`. Keep its Narrative as things
-   happen (requests, decisions, dead ends, what was verified and how).
+1. **Rehydrate, then join or open a session.** `/session start` (alias `/session-start`) reads the docs system in order,
+   then — before the first commit — joins the open session whose Goal is this work (`bun run
+   session list` shows them) or opens one: `bun run session new <slug> [--plan
+   "PLAN-NNN · part"]` (creates `docs/sessions/SES-<next>-<slug>.md`); set its title and `Goal`.
+   A session is a stream of work, open until closed, and may outlive this conversation (ADR-020);
+   a conversation that changes nothing needs none. Keep its Narrative as things happen (requests,
+   decisions, dead ends, what was verified and how).
 
 2. **Branch off `main`** — never commit directly to `main`.
 
@@ -81,12 +84,15 @@ bun test                             # bun:test suite
    The **pre-commit** hook auto-fixes staged files (Biome + markdownlint) and runs `tsc`, blocking
    only on un-auto-fixable lint or type errors. The **pre-push** hook runs the full check + tests.
 
-7. **Record it — after every commit, not at the end.** `bun run session -- --session SES-NNN`
+7. **Record it — after every commit, not at the end.** `bun run session append --session SES-NNN`
    (your file) appends an entry skeleton (`Summary` / `Why` and one line per touched file, every kind of file); fill every
-   placeholder (template in [docs/sessions/README.md](docs/sessions/README.md)); `bun run session -- --current --session SES-NNN` lists what is left; `bun run session
-   -- --check --session SES-NNN`; update `docs/OVERVIEW.md` "Status" / "Next up" and any ADR / PRD / plan / analysis
+   placeholder (template in [docs/sessions/README.md](docs/sessions/README.md)); `bun run session current --session SES-NNN` lists what is left; `bun run session
+   check --session SES-NNN`; update `docs/OVERVIEW.md` "Status" / "Next up" and any ADR / PRD / plan / analysis
    / `CONTEXT.md` / nested `CLAUDE.md` the change made stale, citing the sha; commit as
-   `docs(session): …`. `/session entry` (alias `/session-entry`) is this step as a procedure; at the end of the conversation `/session end` checks nothing was deferred.
+   `docs(session): …`. `/session entry` (alias `/session-entry`) is this step as a procedure; when
+   you leave, `/session end` checks nothing was deferred and writes the handoff (the session
+   stays open); when the Goal is done, `/session close` writes the Outcome, runs `bun run session
+   close --session SES-NNN` and updates the plan it served.
 
 8. **Open a PR** (`gh pr create`). CI (`.github/workflows/ci.yml`) runs the same checks plus a
    gitleaks secret scan. `gh pr checks <n> --watch` may say "no checks reported" for ~20 s after
@@ -125,7 +131,7 @@ gh run watch "$(gh run list --workflow=release.yml --limit 1 --json databaseId -
 gh release view v0.2.0 --json assets -q '[.assets[].name] | join(", ")'
 
 # 6. Record it: the release marker lands in the session log
-bun run session && bun run session -- --check
+bun run session && bun run session check
 ```
 
 `release.yml` compiles `dist/envsetup-darwin-arm64` and `-x64` (`bun build --compile`, Bun

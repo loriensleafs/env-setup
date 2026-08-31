@@ -1,5 +1,5 @@
 ---
-description: "Alias for `/session start` — read the docs system in full, check the tree against the session log, create this conversation's session file, and post the brief. Typed only; never invoked by Claude on its own."
+description: "Alias for `/session start` — read the docs system in full (OVERVIEW, every open session, CONTEXT.md, the area's PLAN/ADRs/ANAs), join the open session this work belongs to (or open one, or state none), and post the brief. Typed only; never invoked by Claude on its own."
 disable-model-invocation: true
 ---
 

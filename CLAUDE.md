@@ -12,14 +12,16 @@ applies the manifest without the picker. Owner: Peter Kloss (github `loriensleaf
 ## Rehydrating — at session start, run `/session start` (alias `/session-start`)
 
 The `/session` skill (`.claude/skills/session/`) is the one home of the session ritual: `start`
-reads the docs system in the right order — OVERVIEW (Status, Next up, Key facts) → the newest
+reads the docs system in the right order — OVERVIEW (Status, Next up, Key facts) → every **open**
 `SES-NNN` in full → [CONTEXT.md](CONTEXT.md) → the tree checked against the log → the area's PLAN /
-ADRs / ANAs and its nested `CLAUDE.md` — creates this conversation's session file, and ends in a
-brief. **Every file it names is read in full, to the end, with no sampling**; a truncated read is
-continued with `offset`, never summarized. Do **not** rebuild history from the code or `git log`;
-the docs system exists so you never have to. Every doc is `<TYPE>-<NNN>-<kebab-title>.md` in its
-directory; each directory's `README.md` holds its rules, index and template; `docs/archive/` is
-history only.
+ADRs / ANAs and its nested `CLAUDE.md` — then joins the open session whose Goal is this work, opens
+one for it, or states that nothing will change, and ends in a brief. A session is a stream of work
+toward one Goal, open until closed, and may span many conversations (ADR-020); a conversation
+needs one before its first commit, not before its first answer. **Every file it names is read in
+full, to the end, with no sampling**; a truncated read is continued with `offset`, never
+summarized. Do **not** rebuild history from the code or `git log`; the docs system exists so you
+never have to. Every doc is `<TYPE>-<NNN>-<kebab-title>.md` in its directory; each directory's
+`README.md` holds its rules, index and template; `docs/archive/` is history only.
 
 ## Working with Peter
 
@@ -35,14 +37,16 @@ history only.
   Merge PRs with **merge commits** (session entries cite shas).
 - Proceed on reversible work without asking; finish the whole task; report faithfully.
 
-## Recording — after every commit, run `/session entry`; at the end, `/session end`
+## Recording — after every commit `/session entry`; leaving `/session end`; Goal done `/session close`
 
 `entry` appends and fills the commit's entry and updates everything the change made stale in the
 same step (OVERVIEW, ADR, PRD, plan, analysis, `CONTEXT.md`, a directory's `CLAUDE.md`), then
-commits it as `docs(session): …`; `end` checks the log, Status and the tree. The procedure lives
-in the skill, the template in `docs/sessions/README.md`; `/session-start`, `/session-entry` and
-`/session-end` are typed-only aliases. Never put it off; the next conversation's
-`start` depends on it.
+commits it as `docs(session): …`; `end` checks the log, Status and the tree and leaves the
+session open with a handoff; `close` writes the Outcome, runs `bun run session close`, and
+updates the plan the session served. The procedure lives in the skill, the template in
+`docs/sessions/README.md`; `/session-start`, `/session-entry`, `/session-end` and
+`/session-close` are typed-only aliases. Never put it off; the next conversation's `start`
+depends on it.
 
 ## Hard rules (do not violate)
 
@@ -89,10 +93,12 @@ bun run fix                      # auto-fix Biome + markdown
 bun run test                     # bun:test suite
 bun run compile                  # standalone binary → dist/envsetup
 bun run changelog                # regenerate CHANGELOG.md (git-cliff)
-bun run session -- --new <slug>            # /session start runs this: creates SES-<next>-<slug>.md
-bun run session -- --session SES-NNN       # append entry skeletons for new commits into YOUR file
-bun run session -- --current --session SES-NNN   # list your placeholders by line
-bun run session -- --check --session SES-NNN     # the gate: exit 1 on missing/unfilled; others' files only warn
+bun run session list                  # every session with its status (open | closed), plan and Goal
+bun run session new <slug> [--plan "PLAN-NNN · part"]   # open SES-<next>-<slug>.md (/session start, when the work is new)
+bun run session append --session SES-NNN       # append entry skeletons for new commits into YOUR session
+bun run session current --session SES-NNN   # list your placeholders by line
+bun run session check --session SES-NNN     # the gate: exit 1 on missing/unfilled; others' files only warn
+bun run session close --session SES-NNN     # Goal done: gate, then Status: closed
 ```
 
 ## Safety when running it

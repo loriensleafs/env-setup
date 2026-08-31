@@ -170,6 +170,34 @@ _Avoid_: settings (as the stored noun), options, preferences
 **Effective config**:
 What `detect()` compares against: the manifest config if present, else the defaults.
 
+**Reset**:
+Re-applying the effective config to an item whose values drifted; only ever by the user's explicit
+selection.
+_Avoid_: overwrite, re-apply (in prompts), fix
+
+**Shell block**:
+The single managed region of `~/.zshrc` assembled from every item's shell contribution.
+_Avoid_: dotfiles (the item's name), rc lines
+
+## The session log (the docs system)
+
+**Session**:
+A bounded stream of work toward one Goal, recorded in one `docs/sessions/SES-NNN` file; **open**
+from the moment it is opened until it is **closed** with its Outcome written. It may span any
+number of conversations and may serve a plan (its `Plan:` line).
+_Avoid_: conversation (for this), sitting, chat, the newest file (as the definition of current)
+
+**Conversation**:
+One agent context or one human sitting. A participant in a session: it joins the open session
+whose Goal is its work, or opens one, before its first commit; a conversation that changes nothing
+needs none.
+_Avoid_: session (for this)
+
+**Open** / **Closed** (session status):
+Open — work toward the Goal may still land; the tool appends entries and gates it. Closed — the
+Goal is done or abandoned, the Outcome says which; nothing is appended to it again.
+_Avoid_: current (as the status word), active, done (for the status), finished
+
 **Entry**:
 One commit's block in a session file — Summary, Why, one line per touched file, Notes — written by
 `/session entry` right after the commit.
@@ -179,15 +207,6 @@ _Avoid_: log entry, note, update, record (as the noun)
 To write the entry and update everything the commit made stale, in the same step; the practice
 the docs system depends on.
 _Avoid_: update, log, document (as the verb for this)
-
-**Reset**:
-Re-applying the effective config to an item whose values drifted; only ever by the user's explicit
-selection.
-_Avoid_: overwrite, re-apply (in prompts), fix
-
-**Shell block**:
-The single managed region of `~/.zshrc` assembled from every item's shell contribution.
-_Avoid_: dotfiles (the item's name), rc lines
 
 ## Secrets
 

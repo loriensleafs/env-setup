@@ -1,6 +1,7 @@
 # 2026-08-27 00:59 · curl|sh interactivity root-caused; first full bootstrap failures fixed (v0.1.0–v0.1.4)
 
 - Goal: Release v0.1.0 with reset-on-drift, then make the one-liner actually work interactively and survive Peter's first real bootstrap.
+- Status: closed
 - Outcome: v0.1.0–v0.1.4. `curl … | sh` prompts work; first full bootstrap on Peter's machine surfaced four failures (embedded assets, GitHub token validation, typora nested zip, duplicated task-log lines), all fixed.
 - Open at end: chrome-config fails when Chrome is running; ceremony-only items reported as 'installed'.
 
