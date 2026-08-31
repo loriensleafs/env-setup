@@ -9,6 +9,11 @@ Accepted — supersedes the *placement* and *mode* clauses of [ADR-019](ADR-019-
 final home). What stands: the session as a stream of work (ADR-020), the entry grain (ADR-021),
 the plan part → session pointer and the PRD Plans table (ADR-022).
 
+Its own *home* clause ("the skill moves into `~/.claude/skills/session`; the git-repo question is
+deferred") is superseded by acmelabs-15/brain's ADR-002 (2026-08-31): the home is the `brain`
+plugin, which carries the whole toolset. The rest stands. The same text is brain's ADR-001, the
+copy of record (noted 2026-08-31, session SES-008).
+
 ## Date
 
 2026-08-31 (session SES-001 in acmelabs-15/sessions; analysis [ANA-011](../analysis/ANA-011-rehydration-ownership.md))

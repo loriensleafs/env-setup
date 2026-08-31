@@ -98,7 +98,7 @@ small separate commands, merge commits). The facts below are the ones a rule can
 - TCC permissions cannot be pre-granted on a personal Mac; ceremonies are by design. ([ANA-005](analysis/ANA-005-macos-permissions-tcc.md))
 - Release uploads can flake ("other side closed"); re-run the failed job, verify both assets.
 
-## Status (2026-08-30)
+## Status (2026-08-31)
 
 > Kept current continuously — every change updates this section, "Next up", the session entry
 > (cite its sha here) and the ADR / PRD section it touched, in the same step. Never deferred.
@@ -141,6 +141,12 @@ small separate commands, merge commits). The facts below are the ones a rule can
   refuses a word the glossary marks `former name` in the live prose (session files, ADRs and analyses
   are records); `CONTEXT.md` gained `## Relationships` and `## Flagged ambiguities`; the success test
   (the glossary changes during the conversation, shrinks as often as it grows) is in CLAUDE.md Recording.
+- **Rehydration belongs to the plan skill** (ADR-024, ANA-011; `1ae9a7e`, [SES-008](sessions/SES-008-brain-toolset-on-env-setup.md)):
+  `/plan [PLAN-NNN]` will own the walk; the session skill keeps the record with three acts
+  (`start · log · close`) and one status (`in progress | done`); join / open / leave and `Open at
+  end` go. Decided in acmelabs-15/sessions, carried out in acmelabs-15/brain (its PLAN-001), whose
+  `brain` 0.4.0 plugin is now the installed home of `/brain:session`. This repo's docs still say
+  `/session start · entry · end · close` — the sweep to the installed forms is SES-008's next step.
 - **Parked, not on `main`:** the visual-grouping patch ([PLAN-001](plan/PLAN-001-visual-grouping.md))
   as a WIP commit on local branch `wip/visual-grouping` (unverified, never run under a PTY).
 

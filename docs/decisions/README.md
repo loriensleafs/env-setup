@@ -33,7 +33,7 @@ away) and cite the session entry (sha).
 | [021](ADR-021-entry-grain.md) | The session log holds value only: an entry per change worth reading about; a fix-up is vouched for by its parent's `Also:` line, a valueless commit carries `Session-entry: none`; every commit still accounted for | accepted |
 | [022](ADR-022-rehydrate-by-plan.md) | Rehydrate by plan: each plan part carries `> Status: planned \| in progress (session SES-NNN) \| done (session SES-NNN, sha)`, the PRD lists its plans, and `/session start PLAN-NNN` walks PRD → plan → part → session | accepted |
 | [023](ADR-023-session-plugin.md) | The session skill, its aliases and its tool ship as the `sessions` plugin (acmelabs-15/sessions, ACMElabs marketplace); this repo consumes it and keeps only its docs | accepted |
-| [024](ADR-024-rehydration-belongs-to-the-plan.md) | Rehydration is `/plan [PLAN-NNN]`'s (`planning-and-task-breakdown`); the session skill keeps the record with three acts (start · log · close), one status (`in progress \| done`), argument inference and three scoped commands; no join/open/leave, `Open at end` retired; home moves to `~/.claude/skills`, built in acmelabs-15/sessions first | accepted |
+| [024](ADR-024-rehydration-belongs-to-the-plan.md) | Rehydration is `/plan [PLAN-NNN]`'s (`planning-and-task-breakdown`); the session skill keeps the record with three acts (start · log · close), one status (`in progress \| done`), argument inference and three scoped commands; no join/open/leave, `Open at end` retired; built in acmelabs-15/sessions first (its home clause — `~/.claude/skills` — is superseded by brain's ADR-002: the home is the `brain` plugin) | accepted |
 
 ## Rules
 
