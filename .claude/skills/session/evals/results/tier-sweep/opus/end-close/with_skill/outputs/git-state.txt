@@ -1,0 +1,29 @@
+$ git status --short
+(no output — clean)
+
+$ git branch --show-current
+main
+
+$ git log --oneline -5
+c912990 docs(session): close SES-006 — docs review found nothing stale
+5f1a5da docs(session): start closing-eval session
+3e84241 Merge pull request #31 from loriensleafs/docs/session-pointers
+3399f95 docs(session): entries for the /session pointer sweep
+f9c5ab0 docs: CONTRIBUTING step 7, docs/sessions README + CLAUDE.md, scripts/CLAUDE.md name /session as the procedure and the --session/--current flags
+
+$ git show --stat HEAD
+commit c9129905c803b153cd2a8bceff955cb7ce448827
+Author: eval <eval@envsetup.test>
+Date:   Sun Aug 30 21:11:26 2026 -0700
+
+    docs(session): close SES-006 — docs review found nothing stale
+
+ docs/sessions/README.md               |  2 +-
+ docs/sessions/SES-006-closing-eval.md | 29 ++++++++++++++++++++++++++---
+ 2 files changed, 27 insertions(+), 4 deletions(-)
+
+$ bun run session -- --check --session SES-006
+$ bun scripts/session.ts --check --session "SES-006"
+warning: SES-005-rehydration.md has 2 placeholder line(s) — not the gated session; leave it to its own conversation (pass --session to gate a different file)
+session: complete
+exit: 0

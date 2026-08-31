@@ -2,7 +2,7 @@
 
 - Goal: Make a fresh session able to pick up exactly where the last one stopped: a handoff overview, a complete record of what was done (with files), and a discipline that keeps it all current.
 - Outcome: OVERVIEW.md; a git-derived change record that evolved (one line per commit → files touched → Summary/Why + a note per file → per-session files); `bun run session` tooling with `--check`; CLAUDE.md rehydration reading order; continuous-upkeep hard rule; then the whole docs system — `plan/` (PRD-001, PLAN-001), `analysis/` (ANA-001…008), `decisions/` (ADR-001…017), `archive/` — with one naming convention `<TYPE>-<NNN>-<kebab-title>.md`, the living plan retired; and a `/run-*` skill with a verified driver in every directory (56), the root one walking the real bootstrap TUI under `expect` up to the confirm; then the `/session start | record | end` skill built with the skill-creator loop (validated, reviewed, two measured iterations: 95% vs 84% on the stricter set), ANA-009 (Anthropic's workflow-skill guidance, verified at source), ADR-019, and the session tool's `--session` / `--current`.
-- Open at end: Next-up 1 (visual grouping, PLAN-001) from `wip/visual-grouping`; first real connect-phase run. From the /session work: the `!` injection is verified only by the next real conversation; the hard negatives (trigger sweep) and the Haiku/Sonnet/Opus tier sweep were never run; SES-005 belongs to another conversation and stays as it is.
+- Open at end: Next-up 1 (visual grouping, PLAN-001) from `wip/visual-grouping`; first real connect-phase run. From the /session work: the `!` injection is verified only by the next real conversation; both sweeps are run (`280d906`, ANA-009 addendum) — the description under-routes on Haiku (2/10) and Sonnet (6/10) and Haiku's outcome runs fail 6/20, which the next eval iteration can take up; three graders flagged that Outcome/Narrative/Shipped lines are tied to no transcript evidence; SES-005 belongs to another conversation and stays as it is.
 
 ## Narrative
 
@@ -48,6 +48,18 @@ over configuration → **Applied** (with **Present** for the raw fact). Cross-re
 along the way: `doctor` filed drifted items under "missing" (Peter's machine shows `1 drifted` now),
 and the `deferred` outcome still told the user to run `envsetup connect`, automatic since v0.1.7.
 A blanket replace briefly rewrote Peter's quoted words in ADR-010 — restored; quotes are not labels.
+
+Last, the two loops the skill-creator flow calls optional ("We should run those two optional
+loops"). The synthesizer refused twice before producing a query set — it found the description
+in evals/results transcripts, then in the neighbour sweep quoting the session skill itself — so the
+set came from a SKILL.md-only copy against a neighbour project without the skill; Peter signed off
+the 23 queries. The description loop found nothing to change: both candidates bought two recall
+misses with two precision misses on the held-out hard negatives. The tier sweep is the finding:
+should-fire routing 9/9/6/2 of 10 on Fable/Opus/Sonnet/Haiku with no over-triggering anywhere, and
+outcomes 19/20, 19/20, 20/20, 14/20 — Haiku ran `--new` twice, asserted a verification it never
+ran, and wrote an Outcome the transcript does not support. While the sweeps ran Peter found and
+fixed the plugin-kit aggregator reporting output_chars as tokens; iteration-1/2 benchmarks were
+regenerated (real deltas +3,453 / +3,309 tokens).
 
 ## Changes (one entry per commit, in order)
 
@@ -691,3 +703,91 @@ A blanket replace briefly rewrote Peter's quoted words in ADR-010 — restored; 
   - `docs/sessions/CLAUDE.md` (+3/−0) — framing line: driven by /session
   - `docs/sessions/README.md` (+6/−1) — Writing section opens by naming the skill and its aliases; --current in the own-file rule
   - `scripts/CLAUDE.md` (+2/−1) — --current documented
+
+### 2026-08-30 · eval(session): trigger/description loop and Haiku/Sonnet/Opus tier sweeps · 280d906
+
+- Summary: Runs the two skill-creator loops that were still open for `/session`: the description/trigger loop (original description wins on held-out, unchanged) and the Haiku/Sonnet/Opus sweep for both triggering (9/9/6/2 of 10 should-fire; 12/13/13/13 hard negatives declined) and outcomes (14/20, 20/20, 19/20 vs Fable 19/20). Commits the evidence, the query set, the analyst notes, and regenerates iteration-1/2 benchmarks with the fixed aggregator.
+- Why: Peter: "We should run those two optional loops" — ANA-009 implication 10 and the evals.json fixture note had both sweeps recorded as not done.
+- Files:
+  - `.claude/skills/session/evals/evals.json` (+1/−1) — fixture note 4 rewritten: hard negatives 101–103 swept (3/3 declined on every tier), pointers to results/trigger and results/tier-sweep
+  - `.claude/skills/session/evals/results/iteration-1/benchmark.json` (+45/−70) — regenerated with the fixed plugin-kit aggregator — Tokens column now from timing.json, not output_chars; notes preserved
+  - `.claude/skills/session/evals/results/iteration-1/benchmark.md` (+2/−2) — regenerated with the fixed plugin-kit aggregator — Tokens column now from timing.json, not output_chars; notes preserved
+  - `.claude/skills/session/evals/results/iteration-2/benchmark.json` (+55/−79) — regenerated with the fixed plugin-kit aggregator — Tokens column now from timing.json, not output_chars; notes preserved
+  - `.claude/skills/session/evals/results/iteration-2/benchmark.md` (+2/−2) — regenerated with the fixed plugin-kit aggregator — Tokens column now from timing.json, not output_chars; notes preserved
+  - `.claude/skills/session/evals/results/tier-sweep/README.md` (+18/−0) — what the sweep is, the cross-tier table (Haiku 14/20, Sonnet 20/20, Opus 19/20, Fable 19/20), where each figure lives
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/benchmark.json` (+198/−0) — aggregate-results over the Haiku 4.5 runs (with_skill arm only; the baseline column is empty by design)
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/benchmark.md` (+13/−0) — aggregate-results over the Haiku 4.5 runs (with_skill arm only; the baseline column is empty by design)
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/end-close/eval_metadata.json` (+15/−0) — copy of iteration-2's end-close metadata (same prompt and expectations) for the Haiku 4.5 run
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/end-close/with_skill/grading.json` (+118/−0) — Haiku 4.5 end-close grader verdict: 5/6 — failed: session-file.md has Outcome and Open at end written
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/end-close/with_skill/outputs/git-state.txt` (+27/−0) — Haiku 4.5 end-close output — HEAD, status, log and gate output at the end of the run
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/end-close/with_skill/outputs/overview.diff` (+1/−0) — Haiku 4.5 end-close output — `git diff HEAD~1 -- docs/OVERVIEW.md` at the end of the run
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/end-close/with_skill/outputs/reply.md` (+2/−0) — Haiku 4.5 end-close output — the run's verbatim reply
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/end-close/with_skill/outputs/session-file.md` (+11/−0) — Haiku 4.5 end-close output — the session file as the run left it
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/end-close/with_skill/outputs/transcript.md` (+214/−0) — Haiku 4.5 end-close output — the run's own step-by-step account of reads and commands
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/end-close/with_skill/timing.json` (+1/−0) — Haiku 4.5 end-close: 62,923 tokens, 157.8 s (from the subagent's completion notification)
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/record-commit/eval_metadata.json` (+16/−0) — copy of iteration-2's record-commit metadata (same prompt and expectations) for the Haiku 4.5 run
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/record-commit/with_skill/grading.json` (+121/−0) — Haiku 4.5 record-commit grader verdict: 5/7 — failed: session-file.md's entry Notes state how the fix's claim was ; commit.diff shows src/items/finder/CLAUDE.md and src/items/f
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/record-commit/with_skill/outputs/commit.diff` (+19/−0) — Haiku 4.5 record-commit output — `git show HEAD` at the end of the run
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/record-commit/with_skill/outputs/git-state.txt` (+13/−0) — Haiku 4.5 record-commit output — HEAD, status, log and gate output at the end of the run
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/record-commit/with_skill/outputs/overview.diff` (+16/−0) — Haiku 4.5 record-commit output — `git diff HEAD~1 -- docs/OVERVIEW.md` at the end of the run
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/record-commit/with_skill/outputs/reply.md` (+29/−0) — Haiku 4.5 record-commit output — the run's verbatim reply
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/record-commit/with_skill/outputs/session-file.md` (+19/−0) — Haiku 4.5 record-commit output — the session file as the run left it
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/record-commit/with_skill/outputs/transcript.md` (+195/−0) — Haiku 4.5 record-commit output — the run's own step-by-step account of reads and commands
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/record-commit/with_skill/timing.json` (+1/−0) — Haiku 4.5 record-commit: 70,429 tokens, 205.3 s (from the subagent's completion notification)
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/start-brief/eval_metadata.json` (+16/−0) — copy of iteration-2's start-brief metadata (same prompt and expectations) for the Haiku 4.5 run
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/start-brief/with_skill/grading.json` (+140/−0) — Haiku 4.5 start-brief grader verdict: 4/7 — failed: brief.md contains a line starting with 'read in full; session-file.md exists; git-state.txt shows HEAD unchanged from the fixture tip and
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/start-brief/with_skill/outputs/brief.md` (+8/−0) — Haiku 4.5 start-brief output — the brief the run posted (verbatim reply)
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/start-brief/with_skill/outputs/git-state.txt` (+23/−0) — Haiku 4.5 start-brief output — HEAD, status, log and gate output at the end of the run
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/start-brief/with_skill/outputs/session-file.md` (+11/−0) — Haiku 4.5 start-brief output — the session file as the run left it
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/start-brief/with_skill/outputs/transcript.md` (+72/−0) — Haiku 4.5 start-brief output — the run's own step-by-step account of reads and commands
+  - `.claude/skills/session/evals/results/tier-sweep/haiku/start-brief/with_skill/timing.json` (+1/−0) — Haiku 4.5 start-brief: 95,617 tokens, 126.8 s (from the subagent's completion notification)
+  - `.claude/skills/session/evals/results/tier-sweep/notes.json` (+14/−0) — analyst pass across tiers: Haiku's six failures, the two length-bound misses, verification and stale-doc coverage per tier, tokens/time
+  - `.claude/skills/session/evals/results/tier-sweep/opus/benchmark.json` (+203/−0) — aggregate-results over the Opus 5 runs (with_skill arm only; the baseline column is empty by design)
+  - `.claude/skills/session/evals/results/tier-sweep/opus/benchmark.md` (+13/−0) — aggregate-results over the Opus 5 runs (with_skill arm only; the baseline column is empty by design)
+  - `.claude/skills/session/evals/results/tier-sweep/opus/end-close/eval_metadata.json` (+15/−0) — copy of iteration-2's end-close metadata (same prompt and expectations) for the Opus 5 run
+  - `.claude/skills/session/evals/results/tier-sweep/opus/end-close/with_skill/grading.json` (+137/−0) — Opus 5 end-close grader verdict: 5/6 — failed: reply.md is at most 60 words and states what shipped in the
+  - `.claude/skills/session/evals/results/tier-sweep/opus/end-close/with_skill/outputs/git-state.txt` (+29/−0) — Opus 5 end-close output — HEAD, status, log and gate output at the end of the run
+  - `.claude/skills/session/evals/results/tier-sweep/opus/end-close/with_skill/outputs/overview.diff` (+1/−0) — Opus 5 end-close output — `git diff HEAD~1 -- docs/OVERVIEW.md` at the end of the run
+  - `.claude/skills/session/evals/results/tier-sweep/opus/end-close/with_skill/outputs/reply.md` (+8/−0) — Opus 5 end-close output — the run's verbatim reply
+  - `.claude/skills/session/evals/results/tier-sweep/opus/end-close/with_skill/outputs/session-file.md` (+34/−0) — Opus 5 end-close output — the session file as the run left it
+  - `.claude/skills/session/evals/results/tier-sweep/opus/end-close/with_skill/outputs/transcript.md` (+120/−0) — Opus 5 end-close output — the run's own step-by-step account of reads and commands
+  - `.claude/skills/session/evals/results/tier-sweep/opus/end-close/with_skill/timing.json` (+1/−0) — Opus 5 end-close: 77,008 tokens, 184.2 s (from the subagent's completion notification)
+  - `.claude/skills/session/evals/results/tier-sweep/opus/record-commit/eval_metadata.json` (+16/−0) — copy of iteration-2's record-commit metadata (same prompt and expectations) for the Opus 5 run
+  - `.claude/skills/session/evals/results/tier-sweep/opus/record-commit/with_skill/grading.json` (+145/−0) — Opus 5 record-commit grader verdict: 7/7
+  - `.claude/skills/session/evals/results/tier-sweep/opus/record-commit/with_skill/outputs/commit.diff` (+163/−0) — Opus 5 record-commit output — `git show HEAD` at the end of the run
+  - `.claude/skills/session/evals/results/tier-sweep/opus/record-commit/with_skill/outputs/git-state.txt` (+14/−0) — Opus 5 record-commit output — HEAD, status, log and gate output at the end of the run
+  - `.claude/skills/session/evals/results/tier-sweep/opus/record-commit/with_skill/outputs/overview.diff` (+33/−0) — Opus 5 record-commit output — `git diff HEAD~1 -- docs/OVERVIEW.md` at the end of the run
+  - `.claude/skills/session/evals/results/tier-sweep/opus/record-commit/with_skill/outputs/reply.md` (+32/−0) — Opus 5 record-commit output — the run's verbatim reply
+  - `.claude/skills/session/evals/results/tier-sweep/opus/record-commit/with_skill/outputs/session-file.md` (+59/−0) — Opus 5 record-commit output — the session file as the run left it
+  - `.claude/skills/session/evals/results/tier-sweep/opus/record-commit/with_skill/outputs/transcript.md` (+234/−0) — Opus 5 record-commit output — the run's own step-by-step account of reads and commands
+  - `.claude/skills/session/evals/results/tier-sweep/opus/record-commit/with_skill/timing.json` (+1/−0) — Opus 5 record-commit: 98,005 tokens, 324.7 s (from the subagent's completion notification)
+  - `.claude/skills/session/evals/results/tier-sweep/opus/start-brief/eval_metadata.json` (+16/−0) — copy of iteration-2's start-brief metadata (same prompt and expectations) for the Opus 5 run
+  - `.claude/skills/session/evals/results/tier-sweep/opus/start-brief/with_skill/grading.json` (+147/−0) — Opus 5 start-brief grader verdict: 7/7
+  - `.claude/skills/session/evals/results/tier-sweep/opus/start-brief/with_skill/outputs/brief.md` (+9/−0) — Opus 5 start-brief output — the brief the run posted (verbatim reply)
+  - `.claude/skills/session/evals/results/tier-sweep/opus/start-brief/with_skill/outputs/git-state.txt` (+21/−0) — Opus 5 start-brief output — HEAD, status, log and gate output at the end of the run
+  - `.claude/skills/session/evals/results/tier-sweep/opus/start-brief/with_skill/outputs/session-file.md` (+17/−0) — Opus 5 start-brief output — the session file as the run left it
+  - `.claude/skills/session/evals/results/tier-sweep/opus/start-brief/with_skill/outputs/transcript.md` (+118/−0) — Opus 5 start-brief output — the run's own step-by-step account of reads and commands
+  - `.claude/skills/session/evals/results/tier-sweep/opus/start-brief/with_skill/timing.json` (+1/−0) — Opus 5 start-brief: 142,346 tokens, 240.4 s (from the subagent's completion notification)
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/benchmark.json` (+204/−0) — aggregate-results over the Sonnet 5 runs (with_skill arm only; the baseline column is empty by design)
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/benchmark.md` (+13/−0) — aggregate-results over the Sonnet 5 runs (with_skill arm only; the baseline column is empty by design)
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/end-close/eval_metadata.json` (+15/−0) — copy of iteration-2's end-close metadata (same prompt and expectations) for the Sonnet 5 run
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/end-close/with_skill/grading.json` (+110/−0) — Sonnet 5 end-close grader verdict: 6/6
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/end-close/with_skill/outputs/git-state.txt` (+31/−0) — Sonnet 5 end-close output — HEAD, status, log and gate output at the end of the run
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/end-close/with_skill/outputs/overview.diff` (+1/−0) — Sonnet 5 end-close output — `git diff HEAD~1 -- docs/OVERVIEW.md` at the end of the run
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/end-close/with_skill/outputs/reply.md` (+2/−0) — Sonnet 5 end-close output — the run's verbatim reply
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/end-close/with_skill/outputs/session-file.md` (+18/−0) — Sonnet 5 end-close output — the session file as the run left it
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/end-close/with_skill/outputs/transcript.md` (+181/−0) — Sonnet 5 end-close output — the run's own step-by-step account of reads and commands
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/end-close/with_skill/timing.json` (+1/−0) — Sonnet 5 end-close: 82,793 tokens, 153.2 s (from the subagent's completion notification)
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/record-commit/eval_metadata.json` (+16/−0) — copy of iteration-2's record-commit metadata (same prompt and expectations) for the Sonnet 5 run
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/record-commit/with_skill/grading.json` (+147/−0) — Sonnet 5 record-commit grader verdict: 7/7
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/record-commit/with_skill/outputs/commit.diff` (+147/−0) — Sonnet 5 record-commit output — `git show HEAD` at the end of the run
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/record-commit/with_skill/outputs/git-state.txt` (+14/−0) — Sonnet 5 record-commit output — HEAD, status, log and gate output at the end of the run
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/record-commit/with_skill/outputs/overview.diff` (+29/−0) — Sonnet 5 record-commit output — `git diff HEAD~1 -- docs/OVERVIEW.md` at the end of the run
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/record-commit/with_skill/outputs/reply.md` (+17/−0) — Sonnet 5 record-commit output — the run's verbatim reply
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/record-commit/with_skill/outputs/session-file.md` (+46/−0) — Sonnet 5 record-commit output — the session file as the run left it
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/record-commit/with_skill/outputs/transcript.md` (+291/−0) — Sonnet 5 record-commit output — the run's own step-by-step account of reads and commands
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/record-commit/with_skill/timing.json` (+1/−0) — Sonnet 5 record-commit: 122,720 tokens, 380.9 s (from the subagent's completion notification)
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/start-brief/eval_metadata.json` (+16/−0) — copy of iteration-2's start-brief metadata (same prompt and expectations) for the Sonnet 5 run
+  - `.claude/skills/session/evals/results/tier-sweep/sonnet/start-brief/with_skill/grading.json` (+151/−0) — Sonnet 5 start-brief grader verdict: 7/7
+  - … +25 more (`git show --stat 280d906`)
+- Notes: Verified: every tier grade was checked by a grader against the fixture clone, not the transcript (reflogs, `git status`, `wc -c`/`wc -w`, driver re-runs); the trigger figures are full-N (no early stop) except the description loop's own baseline. Not verified: one run per cell — the one-expectation gaps between Sonnet, Opus and Fable are inside run-to-run spread; Haiku's six are not. Decisions: description left as is (held-out 8/9 beats both candidates' 7/9); nothing in SKILL.md changed. Found on the way: three graders flagged that Outcome/Narrative/Shipped lines are tied to no transcript evidence (next eval iteration); Peter fixed the plugin-kit aggregator token bug the same day; `optimize-description.ts` imports its HTML report module from the wrong directory (report skipped, results unaffected); the routing measurement runs in a throwaway root with no repo present.

@@ -1,0 +1,33 @@
+diff --git a/docs/OVERVIEW.md b/docs/OVERVIEW.md
+index a423e13..78d23e0 100644
+--- a/docs/OVERVIEW.md
++++ b/docs/OVERVIEW.md
+@@ -120,6 +120,11 @@ small separate commands, merge commits). The facts below are the ones a rule can
+   built with the skill-creator loop — ANA-009, ADR-019, two measured iterations (evidence under
+   `.claude/skills/session/evals/results/`); the session tool takes `--session SES-NNN` and `--current`.
+   Unverified: the `!` injection in a real conversation; the trigger sweep; the model-tier sweep.
++- **Also unreleased on `main`** ([SES-006](sessions/SES-006-record-eval.md), `e1f2f0b`):
++  `src/items/finder/assets/set-favorites.swift` re-synced with the embedded `SET_FAVORITES_SWIFT`
++  constant (the asset had drifted 19 lines behind; runtime always shipped the constant, so this is
++  a source-of-truth fix, not a behaviour change). Verified by the finder driver
++  (`SET_FAVORITES_SWIFT === assets/set-favorites.swift ✓`) and `swiftc -typecheck` on both copies.
+ - **Parked, not on `main`:** the visual-grouping patch ([PLAN-001](plan/PLAN-001-visual-grouping.md))
+   as a WIP commit on local branch `wip/visual-grouping` (unverified, never run under a PTY).
+ 
+@@ -131,10 +136,12 @@ small separate commands, merge commits). The facts below are the ones a rule can
+    bugs; ceremonies were never exercised in one pass. Write `PLAN-003` first if it grows.
+ 3. Persist the binary to `~/.local/bin/envsetup` so re-runs don't re-download (PRD open question).
+ 4. Upstream investigation of the compiled idle-CPU spin.
+-5. **Findings from the run-skill drivers** (SES-004, `ba38081`): `src/items/finder/assets/set-favorites.swift`
+-   is stale vs the embedded `SET_FAVORITES_SWIFT` constant (the constant has `--list`; runtime ships the
+-   constant — re-sync the file or generate one from the other); `hooks-format.ts` exits 0 silently when
+-   Biome's config errors (e.g. `vcs.useIgnoreFile` outside a git repo) — consider logging to stderr.
++5. **Findings from the run-skill drivers** (SES-004, `ba38081`): `hooks-format.ts` exits 0 silently
++   when Biome's config errors (e.g. `vcs.useIgnoreFile` outside a git repo) — consider logging to
++   stderr. The `set-favorites.swift` drift is fixed (`e1f2f0b`, [SES-006](sessions/SES-006-record-eval.md)),
++   but nothing yet *keeps* the asset and the embedded `SET_FAVORITES_SWIFT` equal — the finder
++   driver reports the mismatch, it does not gate it. Generate one from the other, or assert equality
++   in `src/items/finder/__tests__/`.
+ 
+ ## How to resume work
+ 

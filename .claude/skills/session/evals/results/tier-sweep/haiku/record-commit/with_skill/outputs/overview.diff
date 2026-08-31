@@ -1,0 +1,16 @@
+diff --git a/docs/OVERVIEW.md b/docs/OVERVIEW.md
+index a423e13..a7f889f 100644
+--- a/docs/OVERVIEW.md
++++ b/docs/OVERVIEW.md
+@@ -131,9 +131,8 @@ small separate commands, merge commits). The facts below are the ones a rule can
+    bugs; ceremonies were never exercised in one pass. Write `PLAN-003` first if it grows.
+ 3. Persist the binary to `~/.local/bin/envsetup` so re-runs don't re-download (PRD open question).
+ 4. Upstream investigation of the compiled idle-CPU spin.
+-5. **Findings from the run-skill drivers** (SES-004, `ba38081`): `src/items/finder/assets/set-favorites.swift`
+-   is stale vs the embedded `SET_FAVORITES_SWIFT` constant (the constant has `--list`; runtime ships the
+-   constant — re-sync the file or generate one from the other); `hooks-format.ts` exits 0 silently when
++5. **Findings from the run-skill drivers** (SES-004, `ba38081`): Fixed: `src/items/finder/assets/set-favorites.swift`
++   is now synced with the embedded `SET_FAVORITES_SWIFT` constant (34e7e6a). Remaining: `hooks-format.ts` exits 0 silently when
+    Biome's config errors (e.g. `vcs.useIgnoreFile` outside a git repo) — consider logging to stderr.
+
+ ## How to resume work

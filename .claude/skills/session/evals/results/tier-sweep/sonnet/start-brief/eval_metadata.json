@@ -1,0 +1,16 @@
+{
+  "eval_id": 1,
+  "eval_name": "start-brief",
+  "prompt": "I'm picking envsetup back up. Where are we, and what should I do first?",
+  "expectations": [
+    "brief.md is under 1,600 characters (wc -c) and states the released version v0.1.9",
+    "brief.md names what is on main but unreleased and the parked branch wip/visual-grouping",
+    "brief.md contains a line starting with 'read in full:' that names docs/OVERVIEW.md, CONTEXT.md and the newest SES file, and transcript.md shows each of those was read to its last line (a second read with offset where the tool truncated)",
+    "session-file.md exists: exactly one new docs/sessions/SES-NNN file was created and its Goal line is filled",
+    "git-state.txt shows HEAD unchanged from the fixture tip and nothing modified under docs/sessions/ other than the new file and README.md (the regenerated index) — in particular SES-005-rehydration.md is untouched",
+    "brief.md reports the state of the tree and the gate as findings (branch name; `bun run session -- --check` result) rather than fixing anything, and proposes a concrete next item with a first step",
+    "transcript.md shows no push, no PR, no commit"
+  ],
+  "baseline": "old_skill = the iteration-1 SKILL.md (evals/results/skill-snapshot); both arms share the iteration-2 session tool",
+  "note": "subagents read SKILL.md directly, so !`cmd` injection lines reach them as literal text (the injection itself is exercised only by a real invocation)"
+}
