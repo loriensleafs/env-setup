@@ -4,7 +4,7 @@
 - Status: open
 - Plan: —
 - Outcome: _(fill in)_
-- Open at end: plugin-kit PR #1 merged (acmelabs-15/plugin-kit `e4b1a53`) — the fixed viewer, report path, neighbour sweep and aggregator are what the next skill-creator run uses. The tightened join wording and the ADR-021 entry step are unmeasured (iteration 5 with the next skill change). SES-005 belongs to the rehydration conversation of 19:25; close it by hand if that conversation is over.
+- Open at end: everything still open from this session is captured, with its context, in acmelabs-15/sessions `docs/plan/PLAN-001-session-plan-relationship-and-re-evaluation.md` (Part 1 is this repo: merge PR #44, close SES-006 and SES-005, verify the bare `/session` forms interactively, ANA-010's four implications); a fresh conversation there starts with `/session continue PLAN-001`. Unverified here: the bare `/session start` in an interactive session.
 
 ## Narrative
 
