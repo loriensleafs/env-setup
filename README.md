@@ -36,7 +36,7 @@ what is missing.
 
 ## Working on it
 
-Humans and agents start the same way (agents: the read order in CLAUDE.md § Rehydrating; `/brain:session log` after every commit, `/brain:session close` when the Goal is done; the session log holds value only — ADR-021): [docs/OVERVIEW.md](docs/OVERVIEW.md) (map, status, next up)
+Humans and agents start the same way (agents: `/brain:plan PLAN-NNN` is the way in, walking the read order in CLAUDE.md § Rehydrating; `/brain:session log` after every commit, `/brain:session close` when the Goal is done; the session log holds value only — ADR-021): [docs/OVERVIEW.md](docs/OVERVIEW.md) (map, status, next up)
 → the sessions in progress in [docs/sessions/](docs/sessions/README.md) (what was done, with a note per
 touched file) → [CONTEXT.md](CONTEXT.md) (the words) → [docs/decisions/](docs/decisions/README.md)
 (ADRs, the current truth of every decision) · [docs/plan/PRD-001-envsetup.md](docs/plan/PRD-001-envsetup.md)

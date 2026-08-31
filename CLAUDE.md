@@ -9,7 +9,7 @@ pointers below.
 runs the attended ceremonies, and **converges** on re-run; `doctor` is the read-only diff; `sync`
 applies the manifest without the picker. Owner: Peter Kloss (github `loriensleafs`).
 
-## Rehydrating — the read order (the procedure is `/brain:plan PLAN-NNN`, once acmelabs-15/brain PLAN-001 Part 4 lands)
+## Rehydrating — `/brain:plan PLAN-NNN` is the way in; this section is the read order it walks
 
 Read, in this order and in full: `docs/OVERVIEW.md` (Status, Next up, Key facts) → the plan and
 the PRD it serves (`docs/plan/`) → the session the plan part's status line names, in
