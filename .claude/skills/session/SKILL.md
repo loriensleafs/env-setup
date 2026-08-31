@@ -127,11 +127,14 @@ Entry progress:
 - [ ] 5 gate green (bare command, exit read), then named-file stage + docs(session) commit
 ```
 
-1. `bun run session append --session SES-NNN` appends one skeleton per commit not yet in the log
-   (`Summary` / `Why` placeholders, one line per touched file with its +/− counts;
+1. `bun run session append --session SES-NNN` appends one skeleton per commit not yet accounted
+   for (`Summary` / `Why` placeholders, one line per touched file with its +/− counts;
    `current --session SES-NNN` lists them by line). A skeleton for a commit you did not make is
    a finding: fill what `git show <sha>` supports, say in its Notes that it was not verified, or
-   ask.
+   ask. **The ledger holds value only** (ADR-021): a skeleton for a fix-up of an earlier commit
+   is deleted, and that earlier entry gets `- Also: <sha> — <what it fixed>` under its `Why`; a
+   commit with nothing to record should have carried the trailer `Session-entry: none` when it
+   was made (the tool then appends nothing) — write that trailer yourself on such commits.
 2. Fill every placeholder. `Summary` = what the change does as a whole; `Why` = the problem or
    request (name who asked when it was Peter); per file, a phrase that says what changed *in that
    file*; `Notes` = what was verified and how, what is unverified, a follow-up, a decision made on

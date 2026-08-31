@@ -1,7 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import {
+  declinesEntry,
   FILL,
   indexRow,
+  knownShas,
   parseHeader,
   placeholderCount,
   selectSession,
@@ -128,5 +130,32 @@ describe("template, placeholders, index", () => {
 
   test("slugify", () => {
     expect(slugify("Fix 2FA — again!")).toBe("fix-2fa-again");
+  });
+});
+
+describe("what a session accounts for (ADR-021)", () => {
+  test("knownShas: entry headings plus the shas parent entries vouch for on Also lines", () => {
+    const text = `## Changes
+
+### 2026-08-30 · feat(session): the model · 66b083d
+
+- Summary: …
+- Also: 5476479 — its docs(session) fix-up
+- Also: a8f44b2 — typo in the ADR
+- Files:
+  - \`x\` (+1/−0) — a phrase
+
+### 2026-08-30 · eval(session): iteration 3 · 4e7f673
+`;
+    expect(knownShas(text)).toEqual(["66b083d", "4e7f673", "5476479", "a8f44b2"]);
+  });
+
+  test("declinesEntry: only the trailer, anywhere in the body, case-insensitive", () => {
+    expect(declinesEntry("Biome reformat after the fixer moved.\n\nSession-entry: none\n")).toBe(
+      true,
+    );
+    expect(declinesEntry("session-entry: NONE")).toBe(true);
+    expect(declinesEntry("Mentions Session-entry: none in prose, not as a line")).toBe(false);
+    expect(declinesEntry("")).toBe(false);
   });
 });

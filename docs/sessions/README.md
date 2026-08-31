@@ -61,12 +61,20 @@ does by hand.
   gets its status line / ticks citing the shas. Nothing is appended to a closed session; reopen
   one only by editing its Status line, with a dated note in the Narrative saying why.
 - **After every commit** (not at the end of the PR, never "later"): `bun run session` appends an
-  entry skeleton per commit no session mentions — `Summary` / `Why` placeholders and one line per
-  touched file with +/− counts — into the current session. Fill in every `_(fill in)_`: the
-  Summary, the Why, and a short phrase per file of what changed in it. Add `Notes` when a future
-  reader must know something. `bun run session check` fails while anything is missing or
-  unfilled. Commit as `docs(session): …` — those commits are skipped by the script, so they never
-  need an entry of their own.
+  entry skeleton per commit no session accounts for — `Summary` / `Why` placeholders and one line
+  per touched file with +/− counts — into your session. Fill in every `_(fill in)_`: the Summary,
+  the Why, and a short phrase per file of what changed in it. Add `Notes` when a future reader
+  must know something. `bun run session check` fails while anything is missing or unfilled.
+  Commit as `docs(session): …` — those commits are skipped by the script, so they never need an
+  entry of their own.
+- **The ledger holds value only** (ADR-021). A commit that adds nothing a reader would want —
+  a fix-up to the previous commit, a formatting pass, a fixture — gets **no entry**. Two ways to
+  say so, both read by the gate: a fix-up is vouched for by the entry it belongs to, with a line
+  `- Also: <sha> — <what it fixed>` under that entry's `Why` (delete the skeleton the tool
+  appended); a commit with nothing to record carries the trailer `Session-entry: none` in its
+  message (`git commit -m "style: biome reformat" -m "Session-entry: none"`), and the tool never
+  appends a skeleton for it. Decide at commit time; a valueless commit already pushed without the
+  trailer is vouched for by its nearest parent entry.
 - **Narrative as it happens:** requests, decisions, dead ends, false leads, verifications — write
   them into the Narrative when they happen, citing entries by sha. Update `Outcome` / `Open at
   end` before the session ends. Update OVERVIEW "Status" / "Next up" (and the ADR / PRD section,
@@ -100,6 +108,7 @@ What was asked, decided, tried and abandoned, verified (and how); cite entries b
 
 - Summary: one or two lines — what this change does as a whole
 - Why: one line — the problem or request that caused it (name who asked if it was Peter)
+- Also: <sha> — a fix-up this entry vouches for (optional, one line per fix-up; it gets no entry)
 - Files:
   - `src/thing.ts` (+12/−3) — what changed in this file
   - `docs/OVERVIEW.md` (+4/−1) — what changed in this file

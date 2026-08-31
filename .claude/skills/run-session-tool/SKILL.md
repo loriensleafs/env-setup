@@ -54,5 +54,7 @@ bun run test                              # the repo gate: `bun test` (src/) the
   so prose may mention the placeholder by name — and skips `Outcome` / `Open at end`; `close` counts
   those two as well (`session: NOT closed — SES-NNN is not complete.` names the file, exit 1).
 - An append into a closed session is refused; reopen by editing its Status line, with a dated Narrative note.
+- A commit is accounted for by an entry heading, by a parent entry's `- Also: <sha>` line, or by the
+  trailer `Session-entry: none` in its own message (ADR-021); the bare run appends skeletons only for the rest.
 - The tool resolves `docs/sessions/` relative to its own file (`../../../../docs/sessions/`); moving it
   again means changing that one line.

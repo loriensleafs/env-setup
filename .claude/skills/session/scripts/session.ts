@@ -17,7 +17,8 @@
  * to do — never a guess into another conversation's file.
  *
  * Append-only: every commit on the current branch (merges excluded) that no
- * session file mentions gets an entry skeleton — Summary / Why placeholders and
+ * session accounts for -- no entry heading, no parent entry's `- Also: <sha>`
+ * line, no `Session-entry: none` trailer in its message -- gets an entry skeleton — Summary / Why placeholders and
  * one line per touched file (any file: code, docs, config, CI, scripts, assets)
  * with its +/− line counts and a placeholder for what changed in it. A release
  * marker is inserted after each tagged commit. Existing text is never
@@ -28,9 +29,11 @@
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import {
+  declinesEntry,
   FILL,
   id,
   indexRow,
+  knownShas,
   parseHeader,
   placeholderCount,
   selectSession,
@@ -56,6 +59,7 @@ interface Commit {
   sha: string;
   date: string;
   subject: string;
+  body: string;
   files: Touched[];
 }
 
@@ -87,16 +91,16 @@ function commits(): Commit[] {
     "--no-merges",
     "--no-renames", // a rename is a delete + an add: plain paths, greppable
     "--date=short",
-    "--format=%x01%H%x09%ad%x09%s",
+    "--format=%x01%H%x09%ad%x09%s%x02%b%x02",
     "--numstat",
   );
   const result: Commit[] = [];
   for (const block of out.split("\x01")) {
     if (!block.trim()) continue;
-    const [head, ...rest] = block.split("\n");
+    const [head, body, tail] = block.split("\x02");
     const [sha, date, subject] = head.split("\t");
     const files: Touched[] = [];
-    for (const line of rest) {
+    for (const line of (tail ?? "").split("\n")) {
       const [a, d, path] = line.split("\t");
       if (!path) continue;
       files.push({
@@ -105,7 +109,7 @@ function commits(): Commit[] {
         deleted: d === "-" ? null : Number(d),
       });
     }
-    result.push({ sha, date, subject, files });
+    result.push({ sha, date, subject, body: body ?? "", files });
   }
   return result;
 }
@@ -195,14 +199,17 @@ try {
 }
 const all = await sessions().catch(refuse);
 
-/** Commits on this branch that no session records (the log updates themselves excluded). */
+/**
+ * Commits on this branch that no session accounts for. Excluded: the log updates
+ * themselves, commits whose message carries `Session-entry: none`, and commits a
+ * parent entry vouches for on an `- Also:` line (ADR-021).
+ */
 function missingCommits(): Commit[] {
-  const known = all.flatMap((s) =>
-    [...s.text.matchAll(/^### .* · ([0-9a-f]{7,40})$/gm)].map((m) => m[1]),
-  );
+  const known = all.flatMap((s) => knownShas(s.text));
   return commits().filter(
     (c) =>
       !SKIP_PREFIXES.some((p) => c.subject.startsWith(p)) &&
+      !declinesEntry(c.body) &&
       !known.some((k) => c.sha.startsWith(k)),
   );
 }
