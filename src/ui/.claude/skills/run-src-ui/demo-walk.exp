@@ -1,0 +1,38 @@
+#!/usr/bin/expect -f
+# demo-walk.exp — drive `bun src/ui/demo.ts` (the interactive Stage A UI demo:
+# group multiselect with live requires-cascade + horizontal radio) under a PTY.
+# Answers each ◆ prompt with Enter after waiting for its ◇ submitted line; also
+# toggles the first Apps row off/on to exercise the cascade before submitting.
+# Usage (repo root): expect src/ui/.claude/skills/run-src-ui/demo-walk.exp [transcript]
+# Exit 0 = reached "demo complete".
+set timeout 30
+set transcript [lindex $argv 0]
+if {$transcript eq ""} { set transcript "/tmp/envsetup-ui-demo-walk.txt" }
+log_file -noappend $transcript
+set env(TERM) xterm-256color
+spawn bun src/ui/demo.ts
+stty rows 40 columns 100 < $spawn_out(slave,name)
+
+expect {
+  -re {◆[^\r\n]*What should this machine get\?} {}
+  timeout { puts "\n\[demo\] picker never appeared"; exit 2 }
+}
+sleep 0.2
+send "\r"
+expect {
+  -re {◇[^\r\n]*What should this machine get\?} {}
+  timeout { puts "\n\[demo\] picker did not submit"; exit 2 }
+}
+expect {
+  -re {◆[^\r\n]*Claude Code effort level} {}
+  timeout { puts "\n\[demo\] radio never appeared"; exit 2 }
+}
+sleep 0.2
+send "\033\[D"
+sleep 0.2
+send "\r"
+expect {
+  -re {demo complete} { puts "\n\[demo\] OK — picker submitted, radio moved left + submitted, outro reached" }
+  timeout { puts "\n\[demo\] no outro"; exit 3 }
+}
+expect eof
