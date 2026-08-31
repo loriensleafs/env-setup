@@ -120,3 +120,17 @@ cited; a mechanical grep over the whole tree for `CONTEXT.md`, `CONTEXT-MAP`, `d
    CONTEXT.md's own preamble; running the setup skill would also assume `docs/adr/` (finding B3).
 4. Keep the reference's success test as this repo's: `CONTEXT.md` changes during the conversation
    that changes the model, and gets shorter as often as longer.
+
+## Acted on — 2026-08-30
+
+Peter chose to change the installed skills rather than only the project: under `~/.claude/skills`
+(copies of the reference, not symlinks), the hardcoded `docs/adr/` in `domain-modeling`
+(`SKILL.md`, `ADR-FORMAT.md`), `improve-codebase-architecture` and `documentation-and-adrs` now
+says "where the project keeps its ADRs"; the reference's `domain.md` consumer rule ("read
+`CONTEXT.md` before exploring; never an avoided synonym; a missing concept is a gap for
+`/domain-modeling`") was added to 16 skills that explore code or name domain concepts; a closing
+"Keeping the domain model current" section routes `documentation-and-adrs`,
+`spec-driven-development`, `to-spec`, `interview-me` and `idea-refine` to `domain-modeling`, and
+`grill-me` points at `grill-with-docs`. Every touched skill passes plugin-kit's validator; the
+list lives in `~/.claude/skills/LOCAL-CHANGES.md` so a re-sync from the reference does not undo
+it silently. The four implications above stay open for envsetup itself.
