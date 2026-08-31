@@ -1,0 +1,13 @@
+$ git status --short
+
+$ git log --oneline -5
+2ee45ae docs(session): record c65249b — set-favorites.swift re-synced; finder docs and OVERVIEW no longer call it stale
+c579576 docs(session): start record-eval session
+c65249b fix(finder): re-sync set-favorites.swift with the embedded SET_FAVORITES_SWIFT constant
+2a815ac Merge pull request #34 from loriensleafs/docs/session-open-items
+0459c1a docs(session): close SES-004 — the docs-system stream is done
+
+$ bun run session check --session SES-006
+$ bun .claude/skills/session/scripts/session.ts check --session "SES-006"
+session: complete (SES-006, open)
+exit=0

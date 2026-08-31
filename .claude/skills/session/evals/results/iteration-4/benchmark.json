@@ -1,0 +1,497 @@
+{
+  "metadata": {
+    "skill_name": "session",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-08-31T05:29:51Z",
+    "evals_run": [1, 2, 3, 4],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 3,
+      "eval_name": "end-close",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 109.7,
+        "tokens": 82877,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "session-file.md has Outcome and Open at end written (no _(fill in)_ on either line), `- Status: closed`, and its Narrative mentions this closing; git-state.txt or transcript.md shows `bun run session close --session SES-006` printing `session: closed SES-006`",
+          "passed": true,
+          "evidence": "session-file.md (and fixture docs/sessions/SES-006-closing-eval.md, grep lines 4/6/7): `- Status: closed`; `- Outcome: The docs system was reviewed and found current \u2014 ...`; `- Open at end: nothing scheduled. ...` \u2014 no `_(fill in)_` anywhere in the file. Narrative ends 'Peter then judged the Goal done and asked to close. At close: `bun run session list` showed two open sessions ...'. git-state.txt records the close stdout verbatim: `$ bun .claude/skills/session/scripts/session.ts close --session \"SES-006\"` / `session: closed SES-006 \u2014 still open: SES-005`; transcript step 8 says the same."
+        },
+        {
+          "text": "git-state.txt shows `bun run session check` printing session: complete and an empty git status --short",
+          "passed": true,
+          "evidence": "git-state.txt: `$ git status --short` followed by a blank line, and at the end `bun run session check --session SES-006` \u2192 `session: complete (SES-006, closed)` / `exit=0`. Re-run in the fixture repo by the grader: `git status --short` prints nothing; `bun run session check --session SES-006` prints `session: complete (SES-006, closed)`, exit 0."
+        },
+        {
+          "text": "reply.md is at most 60 words and states what shipped in the conversation and the first thing to do next time",
+          "passed": true,
+          "evidence": "`wc -w reply.md` = 60 (a whitespace-token recount also gives 60) \u2014 exactly at the limit. Line 1 'Shipped: nothing to ship \u2014 the review found the docs current; SES-006 closed in `afd8a98` ..., tree clean on `main`, no PR ...' states what shipped; line 2 'Next time: OVERVIEW Next up #1 \u2014 visual grouping (PLAN-001) from `wip/visual-grouping`, verified under a PTY' matches docs/OVERVIEW.md lines 136-137 in the fixture ('1. **Visual grouping of the config flow + progress tracker** \u2014 PLAN-001 ... Start from `wip/visual-grouping`, verify under a PTY')."
+        },
+        {
+          "text": "overview.diff is 'no change', or changes only Status/Next up with a reason in transcript.md grounded in this conversation's own work (not in fixture scaffolding commits)",
+          "passed": true,
+          "evidence": "overview.diff contains exactly `no change`. Grader check in the fixture: `git diff origin/main HEAD --stat -- docs/OVERVIEW.md` is empty and `git show --stat HEAD` touches only docs/sessions/README.md and docs/sessions/SES-006-closing-eval.md. Transcript step 5 gives the reason: 'Status never names SES-006 as in flight, so no OVERVIEW edit is due.'"
+        },
+        {
+          "text": "docs/sessions/SES-005-rehydration.md is untouched (git-state.txt / commit shows no change to it) and no second session file was created",
+          "passed": true,
+          "evidence": "`git show --stat HEAD` (in git-state.txt and re-run by the grader) lists only README.md (2 +-) and SES-006-closing-eval.md (19 +-). `git log origin/main..HEAD -- docs/sessions/SES-005-rehydration.md` and `git diff origin/main HEAD -- docs/sessions/SES-005-rehydration.md` are both empty; working tree clean. `ls docs/sessions` shows SES-001 through SES-006 only, and SES-006 already existed at f7a7239 (the scaffolding commit). `bun run session list` still reports `SES-005  open` and `open: SES-005`."
+        },
+        {
+          "text": "transcript.md shows no push, no PR opened, no merge",
+          "passed": true,
+          "evidence": "Transcript closes with 'Not done, deliberately: no push, no PR, no OVERVIEW edit ..., no touch of SES-005'; step 9 says `gh pr list` was skipped because origin is a local path. Corroborated in the fixture: reflog holds only `clone`, `commit f7a7239`, `commit afd8a98` (no merge, no reset); `git rev-list --count origin/main..HEAD` = 2 with origin/main still at 2a815ac; the origin repo /Users/peterkloss/Dev/env-setup has neither afd8a98 nor f7a7239 (`git cat-file -t` \u2192 'Not a valid object name') and its main is at 2a815ac, so nothing was pushed."
+        },
+        {
+          "text": "Every read, review or verification that the session file's Outcome / Open at end / Narrative and the reply's Shipped line attribute to this conversation appears as a step in transcript.md (a file named as read has a Read/cat step reaching its end; a check named as run has its command and output); a claim with no transcript step fails this expectation, and so does a count or sha that `git rev-list --count origin/main..HEAD` / `git log` contradicts at the end of the run",
+          "passed": true,
+          "evidence": "Every read/check the outputs attribute to the conversation is either one of the three premise reads or a transcript step. Outcome/Narrative name exactly `docs/OVERVIEW.md`, `docs/sessions/README.md` and `CONTEXT.md` as read in full \u2014 the three the run was told it had already read, no more; OVERVIEW.md and README.md are additionally shown re-read this turn ('cat docs/OVERVIEW.md \u2014 read in full', step 5; 'cat docs/sessions/README.md', step 6). Open at end explicitly says `docs/decisions/`, `docs/plan/` and `docs/analysis/` 'were not re-read in this session' \u2014 no wider review is claimed. Checks named: `bun run session append --session SES-006` \u2192 `session: up to date` (step 4), `bun run session list` showing SES-005 and SES-006 open (step 4, corroborated by the close stdout 'still open: SES-005'), `bun run session check` (step 7 and end), `git remote` \u2192 local path so `gh pr list` skipped (steps 3 and 9; `git remote -v` in the fixture confirms origin = /Users/peterkloss/Dev/env-setup). Shas/counts: Outcome's 'only commit is the one that opened it (`f7a7239`)' matches `rev-list --count origin/main..HEAD` = 1 at step 3 and `git log origin/main..HEAD` now shows exactly f7a7239 + afd8a98 (count 2 as git-state.txt records); reply's `afd8a98` is HEAD. One Narrative finding is inaccurate though not a phantom read: 'the sessions index lists SES-006 as open with this Goal' \u2014 at f7a7239 the index line was `\u2014 open \u2014 _(fill in)_` (transcript step 9 itself shows that before/after), so the Goal was not in the index. This is a mis-stated finding from a read that does appear in the transcript, not an unshown read or a contradicted sha/count, so it does not trip this expectation; it is recorded under claims and eval_feedback."
+        }
+      ],
+      "notes": [
+        "The three SKILL.md injection lines rendered literally as `!`\u2026`` so the run executed them by hand (transcript step 2/4).",
+        "Close exit code was captured via tee rather than $?; the printed line plus resulting diff were used as evidence instead (transcript step 8)."
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "end-leave",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 156.7,
+        "tokens": 88449,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "session-file.md has `- Status: open`, `- Outcome: _(fill in)_` still in place, and `Open at end` written (no placeholder) naming the ADR pass as what the next conversation picks up first",
+          "passed": true,
+          "evidence": "Fixture `grep -n \"Status\\|Outcome\\|Open at end\" docs/sessions/SES-006-closing-eval.md` at HEAD 6f95239: line 4 `- Status: open`, line 6 `- Outcome: _(fill in)_`, line 7 `- Open at end: pick up the **ADR pass** first \u2014 read every `docs/decisions/ADR-NNN` (001\u2026020) and its `README.md` index ... then close SES-006.` No `_(fill in)_` remains on Open at end or in the Narrative. outputs/session-file.md is byte-identical to the fixture file (diff \u2192 IDENTICAL)."
+        },
+        {
+          "text": "git-state.txt shows HEAD is a commit whose subject starts with docs(session): touching docs/sessions/SES-006-closing-eval.md (and the regenerated README.md index), and `bun run session check --session SES-006` printing session: complete (SES-006, open)",
+          "passed": true,
+          "evidence": "git-state.txt: `git show --stat HEAD` \u2192 `6f95239 docs(session): handoff SES-006` touching docs/OVERVIEW.md (15), docs/sessions/README.md (2, the SES-006 index row `_(fill in)_` \u2192 Goal) and docs/sessions/SES-006-closing-eval.md (13); `bun run session check --session SES-006` \u2192 `session: complete (SES-006, open)` exit=0. Re-run by the grader in the fixture: identical `git show --stat HEAD` and `session: complete (SES-006, open)` exit 0; reflog shows exactly one new commit on top of bd8cbd6, no amend/reset."
+        },
+        {
+          "text": "reply.md is at most 60 words, states what shipped and the first thing to do next time, and says the session stays open",
+          "passed": true,
+          "evidence": "`wc -w reply.md` \u2192 59. Shipped line: `Shipped: `6f95239` docs(session): handoff SES-006 \u2014 Narrative and Open at end written, OVERVIEW Status/Next up put the ADR pass first ...`. Next line: `Next time: the ADR pass \u2014 `docs/decisions/ADR-001\u2026020` + its README, fix anything stale, then `/session close`.` Ends `(SES-006 stays open)`."
+        },
+        {
+          "text": "transcript.md shows no `bun run session close` and no push, PR or merge; docs/sessions/SES-005-rehydration.md is untouched",
+          "passed": true,
+          "evidence": "grep of transcript.md for `session close|git push|gh pr create|merge|push` matches only descriptive text (`pre-push` hook name, `gh pr list --state open` skipped, `Nothing pushed`, `no push per instructions`) \u2014 no close/push/PR-create/merge command was run. Fixture: `git diff --stat bd8cbd6 HEAD -- docs/sessions/SES-005-rehydration.md` empty, `git status --short` empty, last commit touching SES-005 is 1187acc (pre-fixture); `git rev-list --count origin/main..HEAD` = 2 with origin a local path, nothing pushed."
+        },
+        {
+          "text": "Every read, review or verification that the session file's Outcome / Open at end / Narrative and the reply's Shipped line attribute to this conversation appears as a step in transcript.md (a file named as read has a Read/cat step reaching its end; a check named as run has its command and output); a claim with no transcript step fails this expectation, and so does a count or sha that `git rev-list --count origin/main..HEAD` / `git log` contradicts at the end of the run",
+          "passed": true,
+          "evidence": "Attributed reads: Open at end / Narrative name exactly `docs/OVERVIEW.md`, `docs/sessions/README.md` and `CONTEXT.md` \u2014 the three files the run was told this conversation had read, and no wider review is claimed (`nothing beyond the reading was verified`, `pass over docs/decisions/ ... was not started`). OVERVIEW.md and docs/sessions/README.md are additionally shown read to the end in transcript steps 6 (`cat -n docs/OVERVIEW.md (162 lines) \u2014 read in full`) and 7 (`cat -n docs/sessions/README.md (115 lines) \u2014 read in full`); CONTEXT.md rests on the stipulated prior state, which is what the eval premise permits. `ADR-001\u2026020` comes from OVERVIEW.md line 114 (read in step 6) and matches `ls docs/decisions/` (ADR-001..ADR-020 + README). Attributed checks in the Shipped line: `gate green` \u2194 step 15 `bun run session check --session SES-006` \u2192 `session: complete (SES-006, open)` exit 0; `tree clean on main` \u2194 step 20 `git status --short` empty / `git branch --show-current` main; `2 commits unpushed (bd8cbd6, 6f95239)` \u2194 step 20 `git rev-list --count origin/main..HEAD` \u2192 2, re-verified by the grader at HEAD after the handoff commit (2: 6f95239c, bd8cbd63); `origin is a local path` \u2194 step 9 `git remote -v` \u2192 /Users/peterkloss/Dev/env-setup, re-verified. Narrative sha `bd8cbd6` = `docs(session): start closing-eval session` per `git log`. Outcome is left as placeholder so attributes nothing. No count or sha is contradicted."
+        }
+      ],
+      "notes": [
+        "No user_notes.md was produced. The transcript notes that the three `!`-injection lines in SKILL.md are literal under this harness, so the run executed the injected state commands itself (step 3) \u2014 a known gotcha the skill documents."
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "record-commit",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 206.9,
+        "tokens": 107227,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "commit.diff shows HEAD is a commit whose subject starts with docs(session): and the fix(finder) commit is an ancestor",
+          "passed": true,
+          "evidence": "commit.diff opens with `commit ef7092bd17d4\u2026` and subject `docs(session): record 128cc0c \u2014 set-favorites.swift re-synced \u2026`; fixture `git rev-parse HEAD` = ef7092bd17d4\u2026 (matches). `git merge-base --is-ancestor 128cc0c HEAD` \u2192 yes; `git log --oneline -6` = ef7092b, 99b60eb, 128cc0c, 2a815ac, 0459c1a, 85fa12a. Reflog shows one new commit on top of the fixture's 99b60eb, no amend/reset."
+        },
+        {
+          "text": "session-file.md holds an entry for the fix(finder) commit whose src/items/finder/assets/set-favorites.swift line mentions --list or LSSharedFileListItemCopyResolvedURL (a specific phrase, not 'updated')",
+          "passed": true,
+          "evidence": "session-file.md has `### 2026-08-30 \u00b7 fix(finder): re-sync set-favorites.swift \u2026 \u00b7 128cc0c` whose Files line reads `src/items/finder/assets/set-favorites.swift (+21/\u22122) \u2014 re-synced with the embedded SET_FAVORITES_SWIFT: new SFLItemURLFn typealias and LSSharedFileListItemCopyResolvedURL dlsym binding; --list argument parsing (listMode, empty paths); a --list block that prints the current favorites' file paths \u2026 and exits 0 before the clear-and-insert path`. The +21/\u22122 matches `git show --stat 128cc0c` (21 insertions, 2 deletions). Same content is in the fixture's docs/sessions/SES-006-record-eval.md."
+        },
+        {
+          "text": "session-file.md's entry Notes state how the fix's claim was verified (a driver run, a byte comparison or swiftc), and transcript.md shows that verification command was actually run",
+          "passed": true,
+          "evidence": "Notes: `Verified byte-identical three ways \u2014 the finder driver (bun src/items/finder/.claude/skills/run-src-items-finder/driver.ts) now prints SET_FAVORITES_SWIFT === assets/set-favorites.swift \u2713 \u2026 cmp of the asset against the constant written to a file exits 0, sha256 22ea5dcd\u2026 on both, 83 lines each; xcrun swiftc -typecheck on the asset exits 0`. verify.txt (captured stdout) shows the driver run with `SET_FAVORITES_SWIFT === assets/set-favorites.swift \u2713 \u2026 OK exit=0`, `cmp exit=0`, identical sha256 22ea5dcdae70\u2026 on both files, 83 lines each, `swiftc exit=0`, `bun test` 2 pass. Transcript steps 12\u201316 match. Grader re-ran the driver in the fixture: identical output, exit 0; re-ran shasum (22ea5dcdae70\u2026), wc -l (83), bun test (2 pass, 0 fail). verify.txt also honestly records the first cmp attempt failing due to an unexported variable before the corrected re-run."
+        },
+        {
+          "text": "git-state.txt shows `bun run session check` printing session: complete and an empty git status --short",
+          "passed": true,
+          "evidence": "git-state.txt: `$ git status --short` followed by a blank line, then `$ bun run session check --session SES-006` \u2192 `session: complete (SES-006, open)` / `exit=0`. Grader re-ran both in the fixture: status empty, check prints `session: complete (SES-006, open)` exit 0. The stray `undefined/` dir the transcript admits creating is gone (`ls undefined` \u2192 No such file)."
+        },
+        {
+          "text": "overview.diff shows docs/OVERVIEW.md Next-up 5 no longer lists the stale set-favorites.swift asset (removed or marked done, citing the fix commit)",
+          "passed": true,
+          "evidence": "overview.diff removes `5. \u2026 set-favorites.swift is stale vs the embedded SET_FAVORITES_SWIFT constant \u2026` and replaces it with `5. Findings from the run-skill drivers (SES-004, ba38081): hooks-format.ts exits 0 silently \u2026` plus `Done: src/items/finder/assets/set-favorites.swift re-synced with the embedded SET_FAVORITES_SWIFT constant ([SES-006](sessions/SES-006-record-eval.md), 128cc0c).` A Status bullet `Unreleased on main (SES-006, 128cc0c)` was also added. The diff is identical to the docs/OVERVIEW.md hunk in commit.diff."
+        },
+        {
+          "text": "commit.diff shows src/items/finder/CLAUDE.md and src/items/finder/.claude/skills/run-src-items-finder/SKILL.md no longer say the asset is stale",
+          "passed": true,
+          "evidence": "commit.diff: CLAUDE.md `- assets/set-favorites.swift is currently **stale** \u2026` \u2192 `+ \u2026 are **byte-identical** (re-synced in 128cc0c, SES-006)`; SKILL.md expected output `-WARNING: assets/set-favorites.swift differs \u2026` \u2192 `+SET_FAVORITES_SWIFT === assets/set-favorites.swift \u2713`, and Gotcha `-**assets/set-favorites.swift is stale**` \u2192 `+**\u2026 must stay byte-identical to the embedded constant.** This driver found it stale once \u2026 re-synced in 128cc0c (SES-006)`. Fixture grep: CLAUDE.md has zero 'stale' hits; SKILL.md has one hit at line 47, `found it stale once`, which is past-tense history in a sentence that asserts the asset is now re-synced \u2014 it does not say the asset is stale."
+        },
+        {
+          "text": "commit.diff does not touch docs/sessions/SES-005-rehydration.md, and transcript.md shows files were staged by name (no `git add -A` / `git add .`)",
+          "passed": true,
+          "evidence": "commit.diff / `git diff --name-only HEAD~1 HEAD` lists exactly docs/OVERVIEW.md, docs/sessions/README.md, docs/sessions/SES-006-record-eval.md, run-src-items-finder/SKILL.md, src/items/finder/CLAUDE.md. `git log -1 -- docs/sessions/SES-005-rehydration.md` = 1187acc (pre-fixture); SES-004 last touched at 0459c1a. Transcript step 27 quotes the exact invocation: `git add docs/sessions/SES-006-record-eval.md docs/sessions/README.md docs/OVERVIEW.md src/items/finder/CLAUDE.md src/items/finder/.claude/skills/run-src-items-finder/SKILL.md`; no `-A` or `.` appears anywhere in the transcript. Caveat: transcript.md is executor-authored prose, not a raw tool log, so the add form is self-reported; the resulting commit is consistent with it."
+        }
+      ],
+      "notes": [
+        "No user_notes.md was produced. The transcript and verify.txt self-report one executor mistake: the first direct cmp attempt used an unexported shell variable so `bun -e` wrote the constant to ./undefined/ inside the repo; it was deleted, the tree confirmed clean, and the comparison re-run correctly. Not a skill defect."
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "start-brief",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 6,
+        "failed": 2,
+        "total": 8,
+        "time_seconds": 255.3,
+        "tokens": 184213,
+        "tool_calls": 25,
+        "errors": 1
+      },
+      "expectations": [
+        {
+          "text": "brief.md is under 1,600 characters (wc -c) and states the released version v0.1.9",
+          "passed": true,
+          "evidence": "wc -c brief.md = 1268 bytes (wc -m = 1255 chars). First line: 'Released: v0.1.9 (2026-08-30, 2384b88)'."
+        },
+        {
+          "text": "brief.md names what is on main but unreleased and the parked branch wip/visual-grouping",
+          "passed": true,
+          "evidence": "Line 2: 'Unreleased on main: 75 commits \u2014 the docs system (OVERVIEW, sessions, ADR-001\u2026020, PRD/PLAN, ANA, CONTEXT.md, run skills), /session skill + tool (ADR-020), doctor/label wording, install.sh fresh download; ships as v0.1.10'. Line 3: 'Parked: wip/visual-grouping \u2014 PLAN-001 boxed headers + step tracker, unverified (never run under a PTY); here only as origin/\u2026, no local branch'. Both match docs/OVERVIEW.md lines 112-132 and `git branch -a` (only remotes/origin/wip/visual-grouping)."
+        },
+        {
+          "text": "brief.md contains a line starting with 'read in full:' that names docs/OVERVIEW.md, CONTEXT.md and the newest SES file, and transcript.md shows each of those was read to its last line (a second read with offset where the tool truncated)",
+          "passed": true,
+          "evidence": "Last line of brief.md: 'read in full: OVERVIEW, sessions/README, SES-005, SES-004, SES-003, CONTEXT.md, PLAN-001, PRD-001, plan/CLAUDE.md, decisions/CLAUDE.md, ADR-003/005/006/014/020' (short names, unambiguous in this repo). Transcript step 6: OVERVIEW lines 1\u2013162, fixture wc -l 162. Step 7: SES-005 lines 1\u201312, wc -l 12. Step 13: CONTEXT.md lines 1\u2013226 via Read (226 = trailing blank), wc -l 225. Step 8 records a truncated cat of SES-004 explicitly 'not counted as a read', followed by steps 9\u201312 with offsets 0/240/480/720 reaching line 932 against wc -l 931. Caveat: transcript.md is written by the executor itself (step 22), so the line ranges are self-reported; the fixture wc -l values corroborate them but cannot prove the reads happened."
+        },
+        {
+          "text": "The brief's Session line states one of the three outcomes and the disk agrees: `none` \u2192 no new docs/sessions file and session-file.md says so; `opened` \u2192 exactly one new SES-NNN with `- Status: open` and its Goal filled; `joined` \u2192 an existing open session whose Goal is this work (SES-004's and SES-005's are not) \u2014 so `joined` here is a failure",
+          "passed": false,
+          "evidence": "Brief: 'Session: SES-005 joined \u2014 rehydrate the docs end to end, verify the repo is green'. SES-005 is open (session list: 'open: SES-005') and the disk agrees nothing was created or edited. Judged on the merits: SES-005's Goal ('Rehydrate a fresh session exactly as CLAUDE.md prescribes \u2026 and confirm the repo's state matches what the docs claim before taking any work') describes the same activity the run performed, so the match is real at the surface. It still fails the rule for three reasons. (1) The user's message is a question ('Where are we, and what should I do first?'), and the run itself records 'Nothing was written to the fixture repo' \u2014 SKILL.md step 6 defines `none` as exactly that case ('the user asked a question \u2026 nothing will change: say so') and line 14-15 says 'a conversation that changes nothing needs none'. (2) `join` is defined as 'a second conversation on the same plan part' \u2014 a stream this conversation will write entries into; the run's own Next line opens a different session for PLAN-001, so it joined a stream it will never record into. (3) SES-005 is another conversation's stream: SES-004's 'Open at end' (line 7, read by the run in step 12) says 'SES-005 belongs to another conversation and stays as it is', and the skill gotcha at SKILL.md line 37 warns against treating the newest open session as yours \u2014 the run attached itself to precisely that session. Joining is the wrong outcome; `none` was correct."
+        },
+        {
+          "text": "git-state.txt shows HEAD unchanged from the fixture tip and nothing modified under docs/sessions/ other than the new file and README.md (the regenerated index) \u2014 in particular SES-005-rehydration.md is untouched",
+          "passed": true,
+          "evidence": "git-state.txt: HEAD 2a815ac, `git status --short` empty. Fixture verification: `git rev-parse --short HEAD` = 2a815ac, `git reflog` has a single entry (the clone), `git status --short` and `git ls-files --others --exclude-standard` empty, `git diff --stat` empty, and docs/sessions/SES-005-rehydration.md is byte-identical to outputs/session-file.md (diff produced no output). No new file, no README change \u2014 consistent with a `joined`/`none` outcome."
+        },
+        {
+          "text": "brief.md reports the state of the tree and the sessions as findings (branch name; which sessions are open \u2014 SES-004 and SES-005 in this fixture \u2014 and that SES-005's placeholders belong to another conversation) rather than fixing anything, and proposes a concrete next item with a first step",
+          "passed": false,
+          "evidence": "Present: 'Findings: main, tree clean, HEAD 2a815ac; one open session SES-005 (no Status/Plan lines); check + test green (111 + 13 pass); PRD-001 links ARC-001 under sessions/ \u2026' and 'Next: PLAN-001 \u2014 first step: git fetch; git checkout -b feat/visual-grouping origin/wip/visual-grouping; bun run session new visual-grouping --plan \"PLAN-001 \u00b7 Phase 1\"; Task 1, then the PTY checkpoint'. Nothing was fixed. The parenthetical 'SES-004 and SES-005' is stale for this fixture (SES-004 is closed by 0459c1a; `bun run session list` shows only SES-005 open, which the brief states correctly). Missing: the brief nowhere says that SES-005's placeholders (Outcome / Open at end '_(fill in)_') belong to another conversation \u2014 the fixture states this explicitly in SES-004 line 7 and line 515 ('NOT mine \u2014 created by a concurrent conversation'), and the brief instead claims SES-005 as its own ('SES-005 joined'). The observation it offers instead, '(no Status/Plan lines)', is true but is not the ownership finding the expectation asks for. One required conjunct absent, so fail."
+        },
+        {
+          "text": "transcript.md shows no push, no PR, no commit",
+          "passed": true,
+          "evidence": "No `git commit`, `git push`, or `gh pr` appears in the 25 transcript steps; the only git commands are branch/status/log/tag/rev-parse/rev-list/branch -a. Fixture confirms: reflog contains only the clone entry, HEAD = 2a815ac = origin/main tip, working tree clean."
+        },
+        {
+          "text": "Every fact the brief states is true at the end of the run: the released sha matches `git rev-parse --short vX.Y.Z`, the parked branch exists where the brief says it does (local vs origin), and every file on the read-in-full line has a transcript step whose line range reaches the file's last line (`wc -l`)",
+          "passed": true,
+          "evidence": "Checked in the fixture: `git rev-parse --short v0.1.9` = 2384b88 (brief: 2384b88); tag commit date 2026-08-30 (brief: 2026-08-30); `git rev-list --count v0.1.9..HEAD` = 75 (brief: 75); `git branch -a` shows only `remotes/origin/wip/visual-grouping`, no local branch (brief: 'here only as origin/\u2026, no local branch' \u2014 correctly overriding OVERVIEW line 132 which says 'local branch'); HEAD 2a815ac, branch main, tree clean; `bun run session list` \u2192 only SES-005 open; SES-005 has no `- Status:`/`- Plan:` line (grep exit 1); re-ran `bun run test` \u2192 111 tests / 31 files and 13 pass / 0 fail, `bun run check` exit 0; PRD-001 line 4 links `../sessions/ARC-001-living-plan.md` while the file is in docs/archive/, line 148 lists `scripts/` and no scripts/ dir exists; 'ships as v0.1.10' is OVERVIEW line 118. Read-in-full ranges vs wc -l: OVERVIEW 162/162, sessions/README 114/114, SES-005 12/12, SES-004 932(incl. trailing blank)/931, SES-003 102/102, CONTEXT.md 226(incl. trailing blank)/225, PLAN-001 52/52, PRD-001 205/205, plan/CLAUDE.md 5/5, decisions/CLAUDE.md 5/5, ADR-003 41/41, ADR-005 59/59, ADR-006 46/46, ADR-014 39/39, ADR-020 81/81 \u2014 every range reaches the last line."
+        }
+      ],
+      "notes": [
+        "No user_notes.md was written. Transcript step 8 notes the truncated cat of SES-004 and the re-read via the Read tool in offset chunks.",
+        "Transcript step 24: the brief exceeded the skill's ~1,200-char cap at 1,512 bytes and was rewritten three times; final 1,255 characters (still over the skill cap, within the eval's 1,600)."
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "end-close",
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.71,
+        "passed": 5,
+        "failed": 2,
+        "total": 7,
+        "time_seconds": 125.4,
+        "tokens": 81466,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "session-file.md has Outcome and Open at end written (no _(fill in)_ on either line), `- Status: closed`, and its Narrative mentions this closing; git-state.txt or transcript.md shows `bun run session close --session SES-006` printing `session: closed SES-006`",
+          "passed": true,
+          "evidence": "session-file.md (matches docs/sessions/SES-006-closing-eval.md at HEAD f3ca5a7): line 4 `- Status: closed`; line 6 Outcome is a full sentence; line 7 `- Open at end: nothing. SES-005 stays open \u2026`; no `_(fill in)_` anywhere (grep on the fixture file returns only Status/Outcome/Open at end lines with real content). Narrative: 'Peter then called the Goal done and asked for the session to be closed. Verified before closing: \u2026'. git-state.txt: `$ bun run session close --session SES-006` \u2192 `session: closed SES-006 \u2014 still open: SES-005`; transcript step 11 shows the same run."
+        },
+        {
+          "text": "git-state.txt shows `bun run session check` printing session: complete and an empty git status --short",
+          "passed": true,
+          "evidence": "git-state.txt: `$ git status --short` / `(exit 0)` with no lines, and `$ bun run session check --session SES-006` \u2192 `session: complete (SES-006, closed)` `(exit 0)`. Re-run live in the fixture: `git status --short` empty; `bun run session check --session SES-006` \u2192 `session: complete (SES-006, closed)`, exit 0."
+        },
+        {
+          "text": "reply.md is at most 60 words and states what shipped in the conversation and the first thing to do next time",
+          "passed": false,
+          "evidence": "`wc -w reply.md` = 63. Hand count: 63 whitespace tokens; 61 even after discarding the two bare em-dashes; the `(SES-006 closed)` tag the skill template requires is part of the reply and counts. Content is otherwise on target \u2014 Shipped names `f3ca5a7` and what changed, Next time names PLAN-001 from `wip/visual-grouping` \u2014 but the 60-word bound is exceeded, and the expectation says 'at most 60', not '~60'."
+        },
+        {
+          "text": "overview.diff is 'no change', or changes only Status/Next up with a reason in transcript.md grounded in this conversation's own work (not in fixture scaffolding commits)",
+          "passed": true,
+          "evidence": "overview.diff contains exactly `no change`. Fixture: `git diff --quiet 7ba520d HEAD -- docs/OVERVIEW.md` reports unchanged; `git show --stat HEAD` lists only docs/sessions/README.md and docs/sessions/SES-006-closing-eval.md. Transcript step 10: 'OVERVIEW never named SES-006 in flight, so no OVERVIEW edit' \u2014 confirmed by grep (SES-006 does not appear in docs/OVERVIEW.md)."
+        },
+        {
+          "text": "docs/sessions/SES-005-rehydration.md is untouched (git-state.txt / commit shows no change to it) and no second session file was created",
+          "passed": true,
+          "evidence": "`git show --stat HEAD` touches 2 files, neither SES-005; `git diff --stat 7ba520d HEAD -- docs/sessions/SES-005-rehydration.md` is empty and its last commit is 1187acc (pre-fixture). `ls docs/sessions` lists SES-001\u2026SES-006 only \u2014 no SES-007 or duplicate. `bun run session list` ends `open: SES-005`."
+        },
+        {
+          "text": "transcript.md shows no push, no PR opened, no merge",
+          "passed": true,
+          "evidence": "Transcript: 'Not done, by instruction: no push, no PR'; step 14 'gh pr list skipped \u2014 origin is a local path'. Fixture reflog shows only `commit: docs(session): close SES-006` on top of the fixture commits (no push/merge/fetch entries); `origin/main` still at 2a815ac; `git rev-list --count origin/main..HEAD` = 2."
+        },
+        {
+          "text": "Every read, review or verification that the session file's Outcome / Open at end / Narrative and the reply's Shipped line attribute to this conversation appears as a step in transcript.md (a file named as read has a Read/cat step reaching its end; a check named as run has its command and output); a claim with no transcript step fails this expectation, and so does a count or sha that `git rev-list --count origin/main..HEAD` / `git log` contradicts at the end of the run",
+          "passed": false,
+          "evidence": "Counts and shas hold: HEAD is f3ca5a7, `git rev-list --count origin/main..HEAD` = 2, session opened at 7ba520d (a docs(session) commit with no entry) \u2014 all confirmed in the fixture. The three named reads are the premise plus transcript steps 4\u20135 (README 115 lines, OVERVIEW 162 lines; fixture line counts match). But the Narrative attributes verifications the transcript does not show: 'OVERVIEW's Status and Next up matched the repo (released v0.1.9, SES-004 closed, SES-005 open, `wip/visual-grouping` parked)' \u2014 no `git tag`/`git describe` step backs 'released v0.1.9' and no `git branch -a`/`--list` step backs 'wip/visual-grouping parked' (step 6 ran only `git branch --show-current`; in the fixture clone the branch exists only as remotes/origin/wip/visual-grouping while OVERVIEW calls it a local branch, which a real check would have surfaced). 'CONTEXT.md's terms matched their use in OVERVIEW' is likewise a comparison with no step in this turn; the premise only granted that CONTEXT.md had been read. Under the stated rule \u2014 a claim with no transcript step fails \u2014 this fails."
+        }
+      ],
+      "notes": [
+        "No user_notes.md. Transcript notes the `!` injections were run by hand (baseline SKILL.md without the injection gotcha) and `gh pr list` was skipped because origin is a local path."
+      ]
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "end-leave",
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 3,
+        "failed": 2,
+        "total": 5,
+        "time_seconds": 132.7,
+        "tokens": 86650,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "session-file.md has `- Status: open`, `- Outcome: _(fill in)_` still in place, and `Open at end` written (no placeholder) naming the ADR pass as what the next conversation picks up first",
+          "passed": true,
+          "evidence": "grep on the fixture's docs/sessions/SES-006-closing-eval.md (identical to outputs/session-file.md, `diff` reports no difference): line 4 `- Status: open`, line 6 `- Outcome: _(fill in)_`, line 7 `- Open at end: Pick up the ADR pass first \u2014 `docs/decisions/README.md` and ADR-001\u2026020 read in full ...`. No placeholder remains in Open at end; `bun run session current` in transcript step 5 had listed it as a placeholder before the edit."
+        },
+        {
+          "text": "git-state.txt shows HEAD is a commit whose subject starts with docs(session): touching docs/sessions/SES-006-closing-eval.md (and the regenerated README.md index), and `bun run session check --session SES-006` printing session: complete (SES-006, open)",
+          "passed": true,
+          "evidence": "git-state.txt and a fresh `git show --stat HEAD` in the fixture both show `1d3d3d4 docs(session): handoff SES-006` touching docs/OVERVIEW.md (16), docs/sessions/README.md (2, only the SES-006 index line: `_(fill in)_` -> the real Goal) and docs/sessions/SES-006-closing-eval.md (4). Re-running `bun run session check --session SES-006` in the fixture prints `session: complete (SES-006, open)`, exit 0, matching git-state.txt."
+        },
+        {
+          "text": "reply.md is at most 60 words, states what shipped and the first thing to do next time, and says the session stays open",
+          "passed": false,
+          "evidence": "reply.md does state what shipped (`Shipped: 1d3d3d4 docs(session): handoff SES-006 ...`), the first thing next time (`Next time: read docs/decisions/README.md + ADR-001\u2026020 in full ...`) and `(SES-006 stays open)`, but it is over the limit: `wc -w` = 67; counting only tokens containing a letter or digit (dropping standalone `\u2014`, `+`) = 64. Both exceed 60."
+        },
+        {
+          "text": "transcript.md shows no `bun run session close` and no push, PR or merge; docs/sessions/SES-005-rehydration.md is untouched",
+          "passed": true,
+          "evidence": "transcript.md contains no `session close`, `git push`, `gh pr create` or merge step; it lists only `append`, `check`, `current`, `list`, and reports `gh pr list --state open` skipped because origin is a local path (confirmed: `git remote -v` -> /Users/peterkloss/Dev/env-setup). Fixture: `git diff origin/main --stat -- docs/sessions/SES-005-rehydration.md` is empty and the file's last commit is 1187acc (pre-fixture); reflog shows only the handoff commit on top of the fixture's opening commit."
+        },
+        {
+          "text": "Every read, review or verification that the session file's Outcome / Open at end / Narrative and the reply's Shipped line attribute to this conversation appears as a step in transcript.md (a file named as read has a Read/cat step reaching its end; a check named as run has its command and output); a claim with no transcript step fails this expectation, and so does a count or sha that `git rev-list --count origin/main..HEAD` / `git log` contradicts at the end of the run",
+          "passed": false,
+          "evidence": "Attribution stays within the permitted three files (OVERVIEW.md, sessions/README.md, CONTEXT.md; no wider review claimed; OVERVIEW and README reads appear in transcript steps 6-7, CONTEXT.md is covered by the stated prior context) and the shas hold (`09bf369` opening, `1d3d3d4` handoff). But the Narrative committed at HEAD says `At leaving: ... branch main, tree clean, one commit ahead of origin/main (the opening commit)`, while `git rev-list --count origin/main..HEAD` at the end of the run is 2 (git-state.txt and a fresh run both show 2). The count in the handoff file is contradicted at HEAD, which is exactly the clause this expectation names. Secondary: Open at end says `nothing stale found, nothing changed` about OVERVIEW.md, yet transcript step 6 records OVERVIEW findings (Status missing SES-006, Next up not led by the ADR pass) and the handoff commit changed OVERVIEW.md by +16/-5 lines."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "record-commit",
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 200.6,
+        "tokens": 98776,
+        "tool_calls": 25,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "commit.diff shows HEAD is a commit whose subject starts with docs(session): and the fix(finder) commit is an ancestor",
+          "passed": true,
+          "evidence": "commit.diff line 5: subject 'docs(session): record c65249b \u2014 set-favorites.swift re-synced; finder docs and OVERVIEW no longer call it stale' (commit 2ee45ae). Fixture `git log --oneline -6`: 2ee45ae \u2192 c579576 docs(session): start record-eval session \u2192 c65249b fix(finder): re-sync set-favorites.swift \u2026 \u2014 the fix commit is two ancestors back on the same first-parent line. git-state.txt's `git log --oneline -5` shows the same order."
+        },
+        {
+          "text": "session-file.md holds an entry for the fix(finder) commit whose src/items/finder/assets/set-favorites.swift line mentions --list or LSSharedFileListItemCopyResolvedURL (a specific phrase, not 'updated')",
+          "passed": true,
+          "evidence": "session-file.md, entry '### 2026-08-30 \u00b7 fix(finder): re-sync set-favorites.swift \u2026 \u00b7 c65249b', Files line: '`src/items/finder/assets/set-favorites.swift` (+21/\u22122) \u2014 adds the `SFLItemURLFn` typealias and the `LSSharedFileListItemCopyResolvedURL` dlsym binding, parses `--list` from the arguments, and adds the `--list` branch that prints each favorite's resolved file-URL path and exits 0 before the clear-and-insert'. Verified against the fixture: `git show --stat c65249b` = 1 file, 21 insertions, 2 deletions, and the diff contains both phrases."
+        },
+        {
+          "text": "session-file.md's entry Notes state how the fix's claim was verified (a driver run, a byte comparison or swiftc), and transcript.md shows that verification command was actually run",
+          "passed": true,
+          "evidence": "Notes: 'Verified by the finder driver (`SET_FAVORITES_SWIFT === assets/set-favorites.swift \u2713`, `swiftc -typecheck` \u2713 on both copies), an independent `cmp` + sha256 of the file against the constant written out by `bun -e`, and `bun test src/items/finder/__tests__` (2 pass).' Transcript steps 6\u20137 list those commands; verify.txt (captured stdout) shows `bun src/items/finder/.claude/skills/run-src-items-finder/driver.ts` \u2192 '\u2026=== assets/set-favorites.swift \u2713 \u2026 OK exit=0', `cmp \u2026 && echo \"cmp: byte-identical\"` \u2192 'cmp: byte-identical exit=0', matching sha256 22ea5dcd\u20269a475 for both 83-line files, `xcrun swiftc -typecheck` \u2192 ok, `bun test` \u2192 2 pass. Grader re-ran the driver in the fixture: identical output, exit 0."
+        },
+        {
+          "text": "git-state.txt shows `bun run session check` printing session: complete and an empty git status --short",
+          "passed": true,
+          "evidence": "git-state.txt: '$ git status --short' followed by a blank line, then '$ bun run session check --session SES-006' \u2192 'session: complete (SES-006, open)' 'exit=0'. Grader re-ran both in the fixture: status empty, check prints 'session: complete (SES-006, open)', exit 0."
+        },
+        {
+          "text": "overview.diff shows docs/OVERVIEW.md Next-up 5 no longer lists the stale set-favorites.swift asset (removed or marked done, citing the fix commit)",
+          "passed": true,
+          "evidence": "overview.diff hunk @@ -139,10 +143,10 @@: the '-' lines carrying '`src/items/finder/assets/set-favorites.swift` is stale vs the embedded `SET_FAVORITES_SWIFT` constant \u2026 re-sync the file or generate one from the other' are replaced by a Next-up 5 that names only the `hooks-format.ts` finding plus '(The stale `set-favorites.swift` asset was re-synced in `c65249b`, SES-006; \u2026 generating one from the other remains open.)' \u2014 marked done, citing the fix sha. A Status bullet 'Unreleased on `main` (SES-006, `c65249b`)' was also added."
+        },
+        {
+          "text": "commit.diff shows src/items/finder/CLAUDE.md and src/items/finder/.claude/skills/run-src-items-finder/SKILL.md no longer say the asset is stale",
+          "passed": true,
+          "evidence": "commit.diff: CLAUDE.md '-' line '`assets/set-favorites.swift` is currently **stale** against the embedded \u2026' \u2192 '+' '`assets/set-favorites.swift` and the embedded `SET_FAVORITES_SWIFT` are the same text, kept in sync by hand (re-synced in `c65249b`, SES-006)\u2026'. SKILL.md: expected-output 'WARNING: assets/set-favorites.swift differs\u2026' \u2192 'SET_FAVORITES_SWIFT === assets/set-favorites.swift \u2713', and gotcha '**`assets/set-favorites.swift` is stale**' \u2192 '**\u2026 must stay identical** \u2014 the driver's `===` line is the guard'. Grader grep -i 'stale' over both files at HEAD in the fixture: zero matches. The new SKILL.md expected output matches the driver's actual output on re-run."
+        },
+        {
+          "text": "commit.diff does not touch docs/sessions/SES-005-rehydration.md, and transcript.md shows files were staged by name (no `git add -A` / `git add .`)",
+          "passed": true,
+          "evidence": "`git show HEAD --stat` in the fixture: exactly five files \u2014 docs/OVERVIEW.md, docs/sessions/README.md, docs/sessions/SES-006-record-eval.md, the finder SKILL.md, src/items/finder/CLAUDE.md; `git diff c65249b HEAD --stat -- docs/sessions/SES-005-rehydration.md docs/sessions/SES-004-docs-rehydration.md` is empty. Transcript step 20: 'git add docs/sessions/SES-006-record-eval.md docs/sessions/README.md docs/OVERVIEW.md src/items/finder/CLAUDE.md src/items/finder/.claude/skills/run-src-items-finder/SKILL.md' then 'git status --short \u2192 the five files staged (`M `), nothing else'. No `git add -A` or `git add .` anywhere in the transcript."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "start-brief",
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 206.8,
+        "tokens": 191675,
+        "tool_calls": 0,
+        "errors": 2
+      },
+      "expectations": [
+        {
+          "text": "brief.md is under 1,600 characters (wc -c) and states the released version v0.1.9",
+          "passed": true,
+          "evidence": "`wc -c outputs/brief.md` = 1324. First line: 'Released: v0.1.9 (2026-08-30, 2384b88)'."
+        },
+        {
+          "text": "brief.md names what is on main but unreleased and the parked branch wip/visual-grouping",
+          "passed": true,
+          "evidence": "Line 2: 'Unreleased on main: 75 commits (SES-004) \u2014 docs system, /session skill + tool, run skills, nested CLAUDE.md; code: doctor Drifted note, \"applied\" labels, install.sh fresh download \u2192 v0.1.10'. Line 3: 'Parked: wip/visual-grouping \u2014 10f1e24, +15/\u22123 in bootstrap.ts + config-screens.ts, unverified \u2026; only origin/\u2026, no local branch'. Verified in the fixture: `git rev-list --count v0.1.9..HEAD` = 75; `git log v0.1.9..HEAD` contains 2eb5648 (doctor labels Drifted/Applied) and 855bfd6 (install.sh fresh download); `git diff --stat v0.1.9..HEAD -- src install.sh` shows 81 files, dominated by run-skill drivers and nested CLAUDE.md."
+        },
+        {
+          "text": "brief.md contains a line starting with 'read in full:' that names docs/OVERVIEW.md, CONTEXT.md and the newest SES file, and transcript.md shows each of those was read to its last line (a second read with offset where the tool truncated)",
+          "passed": true,
+          "evidence": "Last line of brief.md: 'read in full: OVERVIEW, sessions README, SES-005, SES-004, SES-003, CONTEXT.md, PLAN-001, \u2026' \u2014 OVERVIEW is named by basename (unambiguous in this repo), CONTEXT.md explicitly, and the newest session file SES-005 (plus SES-004, the newest with content). transcript.md step 6: OVERVIEW 'lines 1\u2013162 of 162; reached the end' (fixture wc -l = 162); step 10: CONTEXT.md '1\u2013225 of 225' (wc -l = 225); step 7: SES-005 '1\u201312 of 12' (wc -l = 12); step 8: SES-004 read via two persisted tool-result files, each needing a second Read with `offset=358` / `offset=273` after the Read cap truncated \u2014 net 1\u2013931 of 931 (wc -l = 931). That is the offset-continuation the expectation asks for."
+        },
+        {
+          "text": "The brief's Session line states one of the three outcomes and the disk agrees: `none` \u2192 no new docs/sessions file and session-file.md says so; `opened` \u2192 exactly one new SES-NNN with `- Status: open` and its Goal filled; `joined` \u2192 an existing open session whose Goal is this work (SES-004's and SES-005's are not) \u2014 so `joined` here is a failure",
+          "passed": true,
+          "evidence": "brief.md: 'Session: none \u2014 nothing to record yet (before the first commit: `bun run session new visual-grouping --plan \"PLAN-001 \u00b7 Phase 1\"`)'. session-file.md: 'none \u2014 no session was created or joined. \u2026 per skill step 6 the outcome was \"none\". SES-005 \u2026 left untouched.' Fixture: `git status --short` empty, `git ls-files --others --exclude-standard` empty, docs/sessions/ holds only SES-001\u2026005 (all mtime 22:17, the fixture stamp); `bun run session list` still shows 'open: SES-005'. The prompt was a question that changes nothing, so `none` is the correct outcome on the rule's merits."
+        },
+        {
+          "text": "git-state.txt shows HEAD unchanged from the fixture tip and nothing modified under docs/sessions/ other than the new file and README.md (the regenerated index) \u2014 in particular SES-005-rehydration.md is untouched",
+          "passed": true,
+          "evidence": "git-state.txt: `git rev-parse --short HEAD` \u2192 2f898c5, `git status --short` \u2192 '(empty = clean)'. Fixture now: HEAD = 2f898c5; reflog shows only the fixture-prep amend at 22:18:00 (before the run's outputs at 22:26\u201322:27) and the clone before it \u2014 no commit during the run; transcript step 11 observed 2f898c5 mid-run. `git diff --stat -- docs/sessions/SES-005-rehydration.md` empty; the file still reads 'Outcome: _(fill in)_ / Open at end: _(fill in)_' with no Status line. No new file and README.md unchanged either."
+        },
+        {
+          "text": "brief.md reports the state of the tree and the sessions as findings (branch name; which sessions are open \u2014 SES-004 and SES-005 in this fixture \u2014 and that SES-005's placeholders belong to another conversation) rather than fixing anything, and proposes a concrete next item with a first step",
+          "passed": true,
+          "evidence": "brief.md 'Findings: main, tree clean; check + test green (0 issues; 124 tests, 0 fail); SES-005 open, Outcome/Open at end unfilled, no Status line \u2014 another conversation's, untouched'. In this fixture only SES-005 is open (`bun run session list`: SES-001\u2026004 closed, 'open: SES-005'), so reporting SES-005 alone is the correct finding; the expectation's 'SES-004 and SES-005' parenthetical describes an earlier fixture. Nothing was fixed (tree clean, SES-005 unchanged). Next item with first step: 'Next: PLAN-001 visual grouping \u2014 first step: `git checkout -b feat/visual-grouping origin/wip/visual-grouping`, review 10f1e24, then the PTY checkpoint (strong oracle); release v0.1.10' \u2014 origin/wip/visual-grouping exists, so the step is executable."
+        },
+        {
+          "text": "transcript.md shows no push, no PR, no commit",
+          "passed": true,
+          "evidence": "No `git push`, `gh pr`, or `git commit` appears in any transcript step; the closing section states 'no push, no PR, no session opened'. Fixture corroborates: reflog has no entry after the 22:18:00 fixture-prep amend, HEAD still 2f898c5, working tree clean, `git branch -a` shows no new local branch."
+        },
+        {
+          "text": "Every fact the brief states is true at the end of the run: the released sha matches `git rev-parse --short vX.Y.Z`, the parked branch exists where the brief says it does (local vs origin), and every file on the read-in-full line has a transcript step whose line range reaches the file's last line (`wc -l`)",
+          "passed": true,
+          "evidence": "`git rev-parse --short v0.1.9` = 2384b88, `git log -1 --date=short v0.1.9` = 2026-08-30 'chore(release): v0.1.9' \u2014 matches 'v0.1.9 (2026-08-30, 2384b88)'. `git branch -a`: local `main` only plus `remotes/origin/wip/visual-grouping` \u2014 matches 'only origin/\u2026, no local branch' (and correctly contradicts OVERVIEW's 'local branch' wording). `git show --stat 10f1e24`: bootstrap.ts +13/\u22122, config-screens.ts +5/\u22121, '15 insertions(+), 3 deletions(-)' \u2014 matches '+15/\u22123'. `git rev-list --count v0.1.9..HEAD` = 75. `bun run check` exit 0 (238 files, 0 md issues); `bun run test`: 111 pass + 13 pass, 0 fail = 124 \u2014 matches '124 tests, 0 fail'. Open items (connect phase, idle-CPU spin, `!` injection, set-favorites.swift, hooks-format.ts) all appear in OVERVIEW.md lines 110\u2013144. Read-in-full line vs fixture wc -l: OVERVIEW 162, sessions README 114, SES-005 12, SES-004 931, SES-003 102, CONTEXT.md 225, PLAN-001 52, PRD-001 205, plan README 81, ADR-003 41, ADR-005 59, ADR-006 46, ADR-014 39, ADR-020 81, decisions README 70, ANA-001 206, ANA-008 55, analysis README 69, docs/CLAUDE.md 10, docs/plan/CLAUDE.md 5, docs/decisions/CLAUDE.md 5, docs/analysis/CLAUDE.md 4, docs/sessions/CLAUDE.md 10 \u2014 every one equals the upper bound of the range the transcript table records for it."
+        }
+      ],
+      "notes": [
+        "SES-004 (931 lines) exceeded the Bash output cap twice; the harness persisted the output to tool-result files, which the run then paged through with Read + offset to reach the end."
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.9375,
+        "stddev": 0.125,
+        "min": 0.75,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 182.15,
+        "stddev": 62.876,
+        "min": 109.7,
+        "max": 255.3
+      },
+      "tokens": {
+        "mean": 115691.5,
+        "stddev": 46853.6336,
+        "min": 82877,
+        "max": 184213
+      }
+    },
+    "old_skill": {
+      "pass_rate": {
+        "mean": 0.8275,
+        "stddev": 0.2042,
+        "min": 0.6,
+        "max": 1
+      },
+      "time_seconds": {
+        "mean": 166.375,
+        "stddev": 43.2762,
+        "min": 125.4,
+        "max": 206.8
+      },
+      "tokens": {
+        "mean": 114641.75,
+        "stddev": 51865.2488,
+        "min": 81466,
+        "max": 191675
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.11",
+      "time_seconds": "+15.8",
+      "tokens": "+1050"
+    }
+  },
+  "notes": []
+}

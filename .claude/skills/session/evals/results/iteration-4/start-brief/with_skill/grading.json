@@ -1,0 +1,169 @@
+{
+  "expectations": [
+    {
+      "text": "brief.md is under 1,600 characters (wc -c) and states the released version v0.1.9",
+      "passed": true,
+      "evidence": "wc -c brief.md = 1268 bytes (wc -m = 1255 chars). First line: 'Released: v0.1.9 (2026-08-30, 2384b88)'."
+    },
+    {
+      "text": "brief.md names what is on main but unreleased and the parked branch wip/visual-grouping",
+      "passed": true,
+      "evidence": "Line 2: 'Unreleased on main: 75 commits — the docs system (OVERVIEW, sessions, ADR-001…020, PRD/PLAN, ANA, CONTEXT.md, run skills), /session skill + tool (ADR-020), doctor/label wording, install.sh fresh download; ships as v0.1.10'. Line 3: 'Parked: wip/visual-grouping — PLAN-001 boxed headers + step tracker, unverified (never run under a PTY); here only as origin/…, no local branch'. Both match docs/OVERVIEW.md lines 112-132 and `git branch -a` (only remotes/origin/wip/visual-grouping)."
+    },
+    {
+      "text": "brief.md contains a line starting with 'read in full:' that names docs/OVERVIEW.md, CONTEXT.md and the newest SES file, and transcript.md shows each of those was read to its last line (a second read with offset where the tool truncated)",
+      "passed": true,
+      "evidence": "Last line of brief.md: 'read in full: OVERVIEW, sessions/README, SES-005, SES-004, SES-003, CONTEXT.md, PLAN-001, PRD-001, plan/CLAUDE.md, decisions/CLAUDE.md, ADR-003/005/006/014/020' (short names, unambiguous in this repo). Transcript step 6: OVERVIEW lines 1–162, fixture wc -l 162. Step 7: SES-005 lines 1–12, wc -l 12. Step 13: CONTEXT.md lines 1–226 via Read (226 = trailing blank), wc -l 225. Step 8 records a truncated cat of SES-004 explicitly 'not counted as a read', followed by steps 9–12 with offsets 0/240/480/720 reaching line 932 against wc -l 931. Caveat: transcript.md is written by the executor itself (step 22), so the line ranges are self-reported; the fixture wc -l values corroborate them but cannot prove the reads happened."
+    },
+    {
+      "text": "The brief's Session line states one of the three outcomes and the disk agrees: `none` → no new docs/sessions file and session-file.md says so; `opened` → exactly one new SES-NNN with `- Status: open` and its Goal filled; `joined` → an existing open session whose Goal is this work (SES-004's and SES-005's are not) — so `joined` here is a failure",
+      "passed": false,
+      "evidence": "Brief: 'Session: SES-005 joined — rehydrate the docs end to end, verify the repo is green'. SES-005 is open (session list: 'open: SES-005') and the disk agrees nothing was created or edited. Judged on the merits: SES-005's Goal ('Rehydrate a fresh session exactly as CLAUDE.md prescribes … and confirm the repo's state matches what the docs claim before taking any work') describes the same activity the run performed, so the match is real at the surface. It still fails the rule for three reasons. (1) The user's message is a question ('Where are we, and what should I do first?'), and the run itself records 'Nothing was written to the fixture repo' — SKILL.md step 6 defines `none` as exactly that case ('the user asked a question … nothing will change: say so') and line 14-15 says 'a conversation that changes nothing needs none'. (2) `join` is defined as 'a second conversation on the same plan part' — a stream this conversation will write entries into; the run's own Next line opens a different session for PLAN-001, so it joined a stream it will never record into. (3) SES-005 is another conversation's stream: SES-004's 'Open at end' (line 7, read by the run in step 12) says 'SES-005 belongs to another conversation and stays as it is', and the skill gotcha at SKILL.md line 37 warns against treating the newest open session as yours — the run attached itself to precisely that session. Joining is the wrong outcome; `none` was correct."
+    },
+    {
+      "text": "git-state.txt shows HEAD unchanged from the fixture tip and nothing modified under docs/sessions/ other than the new file and README.md (the regenerated index) — in particular SES-005-rehydration.md is untouched",
+      "passed": true,
+      "evidence": "git-state.txt: HEAD 2a815ac, `git status --short` empty. Fixture verification: `git rev-parse --short HEAD` = 2a815ac, `git reflog` has a single entry (the clone), `git status --short` and `git ls-files --others --exclude-standard` empty, `git diff --stat` empty, and docs/sessions/SES-005-rehydration.md is byte-identical to outputs/session-file.md (diff produced no output). No new file, no README change — consistent with a `joined`/`none` outcome."
+    },
+    {
+      "text": "brief.md reports the state of the tree and the sessions as findings (branch name; which sessions are open — SES-004 and SES-005 in this fixture — and that SES-005's placeholders belong to another conversation) rather than fixing anything, and proposes a concrete next item with a first step",
+      "passed": false,
+      "evidence": "Present: 'Findings: main, tree clean, HEAD 2a815ac; one open session SES-005 (no Status/Plan lines); check + test green (111 + 13 pass); PRD-001 links ARC-001 under sessions/ …' and 'Next: PLAN-001 — first step: git fetch; git checkout -b feat/visual-grouping origin/wip/visual-grouping; bun run session new visual-grouping --plan \"PLAN-001 · Phase 1\"; Task 1, then the PTY checkpoint'. Nothing was fixed. The parenthetical 'SES-004 and SES-005' is stale for this fixture (SES-004 is closed by 0459c1a; `bun run session list` shows only SES-005 open, which the brief states correctly). Missing: the brief nowhere says that SES-005's placeholders (Outcome / Open at end '_(fill in)_') belong to another conversation — the fixture states this explicitly in SES-004 line 7 and line 515 ('NOT mine — created by a concurrent conversation'), and the brief instead claims SES-005 as its own ('SES-005 joined'). The observation it offers instead, '(no Status/Plan lines)', is true but is not the ownership finding the expectation asks for. One required conjunct absent, so fail."
+    },
+    {
+      "text": "transcript.md shows no push, no PR, no commit",
+      "passed": true,
+      "evidence": "No `git commit`, `git push`, or `gh pr` appears in the 25 transcript steps; the only git commands are branch/status/log/tag/rev-parse/rev-list/branch -a. Fixture confirms: reflog contains only the clone entry, HEAD = 2a815ac = origin/main tip, working tree clean."
+    },
+    {
+      "text": "Every fact the brief states is true at the end of the run: the released sha matches `git rev-parse --short vX.Y.Z`, the parked branch exists where the brief says it does (local vs origin), and every file on the read-in-full line has a transcript step whose line range reaches the file's last line (`wc -l`)",
+      "passed": true,
+      "evidence": "Checked in the fixture: `git rev-parse --short v0.1.9` = 2384b88 (brief: 2384b88); tag commit date 2026-08-30 (brief: 2026-08-30); `git rev-list --count v0.1.9..HEAD` = 75 (brief: 75); `git branch -a` shows only `remotes/origin/wip/visual-grouping`, no local branch (brief: 'here only as origin/…, no local branch' — correctly overriding OVERVIEW line 132 which says 'local branch'); HEAD 2a815ac, branch main, tree clean; `bun run session list` → only SES-005 open; SES-005 has no `- Status:`/`- Plan:` line (grep exit 1); re-ran `bun run test` → 111 tests / 31 files and 13 pass / 0 fail, `bun run check` exit 0; PRD-001 line 4 links `../sessions/ARC-001-living-plan.md` while the file is in docs/archive/, line 148 lists `scripts/` and no scripts/ dir exists; 'ships as v0.1.10' is OVERVIEW line 118. Read-in-full ranges vs wc -l: OVERVIEW 162/162, sessions/README 114/114, SES-005 12/12, SES-004 932(incl. trailing blank)/931, SES-003 102/102, CONTEXT.md 226(incl. trailing blank)/225, PLAN-001 52/52, PRD-001 205/205, plan/CLAUDE.md 5/5, decisions/CLAUDE.md 5/5, ADR-003 41/41, ADR-005 59/59, ADR-006 46/46, ADR-014 39/39, ADR-020 81/81 — every range reaches the last line."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 2,
+    "total": 8,
+    "pass_rate": 0.75
+  },
+  "execution_metrics": {
+    "note": "No metrics.json in outputs_dir; counts derived from transcript.md steps",
+    "tool_calls": {
+      "Bash": 17,
+      "Read": 6,
+      "Write": 2
+    },
+    "total_tool_calls": 25,
+    "total_steps": 25,
+    "errors_encountered": 1,
+    "errors_note": "Step 8: a 63.5 KB cat of SES-004 was truncated to a 2 KB preview; the run recognised it and re-read with the Read tool in four offset chunks",
+    "output_chars": 11384,
+    "transcript_chars": 7359
+  },
+  "timing": {
+    "executor_duration_seconds": 255.3,
+    "grader_duration_seconds": null,
+    "total_duration_seconds": 255.3,
+    "executor_total_tokens": 184213
+  },
+  "claims": [
+    {
+      "claim": "Released v0.1.9 is sha 2384b88, dated 2026-08-30",
+      "type": "factual",
+      "verified": true,
+      "evidence": "git rev-parse --short v0.1.9 = 2384b88; git log -1 --date=short v0.1.9 = 2026-08-30"
+    },
+    {
+      "claim": "75 commits on main since v0.1.9",
+      "type": "factual",
+      "verified": true,
+      "evidence": "git rev-list --count v0.1.9..HEAD = 75"
+    },
+    {
+      "claim": "wip/visual-grouping exists only as origin/wip/visual-grouping, no local branch",
+      "type": "factual",
+      "verified": true,
+      "evidence": "git branch -a: local `main` only; remotes/origin/wip/visual-grouping present. OVERVIEW line 132 says 'local branch' — the brief's finding is the more accurate one for this checkout."
+    },
+    {
+      "claim": "Exactly one open session, SES-005",
+      "type": "factual",
+      "verified": true,
+      "evidence": "bun run session list → 'open: SES-005'; SES-004 closed by commit 0459c1a"
+    },
+    {
+      "claim": "check + test green (111 + 13 pass)",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Re-ran in fixture: 'Ran 111 tests across 31 files', '13 pass 0 fail'; bun run check exit 0"
+    },
+    {
+      "claim": "PRD-001 links ARC-001 under sessions/ (it is in archive/) and lists retired scripts/",
+      "type": "factual",
+      "verified": true,
+      "evidence": "PRD-001 line 4: '../sessions/ARC-001-living-plan.md'; docs/archive/ARC-001-living-plan.md exists; PRD-001 line 148 lists `scripts/`; `ls scripts` → No such file or directory; 66b083d moved the tool into the skill"
+    },
+    {
+      "claim": "SES-005's Goal is this work (join outcome)",
+      "type": "quality",
+      "verified": false,
+      "evidence": "SES-004 line 7 and line 515 (both read by the run) state SES-005 belongs to another conversation; SKILL.md gotcha line 37 says your session is never 'the newest'; the user asked a question and the run changed nothing, which SKILL.md step 6 maps to `none`"
+    },
+    {
+      "claim": "Every file on the read-in-full line was read to its last line",
+      "type": "process",
+      "verified": true,
+      "evidence": "Transcript ranges match fixture wc -l for all 15 files (see expectation 8). Self-reported: transcript.md is executor-authored."
+    },
+    {
+      "claim": "Nothing was written to the fixture repo; HEAD stays 2a815ac",
+      "type": "process",
+      "verified": true,
+      "evidence": "reflog has only the clone entry; status, untracked and diff all empty"
+    },
+    {
+      "claim": "Final brief is 1255 characters (wc -m), under the skill's ~1,200 cap",
+      "type": "factual",
+      "verified": true,
+      "evidence": "wc -m = 1255, wc -c = 1268. Note 1255 is still above the skill's ~1,200 guideline, though within the eval's 1,600 bound; the transcript states the number honestly."
+    },
+    {
+      "claim": "The `!` injection lines were literal, so the three commands were run by hand per the first gotcha",
+      "type": "process",
+      "verified": true,
+      "evidence": "Transcript step 3-4: git branch --show-current, git status --short, bun run session list run explicitly; outputs match the fixture"
+    }
+  ],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": [
+      "No user_notes.md was written. Transcript step 8 notes the truncated cat of SES-004 and the re-read via the Read tool in offset chunks.",
+      "Transcript step 24: the brief exceeded the skill's ~1,200-char cap at 1,512 bytes and was rewritten three times; final 1,255 characters (still over the skill cap, within the eval's 1,600)."
+    ]
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "expectation": "The brief's Session line states one of the three outcomes and the disk agrees: …",
+        "reason": "The parenthetical 'SES-004's and SES-005's are not' is written for an earlier fixture (SES-004 is closed here) and, more importantly, a session titled 'rehydration' makes the Goal-match test a coin-flip for a start-brief eval: the run matched it at the surface. State the discriminating rule directly — a question with no change is `none`; `join` only when the conversation will record entries into that stream; a session another conversation owns (SES-004's Open at end names SES-005 as such) is never yours — so the verdict does not depend on the grader re-deriving it."
+      },
+      {
+        "expectation": "brief.md reports the state of the tree and the sessions as findings …",
+        "reason": "'SES-004 and SES-005 in this fixture' is stale — only SES-005 is open in fixtures-5. Rewrite as 'names every session `bun run session list` reports open, and says SES-005's placeholders belong to another conversation' so the text tracks the fixture rather than a specific pair of ids."
+      },
+      {
+        "expectation": "brief.md contains a line starting with 'read in full:' … transcript.md shows each of those was read to its last line",
+        "reason": "transcript.md is written by the executor (step 22 in this run), so 'transcript shows' is self-report. It passed here because the fixture wc -l corroborates every range, but a run that fabricated ranges from wc -l alone would pass identically. If the harness can capture the raw tool log, grade against that; otherwise require the transcript to quote the last line's content for each file (not just its number)."
+      },
+      {
+        "reason": "No expectation checks that the brief's Next respects SES-004's Open at end (open PLAN-001 under its own session with `--plan \"PLAN-001 · Phase 1\"`, start from wip/visual-grouping, verify under a PTY). This run got it right; a run that proposed committing PLAN-001 work into SES-005 would pass every current expectation."
+      },
+      {
+        "reason": "The skill's ~1,200-character cap is not checked (eval bound is 1,600). The run's brief is 1,255 chars after three rewrites and still over the skill's own guideline. Either align the eval bound with the skill or drop the tighter number from the skill."
+      }
+    ],
+    "overall": "The fact-checking expectation (8) is the strongest addition this iteration — every sha, count, branch and line range checked out against the fixture. The two failures are the same defect seen from two sides: the run treated another conversation's open session as its own, despite reading the line that says otherwise. Expectations 4 and 6 carry fixture-specific ids that no longer match fixtures-5; rewrite them as rules."
+  }
+}

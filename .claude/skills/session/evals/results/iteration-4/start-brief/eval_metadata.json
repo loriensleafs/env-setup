@@ -1,0 +1,15 @@
+{
+  "eval_id": 1,
+  "eval_name": "start-brief",
+  "prompt": "I'm picking envsetup back up. Where are we, and what should I do first?",
+  "expectations": [
+    "brief.md is under 1,600 characters (wc -c) and states the released version v0.1.9",
+    "brief.md names what is on main but unreleased and the parked branch wip/visual-grouping",
+    "brief.md contains a line starting with 'read in full:' that names docs/OVERVIEW.md, CONTEXT.md and the newest SES file, and transcript.md shows each of those was read to its last line (a second read with offset where the tool truncated)",
+    "The brief's Session line states one of the three outcomes and the disk agrees: `none` → no new docs/sessions file and session-file.md says so; `opened` → exactly one new SES-NNN with `- Status: open` and its Goal filled; `joined` → an existing open session whose Goal is this work (SES-004's and SES-005's are not) — so `joined` here is a failure",
+    "git-state.txt shows HEAD unchanged from the fixture tip and nothing modified under docs/sessions/ other than the new file and README.md (the regenerated index) — in particular SES-005-rehydration.md is untouched",
+    "brief.md reports the state of the tree and the sessions as findings (branch name; which sessions are open — SES-004 and SES-005 in this fixture — and that SES-005's placeholders belong to another conversation) rather than fixing anything, and proposes a concrete next item with a first step",
+    "transcript.md shows no push, no PR, no commit",
+    "Every fact the brief states is true at the end of the run: the released sha matches `git rev-parse --short vX.Y.Z`, the parked branch exists where the brief says it does (local vs origin), and every file on the read-in-full line has a transcript step whose line range reaches the file's last line (`wc -l`)"
+  ]
+}

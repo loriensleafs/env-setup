@@ -84,8 +84,11 @@ Start progress:
    `grep -rn <file-or-keyword> docs/sessions/`. A directory's own `CLAUDE.md` loads when you read
    files there.
 6. The session, one of three outcomes:
-   - **join** — an open session's Goal *is* this work (a second conversation on the same plan
-     part): use `--session SES-NNN` from here on and say so in the brief;
+   - **join** — this conversation will record entries into an open session whose Goal is the
+     work it is about to do (a second conversation on the same plan part): use
+     `--session SES-NNN` from here on and say so in the brief. A session another conversation
+     owns — its placeholders unfilled, its Outcome not yours to write — is never joined, whatever
+     its title says; and a question that changes nothing is `none`, not a join;
    - **open** — the work is new: `bun run session new <slug> [--plan "PLAN-NNN · <part>"]`
      (slug = the work ahead, kebab-case), then set the title and `Goal` in the file it names;
    - **none** — the user asked a question, a review, a check, and nothing will change: say so;
