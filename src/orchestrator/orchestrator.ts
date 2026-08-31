@@ -9,6 +9,7 @@ export type StepOutcome =
   | { kind: "skipped-installed"; version?: string }
   | { kind: "skipped-completed" } // done in a previous (resumed) run
   | { kind: "skipped-dependency"; because: string }
+  | { kind: "deferred" } // attended step (ceremony) — nothing to run here
   | { kind: "failed"; error: string };
 
 export interface OrchestratorEvents {
@@ -23,6 +24,8 @@ export interface RunReport {
   skippedInstalled: string[];
   skippedCompleted: string[];
   skippedDependents: { id: string; because: string }[];
+  /** Items whose only work is an attended ceremony (run `envsetup connect`). */
+  deferred: string[];
   failed: { id: string; error: string }[];
   /** Set when a required item failed and the run stopped. */
   aborted?: { id: string; error: string };
@@ -82,6 +85,7 @@ export async function orchestrate(opts: OrchestratorOptions): Promise<RunReport>
     skippedInstalled: [],
     skippedCompleted: [],
     skippedDependents: [],
+    deferred: [],
     failed: [],
     finished: false,
   };
@@ -131,6 +135,15 @@ export async function orchestrate(opts: OrchestratorOptions): Promise<RunReport>
       await journal(id, "skipped", 1, "already installed");
       report.skippedInstalled.push(id);
       events.onStepEnd?.(id, { kind: "skipped-installed", version: detected.version });
+      continue;
+    }
+
+    // Nothing to run here: the item's work is an attended ceremony. Saying
+    // "installed" for it was misleading (chrome-pwas on Peter's first sync).
+    if (!item.install && !item.configure) {
+      await journal(id, "skipped", 1, "deferred to ceremony");
+      report.deferred.push(id);
+      events.onStepEnd?.(id, { kind: "deferred" });
       continue;
     }
 
