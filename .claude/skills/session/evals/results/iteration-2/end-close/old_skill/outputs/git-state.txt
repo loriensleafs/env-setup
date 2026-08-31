@@ -1,0 +1,32 @@
+$ git status --short
+
+$ git branch --show-current
+feat/session-skill
+
+$ git log --oneline -5
+69fd3e9 docs(session): close SES-006 — Outcome, Open at end, Narrative; Status names feat/session-skill as in flight
+1668ae9 docs(session): fixture — iteration-1 skill (baseline arm)
+a573e5c docs(session): start closing-eval session
+c424315 docs(session): entries for the /session skill, ANA-009/ADR-019 and iteration 2 (recorded via --session SES-004)
+8ba5c97 feat(skills): /session iteration 2 — injected state, named mode argument, checklists and templates; session tool gains --session and warns on other sessions' placeholders
+
+$ git show --stat HEAD
+commit 69fd3e997d73d698b893cd406ae1faec516a5fad
+Author: eval <eval@envsetup.test>
+Date:   Sun Aug 30 19:53:53 2026 -0700
+
+    docs(session): close SES-006 — Outcome, Open at end, Narrative; Status names feat/session-skill as in flight
+    
+    Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013D8PQm8Tzi3mYuJc2n2D5C
+
+ docs/OVERVIEW.md                      |  1 +
+ docs/sessions/README.md               |  2 +-
+ docs/sessions/SES-006-closing-eval.md | 14 +++++++++++---
+ 3 files changed, 13 insertions(+), 4 deletions(-)
+
+$ bun run session -- --check
+$ bun scripts/session.ts --check
+warning: SES-005-rehydration.md has 2 placeholder line(s) — not the gated session; leave it to its own conversation (pass --session to gate a different file)
+session: complete
+exit=0

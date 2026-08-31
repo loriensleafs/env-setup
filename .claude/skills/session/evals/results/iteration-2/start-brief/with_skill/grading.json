@@ -1,0 +1,130 @@
+{
+  "expectations": [
+    {
+      "text": "brief.md is under 1,600 characters (wc -c) and states the released version v0.1.9",
+      "passed": false,
+      "evidence": "brief.md opens with 'Released: v0.1.9 (2026-08-30, 2384b88)' (sha verified: git rev-parse --short v0.1.9 = 2384b88), but `wc -c brief.md` = 2167. The template block alone (before the appended 'One question before anything moves' paragraph) is 1621 chars, so even the brief proper exceeds the limit; the skill's own target is '~1,500'."
+    },
+    {
+      "text": "brief.md names what is on main but unreleased and the parked branch wip/visual-grouping",
+      "passed": true,
+      "evidence": "brief.md line 2: 'Unreleased on main: SES-004 — the docs system (OVERVIEW, sessions, ADR-001…018, PRD/PLAN, ANAs, CONTEXT.md, nested CLAUDE.md, 28 run skills) + code: doctor reports Drifted … Ships with v0.1.10.' Line 3: 'Parked: wip/visual-grouping — PLAN-001 patch (10f1e24), unverified, never run under a PTY; here only as origin/wip/visual-grouping.' Both match fixture docs/OVERVIEW.md lines 112–125 and `git log -1 origin/wip/visual-grouping` = 10f1e24."
+    },
+    {
+      "text": "brief.md contains a line starting with 'read in full:' that names docs/OVERVIEW.md, CONTEXT.md and the newest SES file, and transcript.md shows each of those was read to its last line (a second read with offset where the tool truncated)",
+      "passed": true,
+      "evidence": "brief.md has 'read in full: CLAUDE.md, .claude/skills/session/SKILL.md, docs/OVERVIEW.md, docs/sessions/{README,CLAUDE,SES-005,SES-004}.md, CONTEXT.md, …' (SES-005 named in brace shorthand). Transcript step 4: OVERVIEW.md 'lines 1–149, EOF' (fixture wc -l = 149); step 8: CONTEXT.md 'lines 1–196, EOF' (196); step 6: SES-005 'lines 1–12, EOF' (12). The only truncation was SES-004 (85.6KB cat overflow, step 7) and it was re-read via Read with offsets 0/200/400 to line 580 EOF (fixture wc -l = 580)."
+    },
+    {
+      "text": "session-file.md exists: exactly one new docs/sessions/SES-NNN file was created and its Goal line is filled",
+      "passed": true,
+      "evidence": "outputs/session-file.md exists (1131 bytes) and is byte-identical to fixture docs/sessions/SES-006-pickup-visual-grouping.md (diff → IDENTICAL). `git ls-files --others --exclude-standard` lists exactly one file: docs/sessions/SES-006-pickup-visual-grouping.md. Its Goal line reads '- Goal: Rehydrate via `/session start` (OVERVIEW → SES-005/SES-004 → CONTEXT.md → …), brief Peter on where the project stands, and start Next-up 1 — PLAN-001 visual grouping …'. Outcome / Open at end remain _(fill in)_, which is correct at start."
+    },
+    {
+      "text": "git-state.txt shows HEAD unchanged from the fixture tip and nothing modified under docs/sessions/ other than the new file and README.md (the regenerated index) — in particular SES-005-rehydration.md is untouched",
+      "passed": true,
+      "evidence": "git-state.txt: HEAD c424315; `git status --short` = ' M docs/sessions/README.md' + '?? docs/sessions/SES-006-pickup-visual-grouping.md'. Verified in the fixture: HEAD c424315, reflog has only the 'clone' entry, `git diff --stat` = README.md 1 insertion (the SES-006 index line), `git diff docs/sessions/SES-005-rehydration.md` is empty and SES-005 still has its 2 _(fill in)_ placeholders at lines 4–5."
+    },
+    {
+      "text": "brief.md reports the state of the tree and the gate as findings (branch name; `bun run session -- --check` result) rather than fixing anything, and proposes a concrete next item with a first step",
+      "passed": true,
+      "evidence": "brief.md 'Findings: branch feat/session-skill, not main; tree clean (before SES-006); gate NOT ready only because SES-005 (another conversation's, 2 placeholders) — left alone.' SES-005 verified untouched. 'Next: PLAN-001 visual grouping — first step: land feat/session-skill on main (PR + merge commit, your call), then `git checkout -b feat/visual-grouping origin/wip/visual-grouping`, `bun run check` + `bun test`, review the WIP commit (Task 1), PTY checkpoint with a strong oracle.' The PR is proposed as a question, not executed."
+    },
+    {
+      "text": "transcript.md shows no push, no PR, no commit",
+      "passed": true,
+      "evidence": "No git commit/push or gh pr command appears in any transcript step; 'Not read (deliberately)' section states 'No commit, push, PR'. Fixture confirms: reflog contains only the clone entry, origin/feat/session-skill == HEAD (c424315), and the only tree changes are the untracked SES-006 and the modified README.md index."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 1,
+    "total": 7,
+    "pass_rate": 0.857
+  },
+  "execution_metrics": {
+    "note": "no metrics.json in outputs_dir",
+    "output_chars": 13306,
+    "transcript_chars": 8240
+  },
+  "timing": {
+    "total_tokens": 129909,
+    "duration_ms": 186562,
+    "total_duration_seconds": 186.6
+  },
+  "claims": [
+    {
+      "claim": "feat/session-skill is 4 commits past origin/main (ea51e09…c424315)",
+      "type": "factual",
+      "verified": true,
+      "evidence": "`git log --oneline origin/main..HEAD` in the fixture lists exactly c424315, 8ba5c97, 4d3ad13, ea51e09."
+    },
+    {
+      "claim": "Released v0.1.9 on 2026-08-30 at 2384b88",
+      "type": "factual",
+      "verified": true,
+      "evidence": "`git log -1 v0.1.9 --date=short` → '2384b88 2026-08-30 chore(release): v0.1.9'; v0.1.9 is the last tag."
+    },
+    {
+      "claim": "wip/visual-grouping exists only as origin/wip/visual-grouping (10f1e24), not as the local branch OVERVIEW describes",
+      "type": "factual",
+      "verified": true,
+      "evidence": "`git branch --list 'wip/*'` is empty; `git log -1 origin/wip/visual-grouping` = 10f1e24. OVERVIEW.md line 120 says 'local branch `wip/visual-grouping`' — the brief correctly surfaces the discrepancy."
+    },
+    {
+      "claim": "The bare gate was NOT ready only because of SES-005's 2 placeholders (tree clean before SES-006 was created)",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Transcript step 3 shows `git status --short` empty and the gate output naming only SES-005-rehydration.md; SES-005 still has 2 _(fill in)_ lines in the fixture."
+    },
+    {
+      "claim": "The v0.1.9 release marker is the last line of SES-003, so only SES-004 needed reading back to the marker",
+      "type": "factual",
+      "verified": true,
+      "evidence": "grep 'Released v' docs/sessions/SES-003*.md → line 101 '> **Released v0.1.9** — tag on this commit.'; SES-003 is 101 lines."
+    },
+    {
+      "claim": "SES-004 was truncated by cat and re-read to EOF with three offset Read calls; nothing from the preview was relied on",
+      "type": "process",
+      "verified": false,
+      "evidence": "Transcript steps 7–8 describe this and the claimed ranges (1–200, 200–399, 400–580) cover the fixture's 580 lines, but the transcript is authored by the executor, not captured by a harness, so the tool calls themselves cannot be independently confirmed."
+    },
+    {
+      "claim": "The brief was posted 'in the template, every line present, under ~1,500 characters'",
+      "type": "quality",
+      "verified": false,
+      "evidence": "All eight template labels are present, but brief.md is 2167 chars (template block alone 1621), exceeding both the skill's ~1,500 target and the eval's 1,600 limit."
+    },
+    {
+      "claim": "No file other than SES-006 (created) and docs/sessions/README.md (index regenerated by the tool) was changed",
+      "type": "process",
+      "verified": true,
+      "evidence": "`git status --short` and `git diff --stat` in the fixture show only those two paths; README diff is a single inserted SES-006 index line."
+    }
+  ],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": [],
+    "note": "no user_notes.md in outputs_dir; transcript step 7 records one workaround — the cat of SES-004 overflowed to a tool-results file and was re-read with the Read tool in offsets"
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "expectation": "brief.md is under 1,600 characters (wc -c) and states the released version v0.1.9",
+        "reason": "The skill's 'Done when' asks the executor to both post the ~1,500-char brief and answer the user's question; this run appended a 546-char follow-up question after the template block and failed on total size. Decide whether brief.md should contain only the template block (and say so in the eval prompt/output spec) or whether the answer counts toward the limit — otherwise the expectation partly measures output-file packaging rather than brief discipline. Note the template block alone was still 1621, so the failure is real either way."
+      },
+      {
+        "expectation": "brief.md contains a line starting with 'read in full:' that names docs/OVERVIEW.md, CONTEXT.md and the newest SES file, and transcript.md shows each of those was read to its last line",
+        "reason": "'the newest SES file' is ambiguous once the run has created SES-006; specify 'the newest pre-existing SES file (SES-005 in this fixture)'. Also, transcript.md is written by the executor, so 'transcript shows it was read to its last line' is self-reported; a grader can only cross-check claimed line ranges against wc -l. A harness-captured tool log would make this expectation genuinely discriminating."
+      },
+      {
+        "reason": "No expectation checks that every template line label is present (Released / Unreleased on main / Parked / Findings / Open-unverified / Next / Session file / read in full). The skill says 'every line present'; a brief that dropped 'Open / unverified' or 'Parked' would still pass expectations 2 and 6 as long as the named facts appeared somewhere."
+      },
+      {
+        "reason": "No expectation checks that the brief surfaces the unexpected checkout branch as a finding in its own right (the fixture sits on feat/session-skill, 4 commits ahead of origin/main and absent from OVERVIEW Status). This run did report it and proposed dealing with it before PLAN-001 — a good outcome the evals do not reward, and a baseline that started PLAN-001 straight from the stale branch would not be penalised."
+      }
+    ],
+    "overall": "Expectations are mostly discriminating and verifiable against the fixture (git state, placeholder untouched, session file content). The size limit needs a decision about whether the answer to the user's question is part of brief.md, and the read-to-EOF check leans on an executor-authored transcript."
+  }
+}

@@ -1,0 +1,14 @@
+$ git status --short
+
+$ git log --oneline -5
+c48eacd docs(session): record 0db569f (set-favorites.swift re-sync); retire the stale-asset notes in OVERVIEW, finder CLAUDE.md and the finder run-skill
+17c2656 docs(session): fixture — iteration-1 skill (baseline arm)
+f8fb212 docs(session): start record-eval session
+0db569f fix(finder): re-sync set-favorites.swift with the embedded SET_FAVORITES_SWIFT constant
+c424315 docs(session): entries for the /session skill, ANA-009/ADR-019 and iteration 2 (recorded via --session SES-004)
+
+$ bun run session -- --check
+$ bun scripts/session.ts --check
+warning: SES-005-rehydration.md has 2 placeholder line(s) — not the gated session; leave it to its own conversation (pass --session to gate a different file)
+session: complete
+exit=0

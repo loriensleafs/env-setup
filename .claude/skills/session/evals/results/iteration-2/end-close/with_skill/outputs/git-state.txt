@@ -1,0 +1,32 @@
+$ git status --short
+
+$ git branch --show-current
+feat/session-skill
+
+$ git log --oneline -5
+80694ee docs(session): close SES-006 — nothing stale; Status names feat/session-skill as in flight
+450ad65 docs(session): start closing-eval session
+c424315 docs(session): entries for the /session skill, ANA-009/ADR-019 and iteration 2 (recorded via --session SES-004)
+8ba5c97 feat(skills): /session iteration 2 — injected state, named mode argument, checklists and templates; session tool gains --session and warns on other sessions' placeholders
+4d3ad13 docs(analysis): ANA-009 — Anthropic's skill workflow best practices (arguments, conditional pattern, invocation, authoring); ADR-019 for /session; iteration-1 eval evidence
+
+$ git show --stat HEAD
+commit 80694eea765406163ab492053e9c767da5f1c0b3
+Author: eval <eval@envsetup.test>
+Date:   Sun Aug 30 19:53:54 2026 -0700
+
+    docs(session): close SES-006 — nothing stale; Status names feat/session-skill as in flight
+    
+    Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013D8PQm8Tzi3mYuJc2n2D5C
+
+ docs/OVERVIEW.md                      |  8 ++++++++
+ docs/sessions/README.md               |  2 +-
+ docs/sessions/SES-006-closing-eval.md | 18 +++++++++++++++---
+ 3 files changed, 24 insertions(+), 4 deletions(-)
+
+$ bun run session -- --check --session SES-006
+$ bun scripts/session.ts --check --session "SES-006"
+warning: SES-005-rehydration.md has 2 placeholder line(s) — not the gated session; leave it to its own conversation (pass --session to gate a different file)
+session: complete
+exit=0
