@@ -201,3 +201,12 @@ ever ran them. With the documented shape both paths render (transcripts of a typ
 - Files:
   - `.claude/skills/session/SKILL.md` (+7/−5) — first gotcha reworded; no marker text left in the body outside the three real injection lines
 - Notes: Verified: `grep -c` finds exactly the three injection lines; validator valid; the failure itself is the first evidence that the typed path renders injections (SES-006's earlier probes only covered the Skill-tool path). Not yet verified: a typed `/session start` completing in a fresh conversation after this fix — Peter's next `/session` is the check.
+
+### 2026-08-30 · fix(session skill): injection markers in the documented shape — they now render on every path · a6fddea
+
+- Summary: The three injection lines take the documented shape (marker after the label's space, no code span); they now render on the typed path and the Skill-tool path alike. The gotcha states that and keeps the fallback; the Sessions line uses `bun run --silent`.
+- Why: Peter's new conversation showed "the injected state markers didn't render"; the transcript confirmed literal markers on the typed path too, which pointed at the marker shape, not the path.
+- Files:
+  - `.claude/skills/session/SKILL.md` (+10/−10) — three injection lines rewritten; gotcha corrected; --silent on the Sessions line
+  - `docs/sessions/SES-006-session-followups.md` (+6/−0) — dated correction paragraph in the Narrative (the earlier never-renders claim was the marker shape)
+- Notes: Verified: two `claude -p` transcripts in the fixed clone show the block arriving as `- Branch: main / - Tree: … / - Sessions: SES-001 closed …` for both `/session start` and `/session-start` (files 6454da08… and 4bc0cab2… under ~/.claude/projects/…inject-probe/). Four expect-driven interactive attempts failed at the folder-trust dialog (its default is No; arrow keys under the kitty keyboard protocol did not move it), so the interactive check is Peter's next typed `/session start`.
