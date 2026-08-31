@@ -29,11 +29,13 @@ Paths are relative to the repo root; a shell you open needs `export PATH="$HOME/
 
 ## Gotchas
 
-- **If the three lines above still show `` !`…` `` literally, the injection did not run.** Verified
-  in an interactive session and under `claude -p`: whenever this skill arrives through the Skill
-  tool — the model's own invocation, or a `/session-*` alias — the file is delivered unrendered.
-  Run those three commands once yourself, then treat their output as the injected state — nothing
-  else changes.
+- **If the three lines above still show the injection markers (an exclamation mark followed by
+  a backticked command) instead of output, the injection did not run.** Verified: a typed
+  `/session` renders them; the Skill tool — the model's own invocation, or a `/session-*` alias —
+  delivers the file unrendered (interactive and `claude -p` alike). Run those three commands once
+  yourself, then treat their output as the injected state — nothing else changes. (This bullet
+  spells no marker: the harness runs any marker it finds in the body, and a failed one aborts the
+  whole invocation.)
 - **No sampling.** Every file a step names is read to its last line; when the Read tool truncates,
   continue with `offset`. A file you did not finish is a file you did not read.
 - **Your session is the one you joined or opened, never "the newest".** Another conversation may
