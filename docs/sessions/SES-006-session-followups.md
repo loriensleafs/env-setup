@@ -104,3 +104,23 @@ is refused; branch `fix/eval-tooling` @ b0d4411 stays local.
   - `.claude/skills/session/evals/results/iteration-4/start-brief/with_skill/timing.json` (+1/−0) — current skill, start-brief: 184,213 tokens, 255.3 s (from the subagent's completion notification)
   - `docs/plan/PRD-001-envsetup.md` (+2/−2) — ARC-001 link now points at archive/; the retired scripts/ entry removed from the structure line (both found by the iteration-4 with_skill start-brief run)
 - Notes: Verified: every grade re-run against its fixture by the grader; fixtures fully recorded this time (no swept-in skeletons); Peter's review read from feedback.json with status complete before the viewer was stopped. Not verified: the tightened join wording (edited after the run). Open: the graders' standing asks — name the word-count method for the 60-word cap, capture a raw tool log, an OVERVIEW-upkeep expectation on end/close, a handoff-accounts-for-the-commit expectation.
+
+### 2026-08-30 · feat(session): the ledger holds value only — fix-ups vouched for by Also lines, valueless commits opt out by trailer · 77aa614
+
+- Summary: ADR-021: an entry is the block a change worth reading about gets; a fix-up gets none and is vouched for by its parent's `- Also: <sha>` line; a commit with nothing to record carries `Session-entry: none` and the tool skips it; every commit still resolves, so the gate stays mechanical.
+- Why: Peter challenged entry = commit: "it's important that only things of value get put there" — SES-004's 27 entries include fix-ups and a formatting pass with nothing to say.
+- Files:
+  - `.claude/skills/run-session-tool/SKILL.md` (+2/−0) — gotcha: a commit is accounted for by a heading, a parent's `- Also:` line, or the `Session-entry: none` trailer
+  - `.claude/skills/session/CLAUDE.md` (+1/−1) — tool invariants name the trailer and the Also-line accounting
+  - `.claude/skills/session/SKILL.md` (+6/−3) — entry step 1: delete a fix-up's skeleton and add `- Also:` to its parent; write the trailer on valueless commits
+  - `.claude/skills/session/scripts/__tests__/session-lib.test.ts` (+29/−0) — two tests: knownShas over headings + Also lines; declinesEntry on the trailer (case-insensitive, line-anchored)
+  - `.claude/skills/session/scripts/session-lib.ts` (+22/−0) — knownShas() and declinesEntry()
+  - `.claude/skills/session/scripts/session.ts` (+16/−9) — reads commit bodies (%b) and skips trailer commits; missingCommits() uses knownShas
+  - `CLAUDE.md` (+3/−1) — Recording: the ledger holds value only (ADR-021)
+  - `CONTEXT.md` (+5/−3) — Entry redefined: the block a change worth reading about gets; fix-ups vouched for, valueless commits opt out; avoid 'commit' as the unit
+  - `CONTRIBUTING.md` (+4/−1) — step 7 names the Also line and the trailer
+  - `docs/OVERVIEW.md` (+1/−1) — ADR count 001…021
+  - `docs/decisions/ADR-021-entry-grain.md` (+61/−0) — new ADR: entry grain — value only, Also lines, the trailer, the mechanical gate kept; alternatives (per-PR entries, git-independent entries, a one-line valueless entry) rejected
+  - `docs/decisions/README.md` (+1/−0) — index row 021
+  - `docs/sessions/README.md` (+15/−6) — rule 'the ledger holds value only' and the template's `Also:` line
+- Notes: Verified in a scratch clone with the new tool: a commit made with `-m "Session-entry: none"` appends nothing; a fix-up commit with `- Also: <sha>` under its parent is not reported missing; 15 lib tests pass. First probe was invalid (clone taken before the code was committed, so it ran the old tool) and was redone. Unverified: the skill's new entry-step wording in a run (next eval iteration).
