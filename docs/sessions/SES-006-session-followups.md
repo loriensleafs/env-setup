@@ -1,10 +1,10 @@
 # 2026-08-30 22:40 · Session skill follow-ups — injection verified, iteration 4, plugin-kit fixes
 
 - Goal: Close what SES-004 left open: verify the `!` injection in a real conversation, measure the transcript-evidence expectations (iteration 4), and land the plugin-kit eval-tooling fixes.
-- Status: open
+- Status: closed
 - Plan: —
-- Outcome: _(fill in)_
-- Open at end: everything still open from this session is captured, with its context, in acmelabs-15/sessions `docs/plan/PLAN-001-session-plan-relationship-and-re-evaluation.md` (Part 1 is this repo: merge PR #44, close SES-006 and SES-005, verify the bare `/session` forms interactively, ANA-010's four implications); a fresh conversation there starts with `/session continue PLAN-001`. Unverified here: the bare `/session start` in an interactive session.
+- Outcome: the `!` injection verified in real transcripts and its silent code-span defect fixed (PR #43); iteration 4 measured 25/27 against 23/27; plugin-kit's eval-tooling fixes merged (PR #1); then the session skill, its aliases, its tool and its evals moved into the `sessions` plugin (acmelabs-15/sessions, ADR-023, PR #44 `5d13250`) and plans point at sessions (ADR-022): PLAN-001/002 parts carry status lines, PRD-001 lists its plans, the global templates match. What remains is acmelabs-15/sessions `docs/plan/PLAN-001`.
+- Open at end: acmelabs-15/sessions `docs/plan/PLAN-001-session-plan-relationship-and-re-evaluation.md` Part 1 — SES-005 is still open (another conversation's; close it by hand if that conversation is over), the bare `/session start` is unverified interactively, ANA-010's four implications are unaddressed. A fresh conversation in the plugin repo starts with `/session continue PLAN-001`.
 
 ## Narrative
 

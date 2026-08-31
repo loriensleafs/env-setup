@@ -134,9 +134,13 @@ small separate commands, merge commits). The facts below are the ones a rule can
   `.claude/skills/session`, `/run-session-tool`, the four `.claude/commands/session-*.md` and the
   `bun run session` script are gone from this repo. **Rehydrate by plan** (ADR-022): each plan part
   carries a status line naming the session serving it, PRD-001 lists its plans, and `/session start
-  PLAN-NNN` reads PRD → plan → part → session; the plugin's tool gained `init`, `list --plan` and
+  PLAN-NNN` reads PRD → plan → part → session; SES-006 closed with the merge of PR #44 (`5d13250`); the plugin's tool gained `init`, `list --plan` and
   `list --brief` and finds the repo on its own. The global plan/spec templates under `~/.claude/skills`
   carry the same status line (`LOCAL-CHANGES.md`).
+- **CONTEXT.md upkeep** (ANA-010's four implications, SES-007): `docs/.claude/skills/run-docs/avoid-check.ts`
+  refuses a word the glossary marks `former name` in the live prose (session files, ADRs and analyses
+  are records); `CONTEXT.md` gained `## Relationships` and `## Flagged ambiguities`; the success test
+  (the glossary changes during the conversation, shrinks as often as it grows) is in CLAUDE.md Recording.
 - **Parked, not on `main`:** the visual-grouping patch ([PLAN-001](plan/PLAN-001-visual-grouping.md))
   as a WIP commit on local branch `wip/visual-grouping` (unverified, never run under a PTY).
 

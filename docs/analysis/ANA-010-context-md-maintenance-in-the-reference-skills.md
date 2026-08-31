@@ -1,6 +1,6 @@
 # How the reference skills keep CONTEXT.md current — analysis
 
-> **Analysis** · 2026-08-30 · status: current · session SES-006 · informs `CONTEXT.md` upkeep and the
+> **Analysis** · 2026-08-30 · status: current · sessions SES-006, SES-007 · informs `CONTEXT.md` upkeep and the
 > `/session entry` step that routes new terms to it.
 
 ## Question
@@ -134,3 +134,18 @@ says "where the project keeps its ADRs"; the reference's `domain.md` consumer ru
 `grill-me` points at `grill-with-docs`. Every touched skill passes plugin-kit's validator; the
 list lives in `~/.claude/skills/LOCAL-CHANGES.md` so a re-sync from the reference does not undo
 it silently. The four implications above stay open for envsetup itself.
+
+## Acted on — 2026-08-31 (the four implications, SES-007)
+
+1. `docs/.claude/skills/run-docs/avoid-check.ts`: the judgment-free check. A prototype over every
+   unqualified `_Avoid_` item (93 of 130) found the lists are sense restrictions — check, status,
+   done, update, log, step — and would flood; so the check enforces only the items the glossary
+   marks `(former name, …)`, over the live prose (CLAUDE.md, README, CONTRIBUTING, OVERVIEW,
+   `plan/`, the sessions README outside its index, the `.claude/` trees). Records — session files,
+   ADRs, analyses — keep the words of their time. One former name today: ledger. The frequency
+   detector stays unbuilt (finding D3).
+2. `CONTEXT.md` gained `## Relationships` and `## Flagged ambiguities` (ledger → Session log,
+   Open the status vs Open the move, check, session vs conversation, Step vs Plan part).
+3. No `docs/agents/domain.md`: CLAUDE.md "Rehydrating" and the glossary's preamble already carry it.
+4. The success test is in CLAUDE.md "Recording": the glossary changes during the conversation that
+   changes the model and gets shorter as often as longer.
