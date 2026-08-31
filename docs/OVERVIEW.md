@@ -108,7 +108,7 @@ Owner: Peter Kloss (github loriensleafs). Public repo. Released: v0.1.9 (2026-08
 - **Unreleased on `main`** (session `2026-08-30-docs-rehydration.md`): docs only — OVERVIEW
   (`bb46dcb`), the change record: ledger (`7439bec`, `ee5e336`) → granular entries + rehydration
   procedure (`f772638`, `f29ec58`) → continuous-upkeep rule (`62dbf83`) → per-session files under
-  `docs/sessions/` with `bun run session`. No code change since v0.1.9.
+  `docs/sessions/` with `bun run session` (`db47945`). No code change since v0.1.9.
 - **Parked, not on `main`:** the visual-grouping patch for Next-up 1 exists as a WIP commit on the
   local branch `wip/visual-grouping` (unverified, never run under a PTY).
 

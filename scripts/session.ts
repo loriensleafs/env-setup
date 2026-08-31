@@ -70,6 +70,7 @@ function commits(): Commit[] {
     "log",
     "--reverse",
     "--no-merges",
+    "--no-renames", // a rename is a delete + an add: plain paths, greppable
     "--date=short",
     "--format=%x01%H%x09%ad%x09%s",
     "--numstat",

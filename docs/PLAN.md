@@ -29,7 +29,7 @@ when a decision changes, change it here *in the same commit* and cite the sessio
 
 - Released through **v0.1.9** (2026-08-30). Peter's machine converges via the one-liner, 0 failed.
 - Unreleased on `main`: docs only — OVERVIEW (`bb46dcb`), the change record that became
-  `docs/sessions/` + `bun run session` (`7439bec`, `ee5e336`, `f772638`, `f29ec58`, `62dbf83`).
+  `docs/sessions/` + `bun run session` (`7439bec`, `ee5e336`, `f772638`, `f29ec58`, `62dbf83`, `db47945`).
 - Parked: visual grouping of the config flow — local branch `wip/visual-grouping`, unverified
   (OVERVIEW Next-up 1).
 - Decisions since the snapshot below that are settled here: reset-on-drift config model

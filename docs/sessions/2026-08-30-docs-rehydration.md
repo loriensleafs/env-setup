@@ -88,19 +88,21 @@ in these entries depend on that — never squash).
 
 ### 2026-08-30 · docs: per-session change log replaces the single ledger (docs/sessions/, bun run session) · db47945
 
-- Summary: _(fill in)_
-- Why: _(fill in)_
+- Summary: The single ledger becomes per-session files under `docs/sessions/` with `bun run session` (start / append / check) and an auto-generated index; history migrated and split into four sessions with narratives.
+- Why: Peter: "should the ledger be changed to be called session, and can there be multiple sessions — it might not make sense to put everything in a single session"; chose the per-session split over one ledger + session notes.
 - Files:
-  - `CLAUDE.md` (+30/−20) — _(fill in)_
-  - `CONTRIBUTING.md` (+9/−8) — _(fill in)_
-  - `README.md` (+2/−2) — _(fill in)_
-  - `docs/OVERVIEW.md` (+13/−11) — _(fill in)_
-  - `docs/PLAN.md` (+6/−6) — _(fill in)_
-  - `docs/{LEDGER.md => sessions/2026-08-26-foundation.md}` (+21/−320) — _(fill in)_
-  - `docs/sessions/2026-08-27-curl-sh-interactivity-and-first-bootstrap-fixes.md` (+149/−0) — _(fill in)_
-  - `docs/sessions/2026-08-30-docs-rehydration.md` (+87/−0) — _(fill in)_
-  - `docs/sessions/2026-08-30-real-bootstrap-runs-v0.1.5-to-v0.1.9.md` (+101/−0) — _(fill in)_
-  - `docs/sessions/README.md` (+84/−0) — _(fill in)_
-  - `package.json` (+1/−1) — _(fill in)_
-  - `scripts/ledger.ts` (+0/−139) — _(fill in)_
-  - `scripts/session.ts` (+230/−0) — _(fill in)_
+  - `CLAUDE.md` (+30/−20) — Rehydrating step 2 reads the sessions index + newest file; Recording covers session start (`--new`), after-every-commit, narrative-as-it-happens; commands block
+  - `CONTRIBUTING.md` (+9/−8) — step 5 rewritten for the session workflow
+  - `README.md` (+2/−2) — pointer → docs/sessions/ newest file
+  - `docs/LEDGER.md` (+0/−888) — removed — content migrated into docs/sessions/
+  - `docs/OVERVIEW.md` (+13/−11) — doc-map row for docs/sessions/; Status cites the session file; resume steps use `bun run session`
+  - `docs/PLAN.md` (+6/−6) — banner + CURRENT STATUS cite docs/sessions/ instead of LEDGER
+  - `docs/sessions/2026-08-26-foundation.md` (+589/−0) — new — migrated 2026-08-26 entries; narrative points at PLAN.md's build log / UI history / session log
+  - `docs/sessions/2026-08-27-curl-sh-interactivity-and-first-bootstrap-fixes.md` (+149/−0) — new — migrated 2026-08-27 entries (v0.1.0–v0.1.4); narrative: curl|sh root cause and the first full bootstrap failures
+  - `docs/sessions/2026-08-30-docs-rehydration.md` (+87/−0) — new — this session: the post-v0.1.9 docs entries; narrative of the ledger → sessions evolution
+  - `docs/sessions/2026-08-30-real-bootstrap-runs-v0.1.5-to-v0.1.9.md` (+101/−0) — new — migrated v0.1.5–v0.1.9 entries; narrative: Peter's run-driven UX directives
+  - `docs/sessions/README.md` (+84/−0) — new — index (auto-regenerated between markers), how to read, how to keep up to date, session + entry template
+  - `package.json` (+1/−1) — `session` script replaces `ledger`
+  - `scripts/ledger.ts` (+0/−139) — removed (became session.ts)
+  - `scripts/session.ts` (+230/−0) — new — `--new <slug>`, append into the newest session (ordered by H1 timestamp), `--check`, release markers, index regeneration; skips docs(session)/docs(ledger) commits
+- Notes: Session order comes from the H1 timestamp, not the file name, so two sessions on one day sort correctly. `--check` treats a bare placeholder narrative line as unfilled too. The day-based split of history is an approximation of sessions — stated in the README. The first version of this entry was committed unfilled (`3bc882a`) because git's rename detection printed `docs/{LEDGER.md => sessions/…}` paths; the script now passes `--no-renames`.
