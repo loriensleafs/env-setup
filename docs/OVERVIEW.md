@@ -107,7 +107,7 @@ Owner: Peter Kloss (github loriensleafs). Public repo. Released: v0.1.9 (2026-08
   end-to-end on a fresh machine (first full connect run pending).
 - **Unreleased on `main`** (LEDGER "Since v0.1.9"): docs only — OVERVIEW (`bb46dcb`), ledger +
   `bun run ledger` (`7439bec`, `ee5e336`), granular entries + rehydration procedure (`f772638`,
-  `f29ec58`). No code change since v0.1.9.
+  `f29ec58`, `62dbf83`). No code change since v0.1.9.
 - **Parked, not on `main`:** the visual-grouping patch for Next-up 1 exists as a WIP commit on the
   local branch `wip/visual-grouping` (unverified, never run under a PTY).
 
