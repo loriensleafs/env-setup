@@ -30,8 +30,8 @@ bun test                             # bun:test suite
 
 ## Making a change
 
-1. **Rehydrate, then name your session.** Read the docs system in the order CLAUDE.md
-   § Rehydrating gives (`/brain:plan PLAN-NNN` once it lands — ADR-024); the plan part's status
+1. **Rehydrate, then name your session.** `/brain:plan PLAN-NNN` walks the docs system in the
+   order CLAUDE.md § Rehydrating gives (ADR-024); the plan part's status
    line names the session `in progress` that every `/brain:session log` writes into. New work:
    `/brain:session start <description> --plan "PLAN-NNN · part N"` runs `session new <slug>
    --plan …` (creates `docs/sessions/SES-<next>-<slug>.md`), sets the part to
