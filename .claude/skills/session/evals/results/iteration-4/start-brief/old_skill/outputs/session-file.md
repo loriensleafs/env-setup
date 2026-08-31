@@ -1,1 +1,0 @@
-none — no session was created or joined. The user asked a question (where are we, what first); nothing changed, so per skill step 6 the outcome was "none". SES-005 (open, another conversation's) was read and left untouched.

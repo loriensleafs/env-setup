@@ -15,9 +15,11 @@ item a boxed header and show where the user is in the whole bootstrap.
 - ADR-005 (the phases are: scan, identity, pick, configure, review; connect runs after install).
 - No new ADR needed.
 
-## Task list
+## Parts
 
-### Phase 1: implement (patch exists)
+### Part 1: implement (patch exists)
+
+> Status: planned
 
 - [ ] Task 1: `git checkout -b feat/visual-grouping wip/visual-grouping`; review the WIP commit:
   `promptItemConfig(item, stored, position?: { index; total })` renders `p.note(item.title,
@@ -28,14 +30,14 @@ item a boxed header and show where the user is in the whole bootstrap.
 - [ ] Task 2: decide whether the connect phase counts as step 6 (recommend: yes when the run has
   ceremonies; the marker is cheap) and add it in `executePlan` before `runConnectPhase`.
 
-### Checkpoint: verified under a PTY
-
-- [ ] Drive `bun src/index.ts --defaults`-free run under the expect harness pattern in
+- [ ] Checkpoint — verified under a PTY: drive `bun src/index.ts --defaults`-free run under the expect harness pattern in
   `.claude/skills/run-envsetup/` with a strong oracle: strip ANSI, assert the "Step 4 of 5"
   marker and the boxed "Configure 1 of N" frame precede the first field, and that the frame
   closes before the next item's header.
 
-### Phase 2: ship
+### Part 2: ship
+
+> Status: planned
 
 - [ ] Task 3: session entry, PRD requirement 4 marked done, OVERVIEW Next-up 1 removed; PR; merge;
   release v0.1.10 per CONTRIBUTING.

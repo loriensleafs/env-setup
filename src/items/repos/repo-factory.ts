@@ -48,7 +48,7 @@ export function repoItem(spec: RepoSpec): Item {
   });
 }
 
-/** The 5 decided ACMElabs plugin repos (docs/plan/PRD-001-envsetup.md Group 3). */
+/** The decided ACMElabs plugin repos (docs/plan/PRD-001-envsetup.md Group 3; `session` per ADR-023). */
 export const ACMELABS_REPOS: RepoSpec[] = [
   {
     id: "repo-skills",
@@ -67,6 +67,12 @@ export const ACMELABS_REPOS: RepoSpec[] = [
     title: "ACMElabs/plugin-kit",
     repo: "acmelabs-15/plugin-kit",
     dest: "ACMElabs/plugin-kit",
+  },
+  {
+    id: "repo-sessions",
+    title: "ACMElabs/sessions",
+    repo: "acmelabs-15/sessions",
+    dest: "ACMElabs/sessions",
   },
   {
     id: "repo-code-review",

@@ -31,22 +31,28 @@ branches; positive phrasing; single source of truth; no restating the root).
 Not sufficient on its own: "the directory exists", "it has a run skill" (the skill is discovered
 by itself), "it has tests" (the convention is in the root).
 
-## Task list
+## Parts
 
-### Phase 1: research
+### Part 1: research
+
+> Status: done (session SES-004)
 
 - [x] T1 Confirm nested-CLAUDE.md load semantics from the official docs (claude-code-guide agent).
 - [x] T2 Read the `writing-for-agents` skill; extract the rules above.
 
-### Phase 2: inventory
+### Part 2: inventory
+
+> Status: done (session SES-004)
 
 - [x] T3 For every directory with a `.claude/` (56), list candidate content against the criteria
   (two forks: src core + src/items/**; docs/.github/scripts/vendor). Output: a scored table.
 - [x] T4 Propose (Peter: option one + docs subdirectories + prune skills that don't earn their command) the placement set to Peter — one question, recommendation first.
 
-### Checkpoint: placement agreed
+- [x] Checkpoint: placement agreed
 
-### Phase 3: write
+### Part 3: write
+
+> Status: done (session SES-004)
 
 - [x] T5a Prune run skills without a real driver (20 `__tests__`, 5 docs subdirs, `.github/workflows`, 2 Swift-asset skills → typecheck folded into the parent drivers); 28 remain.
 
@@ -56,7 +62,9 @@ by itself), "it has tests" (the convention is in the root).
 - [x] T7 Verify: `bun run check` (markdownlint), the docs link checker over the new files, and a
   duplication pass (no sentence appears in two CLAUDE.md files).
 
-### Phase 4: record and ship
+### Part 4: record and ship
+
+> Status: done (session SES-004)
 
 - [x] T8 ADR-018; OVERVIEW doc-map row; session entry; this plan's status → done.
 - [x] T9 PR → CI → merge (docs only, no release).

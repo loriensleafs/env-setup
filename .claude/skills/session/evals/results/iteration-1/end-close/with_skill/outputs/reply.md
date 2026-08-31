@@ -1,4 +1,0 @@
-Closed out. Log complete (`bun run session` → `up to date`, `--check` → `session: complete`), `bun run check` clean, committed `1303fa1` on `feat/session-skill`. The tree is clean but not on `main`: the branch is 2 commits ahead of origin with no PR, left un-pushed since push/PR is your call.
-
-- **Shipped this conversation:** the docs review found nothing stale, but the closing check did — `ea51e09` (the `/session` skill commit) had never been recorded, and SES-005 was left with Outcome / Open at end unfilled (the check counts placeholders in every session file). Both are closed now; OVERVIEW Status names `feat/session-skill` as work off `main`.
-- **First thing next time:** push `feat/session-skill`, open the PR, merge it with a merge commit — it's at the top of Next up. Unverified: `gh pr list` couldn't run from this checkout (origin isn't a GitHub host), so PR state is from `git branch -vv` only.

@@ -30,10 +30,13 @@ bun test                             # bun:test suite
 
 ## Making a change
 
-1. **Rehydrate, then join or open a session.** `/session start` (alias `/session-start`) reads the docs system in order,
-   then — before the first commit — joins the open session whose Goal is this work (`bun run
-   session list` shows them) or opens one: `bun run session new <slug> [--plan
-   "PLAN-NNN · part"]` (creates `docs/sessions/SES-<next>-<slug>.md`); set its title and `Goal`.
+1. **Rehydrate, then join or open a session.** `/session start [PLAN-NNN]` (alias `/session-start`; the
+   `sessions` plugin, ADR-023) reads the docs system in order, then — before the first commit — joins
+   the open session the plan part's status line names, or opens one: `session new <slug> --plan
+   "PLAN-NNN · part N"` (creates `docs/sessions/SES-<next>-<slug>.md`) and sets the part to
+   `in progress (session SES-NNN)` (ADR-022); set the file's title and `Goal`. `session` here is
+   the plugin's tool — the skill runs it; by hand it is
+   `bun ~/Dev/ACMElabs/sessions/skills/session/scripts/session.ts`.
    A session is a stream of work, open until closed, and may outlive this conversation (ADR-020);
    a conversation that changes nothing needs none. Keep its Narrative as things happen (requests,
    decisions, dead ends, what was verified and how).
@@ -84,18 +87,18 @@ bun test                             # bun:test suite
    The **pre-commit** hook auto-fixes staged files (Biome + markdownlint) and runs `tsc`, blocking
    only on un-auto-fixable lint or type errors. The **pre-push** hook runs the full check + tests.
 
-7. **Record it — after every commit, not at the end.** `bun run session append --session SES-NNN`
+7. **Record it — after every commit, not at the end.** `session append --session SES-NNN`
    (your file) appends an entry skeleton (`Summary` / `Why` and one line per touched file, every kind of file) for
    each commit the session log does not yet account for — a fix-up gets no entry (add `- Also: <sha> — …` to the
    entry it belongs to instead) and a commit with nothing to record says so with the trailer
    `Session-entry: none` (ADR-021); fill every
-   placeholder (template in [docs/sessions/README.md](docs/sessions/README.md)); `bun run session current --session SES-NNN` lists what is left; `bun run session
-   check --session SES-NNN`; update `docs/OVERVIEW.md` "Status" / "Next up" and any ADR / PRD / plan / analysis
+   placeholder (template in [docs/sessions/README.md](docs/sessions/README.md)); `session current --session SES-NNN` lists what is left; `session
+   check --session SES-NNN`; tick the plan part's tasks citing the sha; update `docs/OVERVIEW.md` "Status" / "Next up" and any ADR / PRD / plan / analysis
    / `CONTEXT.md` / nested `CLAUDE.md` the change made stale, citing the sha; commit as
    `docs(session): …`. `/session entry` (alias `/session-entry`) is this step as a procedure; when
    you leave, `/session end` checks nothing was deferred and writes the handoff (the session
-   stays open); when the Goal is done, `/session close` writes the Outcome, runs `bun run session
-   close --session SES-NNN` and updates the plan it served.
+   stays open); when the Goal is done, `/session close` writes the Outcome, runs `session
+   close --session SES-NNN` and marks the plan part `done (session SES-NNN, sha)`.
 
 8. **Open a PR** (`gh pr create`). CI (`.github/workflows/ci.yml`) runs the same checks plus a
    gitleaks secret scan. `gh pr checks <n> --watch` may say "no checks reported" for ~20 s after
@@ -133,8 +136,8 @@ git push origin v0.2.0
 gh run watch "$(gh run list --workflow=release.yml --limit 1 --json databaseId -q '.[0].databaseId')" --exit-status
 gh release view v0.2.0 --json assets -q '[.assets[].name] | join(", ")'
 
-# 6. Record it: the release marker lands in the session log
-bun run session && bun run session check
+# 6. Record it: the release marker lands in the session log (/session entry — the tool appends, then gates)
+session append --session SES-NNN && session check --session SES-NNN
 ```
 
 `release.yml` compiles `dist/envsetup-darwin-arm64` and `-x64` (`bun build --compile`, Bun

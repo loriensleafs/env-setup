@@ -1,2 +1,0 @@
-Shipped: no code — the review of OVERVIEW, the sessions, CONTEXT.md and the plans found nothing stale; handoff committed as `024398f` (`docs(session): handoff SES-006`) on `feat/session-model`, which sits 3 commits ahead of `origin/main` with no PR (origin is a local path; `gh pr list` skipped).
-Next time: the ADR pass over `docs/decisions/` ADR-001…020, then `/session close`.  (SES-006 stays open)

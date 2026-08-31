@@ -4,7 +4,7 @@
 - Status: open
 - Plan: —
 - Outcome: _(fill in)_
-- Open at end: plugin-kit PR #1 merged (acmelabs-15/plugin-kit `e4b1a53`) — the fixed viewer, report path, neighbour sweep and aggregator are what the next skill-creator run uses. The tightened join wording and the ADR-021 entry step are unmeasured (iteration 5 with the next skill change). SES-005 belongs to the rehydration conversation of 19:25; close it by hand if that conversation is over.
+- Open at end: everything still open from this session is captured, with its context, in acmelabs-15/sessions `docs/plan/PLAN-001-session-plan-relationship-and-re-evaluation.md` (Part 1 is this repo: merge PR #44, close SES-006 and SES-005, verify the bare `/session` forms interactively, ANA-010's four implications); a fresh conversation there starts with `/session continue PLAN-001`. Unverified here: the bare `/session start` in an interactive session.
 
 ## Narrative
 
@@ -31,6 +31,19 @@ delivers the skill unrendered — was wrong. The cause was the marker shape: the
 code span (a backtick before the `!`), and a marker is recognised only at line start or after a space, so no path
 ever ran them. With the documented shape both paths render (transcripts of a typed `/session start` and of the
 `/session-start` alias under `claude -p`, 23:53–23:54). The gotcha now states that.
+
+2026-08-31 — the plugin. Peter challenged rehydration from a plan (plans should name the session serving each
+part; PRDs should name their plans; "as simple as telling the agent what plan you want to work on") → ADR-022; then
+moved the skill out of this repo → the `sessions` plugin (acmelabs-15/sessions, ADR-023), built after reading
+plugin-kit's plugin-creator, command-creator, skill-creator and every shared reference in full at his request. What
+the reviewers caught: the injected lines were pipelines the permission checker evaluates segment by segment (fixed
+with `list --brief` and bare commands), a root CLAUDE.md fails `--strict` (moved under `.claude/`), the aliases
+named the skill unqualified, `.gitignore` anchored the fixture pattern at the wrong depth, and the README documented an
+install path with no marketplace behind it (the repo is now its own marketplace too). Dead end: `claude -p "/session
+start"` answers "isn't available" — headless resolves only `/sessions:session`; the bare form is an interactive-only
+claim, unverified. Render checks (`--plugin-dir`, scratch repo): skill path and alias path both rendered
+`Branch: main` / `Tree: …` / `Sessions: SES-001 …`; the alias forwarded `args: start PLAN-001`. The trigger sweep on
+record measured the pre-plugin description; the current one is unmeasured on Sonnet/Haiku (iteration 5, in the plugin).
 
 ## Changes (one entry per commit, in order)
 
@@ -210,3 +223,91 @@ ever ran them. With the documented shape both paths render (transcripts of a typ
   - `.claude/skills/session/SKILL.md` (+10/−10) — three injection lines rewritten; gotcha corrected; --silent on the Sessions line
   - `docs/sessions/SES-006-session-followups.md` (+6/−0) — dated correction paragraph in the Narrative (the earlier never-renders claim was the marker shape)
 - Notes: Verified: two `claude -p` transcripts in the fixed clone show the block arriving as `- Branch: main / - Tree: … / - Sessions: SES-001 closed …` for both `/session start` and `/session-start` (files 6454da08… and 4bc0cab2… under ~/.claude/projects/…inject-probe/). Four expect-driven interactive attempts failed at the folder-trust dialog (its default is No; arrow keys under the kitty keyboard protocol did not move it), so the interactive check is Peter's next typed `/session start`.
+
+### 2026-08-31 · feat(session): the session skill moves to the session plugin; rehydrate by plan (ADR-022, ADR-023) · 2bb7e9f
+
+- Summary: The `/session` skill, its four aliases, the run skill, the tool and its eval evidence leave this repo for the `sessions` plugin (acmelabs-15/sessions `d194e3e`, installed from the regenerated ACMElabs marketplace; the `repo-sessions` item clones it). Plans now point at sessions (ADR-022): every plan part carries `> Status: planned | in progress (session SES-NNN) | done (session SES-NNN, sha)`, PRD-001 lists its plans, and `/session start PLAN-NNN` walks PRD → plan → part → session; the sessions and plan READMEs are rebuilt from the plugin's templates and point at the skill for the rules, which now have one home (ADR-023).
+- Why: Peter, after reading a real `/session start` transcript: starting a conversation should be "as simple as telling the agent what plan you want to work on", plans should point at the session note serving each part and PRDs at plans; then "the session skill might need to be moved" out of this repo — "plugin name should just be session … a single skill with a commands folder", built with plugin-kit's creators, read in full.
+- Files:
+  - `.claude/commands/session-close.md` (+0/−9) — deleted — the alias lives in the plugin's `commands/` (qualified `skill: session:session`; the start alias forwards a PLAN-NNN)
+  - `.claude/commands/session-end.md` (+0/−9) — deleted — the alias lives in the plugin's `commands/` (qualified `skill: session:session`; the start alias forwards a PLAN-NNN)
+  - `.claude/commands/session-entry.md` (+0/−9) — deleted — the alias lives in the plugin's `commands/` (qualified `skill: session:session`; the start alias forwards a PLAN-NNN)
+  - `.claude/commands/session-start.md` (+0/−9) — deleted — the alias lives in the plugin's `commands/` (qualified `skill: session:session`; the start alias forwards a PLAN-NNN)
+  - `.claude/skills/run-envsetup/SKILL.md` (+1/−1) — the session-gate line now runs the plugin's tool by its path instead of `bun run session`
+  - `.claude/skills/run-session-tool/SKILL.md` (+0/−60) — deleted — a driver skill has no place in a plugin; its content became the plugin's `references/tool.md` and README
+  - `.claude/skills/session/CLAUDE.md` (+0/−15) — deleted — the plugin's `skills/session/CLAUDE.md` carries it
+  - `.claude/skills/session/SKILL.md` (+0/−249) — deleted — moved to the plugin, rewritten for `start [PLAN-NNN]`, single-command injections and the plugin-root tool path
+  - `.claude/skills/session/evals/evals.json` (+0/−92) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/.started-at` (+0/−1) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/benchmark.json` (+0/−366) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/benchmark.md` (+0/−13) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/end-close/eval_metadata.json` (+0/−12) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/end-close/with_skill/grading.json` (+0/−137) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/end-close/with_skill/outputs/git-state.txt` (+0/−16) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/end-close/with_skill/outputs/overview.diff` (+0/−20) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/end-close/with_skill/outputs/reply.md` (+0/−4) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/end-close/with_skill/outputs/session-file.md` (+0/−56) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/end-close/with_skill/outputs/transcript.md` (+0/−108) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/end-close/with_skill/timing.json` (+0/−1) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/end-close/without_skill/grading.json` (+0/−143) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/end-close/without_skill/outputs/git-state.txt` (+0/−16) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/end-close/without_skill/outputs/overview.diff` (+0/−45) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/end-close/without_skill/outputs/reply.md` (+0/−11) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/end-close/without_skill/outputs/session-file.md` (+0/−86) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/end-close/without_skill/outputs/transcript.md` (+0/−91) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/end-close/without_skill/timing.json` (+0/−1) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/feedback.json` (+0/−35) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/notes.json` (+0/−25) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/record-commit/eval_metadata.json` (+0/−13) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/record-commit/with_skill/grading.json` (+0/−160) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/record-commit/with_skill/outputs/commit.diff` (+0/−196) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/record-commit/with_skill/outputs/git-state.txt` (+0/−13) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/record-commit/with_skill/outputs/overview.diff` (+0/−30) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/record-commit/with_skill/outputs/reply.md` (+0/−13) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/record-commit/with_skill/outputs/session-file.md` (+0/−37) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/record-commit/with_skill/outputs/transcript.md` (+0/−53) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/record-commit/with_skill/timing.json` (+0/−1) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/record-commit/without_skill/grading.json` (+0/−167) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/record-commit/without_skill/outputs/commit.diff` (+0/−214) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/record-commit/without_skill/outputs/git-state.txt` (+0/−12) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/record-commit/without_skill/outputs/overview.diff` (+0/−29) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/record-commit/without_skill/outputs/reply.md` (+0/−18) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/record-commit/without_skill/outputs/session-file.md` (+0/−84) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/record-commit/without_skill/outputs/transcript.md` (+0/−71) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/record-commit/without_skill/timing.json` (+0/−1) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/start-brief/eval_metadata.json` (+0/−13) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/start-brief/with_skill/grading.json` (+0/−158) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/start-brief/with_skill/outputs/brief.md` (+0/−13) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/start-brief/with_skill/outputs/git-state.txt` (+0/−19) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/start-brief/with_skill/outputs/session-file.md` (+0/−11) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/start-brief/with_skill/outputs/transcript.md` (+0/−67) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/start-brief/with_skill/timing.json` (+0/−1) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/start-brief/without_skill/grading.json` (+0/−167) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/start-brief/without_skill/outputs/brief.md` (+0/−30) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/start-brief/without_skill/outputs/git-state.txt` (+0/−18) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/start-brief/without_skill/outputs/session-file.md` (+0/−30) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/start-brief/without_skill/outputs/transcript.md` (+0/−76) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-1/start-brief/without_skill/timing.json` (+0/−1) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/benchmark.json` (+0/−382) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/benchmark.md` (+0/−13) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/eval_metadata.json` (+0/−15) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/old_skill/grading.json` (+0/−120) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/old_skill/outputs/git-state.txt` (+0/−32) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/old_skill/outputs/overview.diff` (+0/−12) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/old_skill/outputs/reply.md` (+0/−4) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/old_skill/outputs/session-file.md` (+0/−19) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/old_skill/outputs/transcript.md` (+0/−51) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/old_skill/timing.json` (+0/−1) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/with_skill/grading.json` (+0/−139) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/with_skill/outputs/git-state.txt` (+0/−32) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/with_skill/outputs/overview.diff` (+0/−22) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/with_skill/outputs/reply.md` (+0/−2) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/with_skill/outputs/session-file.md` (+0/−23) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/with_skill/outputs/transcript.md` (+0/−28) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/with_skill/timing.json` (+0/−1) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/feedback.json` (+0/−15) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/notes.json` (+0/−23) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/record-commit/eval_metadata.json` (+0/−16) — moved to the plugin unchanged (`skills/session/evals/`)
+  - `.claude/skills/session/evals/results/iteration-2/record-commit/old_skill/grading.json` (+0/−143) — moved to the plugin unchanged (`skills/session/evals/`)
+  - … +277 more (`git show --stat 2bb7e9f`)
+- Notes: verified — `bun run check`, `bun test` (111 pass), the docs link checker (0 broken); the installed plugin (`sessions@ACMElabs` 0.1.0) rendered its three injected state lines on both the skill path and the alias path under `claude -p --plugin-dir` in a scratch repo, its tool ran through the substituted plugin-root path, and in this checkout `session:session` is the only session command registered (no project copy left to shadow it). Unverified: the bare `/session` in an interactive session (headless resolves only the namespaced `/sessions:session`), and the `acmelabs-marketplace` item's `detect` against the regenerated file. The global plan/spec templates under `~/.claude/skills` carry the same status line (`LOCAL-CHANGES.md`, 2026-08-31).
