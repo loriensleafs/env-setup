@@ -4,7 +4,7 @@
 - Status: open
 - Plan: —
 - Outcome: OVERVIEW.md; a git-derived change record that evolved (one line per commit → files touched → Summary/Why + a note per file → per-session files); `bun run session` tooling with `--check`; CLAUDE.md rehydration reading order; continuous-upkeep hard rule; then the whole docs system — `plan/` (PRD-001, PLAN-001), `analysis/` (ANA-001…008), `decisions/` (ADR-001…017), `archive/` — with one naming convention `<TYPE>-<NNN>-<kebab-title>.md`, the living plan retired; and a `/run-*` skill with a verified driver in every directory (56), the root one walking the real bootstrap TUI under `expect` up to the confirm; then the `/session start | record | end` skill built with the skill-creator loop (validated, reviewed, two measured iterations: 95% vs 84% on the stricter set), ANA-009 (Anthropic's workflow-skill guidance, verified at source), ADR-019, and the session tool's `--session` / `--current`.
-- Open at end: Next-up 1 (visual grouping, PLAN-001) from `wip/visual-grouping`; first real connect-phase run. From the /session work: the `!` injection is verified only by the next real conversation; both sweeps are run (`280d906`, ANA-009 addendum) — the description under-routes on Haiku (2/10) and Sonnet (6/10) and Haiku's outcome runs fail 6/20, which the next eval iteration can take up; three graders flagged that Outcome/Narrative/Shipped lines are tied to no transcript evidence; SES-005 belongs to another conversation and stays as it is.
+- Open at end: Next-up 1 (visual grouping, PLAN-001) from `wip/visual-grouping`; first real connect-phase run. From the /session work: the `!` injection is verified only by the next real conversation; both sweeps are run (`280d906`, ANA-009 addendum) — the description under-routes on Haiku (2/10) and Sonnet (6/10) and Haiku's outcome runs fail 6/20, which the next eval iteration can take up; three graders flagged that Outcome/Narrative/Shipped lines are tied to no transcript evidence; SES-005 belongs to another conversation and stays as it is. Session model (ADR-020, `66b083d`, `4e7f673`): the skill, tool and docs shipped and re-measured (24/24 vs 22/24); still open — the `!` injection and the `/session-*` aliases in a real conversation, an expectation tying Outcome/Narrative claims to transcript evidence, and closing this session once the docs stream ends.
 
 ## Narrative
 
@@ -62,6 +62,17 @@ outcomes 19/20, 19/20, 20/20, 14/20 — Haiku ran `--new` twice, asserted a veri
 ran, and wrote an Outcome the transcript does not support. While the sweeps ran Peter found and
 fixed the plugin-kit aggregator reporting output_chars as tokens; iteration-1/2 benchmarks were
 regenerated (real deltas +3,453 / +3,309 tokens).
+
+Then the model itself: Peter — "I'm not sure it makes sense to require a session be the length of a
+conversation… a session could potentially be longer… some sort of status… hooking sessions up to
+plans." The docs defined a session as a conversation while SES-004 had spanned a day and SES-005 was
+one read-only conversation forced to create a file. ADR-020 (`66b083d`): a session is a stream of
+work, open until closed, joined or opened before the first commit, none needed for a conversation
+that changes nothing; Peter confirmed that new work opens a new session. Same turn he moved the tool
+into the skill and chose a subcommand CLI over flags or six scripts. The skill-reviewer's five
+majors were applied before the evals (the gate had counted Outcome/Open at end; now only `close`
+does). Iteration 3 (`4e7f673`): 24/24 vs 22/24, both baseline misses on the behaviours ADR-020
+changed. The viewer's done-dialog erased an all-empty submit twice; the review was written by hand.
 
 ## Changes (one entry per commit, in order)
 
@@ -831,3 +842,76 @@ regenerated (real deltas +3,453 / +3,309 tokens).
   - `scripts/CLAUDE.md` (+0/−9) — removed — content moved to .claude/skills/session/CLAUDE.md
   - `scripts/session.ts` (+0/−294) — removed — moved into the skill (see above)
 - Notes: Verified: 13 lib tests + the 111 src tests via `bun run test`; every subcommand run against the real log (list, check --session 4, legacy `-- --check`, close on a closed session, current, an unknown command, a bare check with two open sessions refusing); validators valid for both skills and four aliases; link-check 0 broken; skill-reviewer NEEDS WORK → its five majors applied (gate/header contradiction fixed in the tool, injected line hardened, release-marker gotcha, handoff commit in end, close step 1 = end 1–3). Not verified: the `!` injection in a real conversation; the evals on the changed skill (iteration 3 follows). Decisions on the spot: `Outcome`/`Open at end` are counted only by `close`; a file without a Status line reads as open; legacy `--flag` spellings still parse.
+
+### 2026-08-30 · eval(session): iteration 3 — the ADR-020 skill vs main's, four evals · 4e7f673
+
+- Summary: Iteration 3 of the skill-creator loop on the ADR-020 skill: four evals (end-leave new, end-close now measures `close`), with_skill 24/24 vs the SKILL.md shipped on main 22/24, one run per cell, graded against fixture clones; results, notes and Peter's review committed. Plus the tool's refusals as one clean line.
+- Why: The skill changed shape (join/open/none, end = leave, close) and needed re-measuring before the PR; Peter approved the run in the ADR-020 plan.
+- Files:
+  - `.claude/skills/session/evals/evals.json` (+14/−2) — eval 4 `end-leave` added; eval 3 prompt states the Goal is met; eval 1 session expectation = none | opened | joined with the disk agreeing; subcommand spelling
+  - `.claude/skills/session/evals/results/iteration-3/benchmark.json` (+468/−0) — aggregate: with_skill 100% vs old_skill 90%, +1.3 s, +5,664 tokens (tokens from timing.json)
+  - `.claude/skills/session/evals/results/iteration-3/benchmark.md` (+13/−0) — aggregate: with_skill 100% vs old_skill 90%, +1.3 s, +5,664 tokens (tokens from timing.json)
+  - `.claude/skills/session/evals/results/iteration-3/end-close/eval_metadata.json` (+13/−0) — eval end-close: prompt + expectations handed to the graders (eval 4 end-leave is new; eval 1's session expectation accepts none | opened | joined)
+  - `.claude/skills/session/evals/results/iteration-3/end-close/old_skill/grading.json` (+125/−0) — main's SKILL.md (baseline), end-close: grader verdict 6/6
+  - `.claude/skills/session/evals/results/iteration-3/end-close/old_skill/outputs/git-state.txt` (+46/−0) — main's SKILL.md (baseline), end-close output — HEAD, status, log, session list and gate output at the end of the run
+  - `.claude/skills/session/evals/results/iteration-3/end-close/old_skill/outputs/overview.diff` (+1/−0) — main's SKILL.md (baseline), end-close output — `git diff HEAD~1 -- docs/OVERVIEW.md` at the end of the run
+  - `.claude/skills/session/evals/results/iteration-3/end-close/old_skill/outputs/reply.md` (+2/−0) — main's SKILL.md (baseline), end-close output — the run's verbatim reply
+  - `.claude/skills/session/evals/results/iteration-3/end-close/old_skill/outputs/session-file.md` (+13/−0) — main's SKILL.md (baseline), end-close output — the session file as the run left it
+  - `.claude/skills/session/evals/results/iteration-3/end-close/old_skill/outputs/transcript.md` (+17/−0) — main's SKILL.md (baseline), end-close output — the run's own step-by-step account of reads and commands
+  - `.claude/skills/session/evals/results/iteration-3/end-close/old_skill/timing.json` (+1/−0) — main's SKILL.md (baseline), end-close: 82,094 tokens, 137.1 s (from the subagent's completion notification)
+  - `.claude/skills/session/evals/results/iteration-3/end-close/with_skill/grading.json` (+125/−0) — ADR-020 skill, end-close: grader verdict 6/6
+  - `.claude/skills/session/evals/results/iteration-3/end-close/with_skill/outputs/git-state.txt` (+56/−0) — ADR-020 skill, end-close output — HEAD, status, log, session list and gate output at the end of the run
+  - `.claude/skills/session/evals/results/iteration-3/end-close/with_skill/outputs/overview.diff` (+1/−0) — ADR-020 skill, end-close output — `git diff HEAD~1 -- docs/OVERVIEW.md` at the end of the run
+  - `.claude/skills/session/evals/results/iteration-3/end-close/with_skill/outputs/reply.md` (+2/−0) — ADR-020 skill, end-close output — the run's verbatim reply
+  - `.claude/skills/session/evals/results/iteration-3/end-close/with_skill/outputs/session-file.md` (+65/−0) — ADR-020 skill, end-close output — the session file as the run left it
+  - `.claude/skills/session/evals/results/iteration-3/end-close/with_skill/outputs/transcript.md` (+82/−0) — ADR-020 skill, end-close output — the run's own step-by-step account of reads and commands
+  - `.claude/skills/session/evals/results/iteration-3/end-close/with_skill/timing.json` (+1/−0) — ADR-020 skill, end-close: 118,917 tokens, 206.5 s (from the subagent's completion notification)
+  - `.claude/skills/session/evals/results/iteration-3/end-leave/eval_metadata.json` (+11/−0) — eval end-leave: prompt + expectations handed to the graders (eval 4 end-leave is new; eval 1's session expectation accepts none | opened | joined)
+  - `.claude/skills/session/evals/results/iteration-3/end-leave/old_skill/grading.json` (+138/−0) — main's SKILL.md (baseline), end-leave: grader verdict 3/4 — failed: reply.md is at most 60 words, states what shipped
+  - `.claude/skills/session/evals/results/iteration-3/end-leave/old_skill/outputs/git-state.txt` (+49/−0) — main's SKILL.md (baseline), end-leave output — HEAD, status, log, session list and gate output at the end of the run
+  - `.claude/skills/session/evals/results/iteration-3/end-leave/old_skill/outputs/overview.diff` (+1/−0) — main's SKILL.md (baseline), end-leave output — `git diff HEAD~1 -- docs/OVERVIEW.md` at the end of the run
+  - `.claude/skills/session/evals/results/iteration-3/end-leave/old_skill/outputs/reply.md` (+2/−0) — main's SKILL.md (baseline), end-leave output — the run's verbatim reply
+  - `.claude/skills/session/evals/results/iteration-3/end-leave/old_skill/outputs/session-file.md` (+13/−0) — main's SKILL.md (baseline), end-leave output — the session file as the run left it
+  - `.claude/skills/session/evals/results/iteration-3/end-leave/old_skill/outputs/transcript.md` (+87/−0) — main's SKILL.md (baseline), end-leave output — the run's own step-by-step account of reads and commands
+  - `.claude/skills/session/evals/results/iteration-3/end-leave/old_skill/timing.json` (+1/−0) — main's SKILL.md (baseline), end-leave: 89,228 tokens, 154.8 s (from the subagent's completion notification)
+  - `.claude/skills/session/evals/results/iteration-3/end-leave/with_skill/grading.json` (+129/−0) — ADR-020 skill, end-leave: grader verdict 4/4
+  - `.claude/skills/session/evals/results/iteration-3/end-leave/with_skill/outputs/git-state.txt` (+47/−0) — ADR-020 skill, end-leave output — HEAD, status, log, session list and gate output at the end of the run
+  - `.claude/skills/session/evals/results/iteration-3/end-leave/with_skill/outputs/overview.diff` (+37/−0) — ADR-020 skill, end-leave output — `git diff HEAD~1 -- docs/OVERVIEW.md` at the end of the run
+  - `.claude/skills/session/evals/results/iteration-3/end-leave/with_skill/outputs/reply.md` (+2/−0) — ADR-020 skill, end-leave output — the run's verbatim reply
+  - `.claude/skills/session/evals/results/iteration-3/end-leave/with_skill/outputs/session-file.md` (+27/−0) — ADR-020 skill, end-leave output — the session file as the run left it
+  - `.claude/skills/session/evals/results/iteration-3/end-leave/with_skill/outputs/transcript.md` (+19/−0) — ADR-020 skill, end-leave output — the run's own step-by-step account of reads and commands
+  - `.claude/skills/session/evals/results/iteration-3/end-leave/with_skill/timing.json` (+1/−0) — ADR-020 skill, end-leave: 86,229 tokens, 152.4 s (from the subagent's completion notification)
+  - `.claude/skills/session/evals/results/iteration-3/feedback.json` (+45/−0) — Peter's review: every run reviewed, no feedback ("looks good"); written in the viewer's submit shape because closing its done-dialog erases an all-empty submission (plugin-kit viewer bug)
+  - `.claude/skills/session/evals/results/iteration-3/notes.json` (+13/−0) — analyst pass: the contaminated baseline, the two join/none and word-count misses, the harness variance between clones, the ungraded Outcome/Narrative gap flagged by five graders, token/time per eval
+  - `.claude/skills/session/evals/results/iteration-3/record-commit/eval_metadata.json` (+14/−0) — eval record-commit: prompt + expectations handed to the graders (eval 4 end-leave is new; eval 1's session expectation accepts none | opened | joined)
+  - `.claude/skills/session/evals/results/iteration-3/record-commit/old_skill/grading.json` (+142/−0) — main's SKILL.md (baseline), record-commit: grader verdict 7/7
+  - `.claude/skills/session/evals/results/iteration-3/record-commit/old_skill/outputs/commit.diff` (+174/−0) — main's SKILL.md (baseline), record-commit output — `git show HEAD` at the end of the run
+  - `.claude/skills/session/evals/results/iteration-3/record-commit/old_skill/outputs/git-state.txt` (+14/−0) — main's SKILL.md (baseline), record-commit output — HEAD, status, log, session list and gate output at the end of the run
+  - `.claude/skills/session/evals/results/iteration-3/record-commit/old_skill/outputs/overview.diff` (+36/−0) — main's SKILL.md (baseline), record-commit output — `git diff HEAD~1 -- docs/OVERVIEW.md` at the end of the run
+  - `.claude/skills/session/evals/results/iteration-3/record-commit/old_skill/outputs/reply.md` (+13/−0) — main's SKILL.md (baseline), record-commit output — the run's verbatim reply
+  - `.claude/skills/session/evals/results/iteration-3/record-commit/old_skill/outputs/session-file.md` (+63/−0) — main's SKILL.md (baseline), record-commit output — the session file as the run left it
+  - `.claude/skills/session/evals/results/iteration-3/record-commit/old_skill/outputs/transcript.md` (+71/−0) — main's SKILL.md (baseline), record-commit output — the run's own step-by-step account of reads and commands
+  - `.claude/skills/session/evals/results/iteration-3/record-commit/old_skill/timing.json` (+1/−0) — main's SKILL.md (baseline), record-commit: 132,538 tokens, 298 s (from the subagent's completion notification)
+  - `.claude/skills/session/evals/results/iteration-3/record-commit/with_skill/grading.json` (+142/−0) — ADR-020 skill, record-commit: grader verdict 7/7
+  - `.claude/skills/session/evals/results/iteration-3/record-commit/with_skill/outputs/commit.diff` (+163/−0) — ADR-020 skill, record-commit output — `git show HEAD` at the end of the run
+  - `.claude/skills/session/evals/results/iteration-3/record-commit/with_skill/outputs/git-state.txt` (+13/−0) — ADR-020 skill, record-commit output — HEAD, status, log, session list and gate output at the end of the run
+  - `.claude/skills/session/evals/results/iteration-3/record-commit/with_skill/outputs/overview.diff` (+27/−0) — ADR-020 skill, record-commit output — `git diff HEAD~1 -- docs/OVERVIEW.md` at the end of the run
+  - `.claude/skills/session/evals/results/iteration-3/record-commit/with_skill/outputs/reply.md` (+11/−0) — ADR-020 skill, record-commit output — the run's verbatim reply
+  - `.claude/skills/session/evals/results/iteration-3/record-commit/with_skill/outputs/session-file.md` (+67/−0) — ADR-020 skill, record-commit output — the session file as the run left it
+  - `.claude/skills/session/evals/results/iteration-3/record-commit/with_skill/outputs/transcript.md` (+92/−0) — ADR-020 skill, record-commit output — the run's own step-by-step account of reads and commands
+  - `.claude/skills/session/evals/results/iteration-3/record-commit/with_skill/timing.json` (+1/−0) — ADR-020 skill, record-commit: 139,565 tokens, 277 s (from the subagent's completion notification)
+  - `.claude/skills/session/evals/results/iteration-3/start-brief/eval_metadata.json` (+15/−0) — eval start-brief: prompt + expectations handed to the graders (eval 4 end-leave is new; eval 1's session expectation accepts none | opened | joined)
+  - `.claude/skills/session/evals/results/iteration-3/start-brief/old_skill/grading.json` (+153/−0) — main's SKILL.md (baseline), start-brief: grader verdict 6/7 — failed: The brief's Session line states one of the three o
+  - `.claude/skills/session/evals/results/iteration-3/start-brief/old_skill/outputs/brief.md` (+9/−0) — main's SKILL.md (baseline), start-brief output — the brief the run posted (verbatim reply)
+  - `.claude/skills/session/evals/results/iteration-3/start-brief/old_skill/outputs/git-state.txt` (+28/−0) — main's SKILL.md (baseline), start-brief output — HEAD, status, log, session list and gate output at the end of the run
+  - `.claude/skills/session/evals/results/iteration-3/start-brief/old_skill/outputs/session-file.md` (+795/−0) — main's SKILL.md (baseline), start-brief output — the session file as the run left it
+  - `.claude/skills/session/evals/results/iteration-3/start-brief/old_skill/outputs/transcript.md` (+139/−0) — main's SKILL.md (baseline), start-brief output — the run's own step-by-step account of reads and commands
+  - `.claude/skills/session/evals/results/iteration-3/start-brief/old_skill/timing.json` (+1/−0) — main's SKILL.md (baseline), start-brief: 187,562 tokens, 244.6 s (from the subagent's completion notification)
+  - `.claude/skills/session/evals/results/iteration-3/start-brief/with_skill/grading.json` (+150/−0) — ADR-020 skill, start-brief: grader verdict 7/7
+  - `.claude/skills/session/evals/results/iteration-3/start-brief/with_skill/outputs/brief.md` (+9/−0) — ADR-020 skill, start-brief output — the brief the run posted (verbatim reply)
+  - `.claude/skills/session/evals/results/iteration-3/start-brief/with_skill/outputs/git-state.txt` (+41/−0) — ADR-020 skill, start-brief output — HEAD, status, log, session list and gate output at the end of the run
+  - `.claude/skills/session/evals/results/iteration-3/start-brief/with_skill/outputs/session-file.md` (+10/−0) — ADR-020 skill, start-brief output — the session file as the run left it
+  - `.claude/skills/session/evals/results/iteration-3/start-brief/with_skill/outputs/transcript.md` (+106/−0) — ADR-020 skill, start-brief output — the run's own step-by-step account of reads and commands
+  - `.claude/skills/session/evals/results/iteration-3/start-brief/with_skill/timing.json` (+1/−0) — ADR-020 skill, start-brief: 169,367 tokens, 203.7 s (from the subagent's completion notification)
+  - `.claude/skills/session/scripts/session.ts` (+14/−3) — refuse(): an unknown command, a selection error or a read failure prints one `session: …` line and exits 1 instead of a stack trace
+- Notes: Verified: every grade re-run against its fixture clone by the grader (reflogs, `git show`, `wc -w`, driver re-runs, `session check` re-run); aggregate via the fixed aggregator. Not verified / caveats: one run per cell; the baseline swapped only SKILL.md so three old-skill runs followed the new docs (the +0.10 measures the skill text inside the new system); fixtures for start-brief and record-commit were cloned before 66b083d's entry landed, so those four runs had a 31-file skeleton to fill (handled per the skill by both arms); the human review was recorded by hand after the viewer's done-dialog erased an all-empty submit twice (bug for plugin-kit: `closeDoneDialog()` re-saves as in_progress with only non-empty feedback). Open: five graders flagged that Outcome/Narrative/Shipped claims are tied to no transcript evidence — the next eval iteration's expectation to add.
