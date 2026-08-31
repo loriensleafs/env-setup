@@ -184,7 +184,7 @@ _Avoid_: dotfiles (the item's name), rc lines
 **Session log**:
 The `docs/sessions/` files together: the append-only record of every change that reached `main`
 and the narrative around it — what a conversation reads to rehydrate.
-_Avoid_: ledger, history, changelog (that is the generated one)
+_Avoid_: ledger (former name, retired by ADR-017), history, changelog (that is the generated CHANGELOG.md)
 
 **Session**:
 A bounded stream of work toward one Goal, recorded in one `docs/sessions/SES-NNN` file;
@@ -234,3 +234,42 @@ _Avoid_: log entry, note, update, record (as the noun), commit (as the unit — 
 To write the entry and update everything the commit made stale, in the same step; the practice
 the docs system depends on.
 _Avoid_: update, log, document (as the verb for this)
+
+## Secrets
+
+**Secret store**:
+The age-encrypted `secrets.json.age` committed to the repo, unlocked by one passphrase.
+_Avoid_: vault, keychain (that is macOS's, where the API key ends up)
+
+**License**:
+A per-app activation key held in the secret store; applied by writing it (scriptable apps) or by a
+paste ceremony (online-validated apps).
+_Avoid_: key (alone), serial
+
+## Relationships
+
+- A **Machine** has one **Manifest**; the Manifest says which **Items** are **Wanted** and with
+  which **Config**; the **Effective config** is that Config or the **Defaults**.
+- A **Run** executes the **Picked** Items as **Steps**; a Step that needs a human queues a
+  **Ceremony** for the **Connect phase**; the **Journal** records every Step.
+- A **Session** serves at most one **Plan part**; a **Conversation** names the Session in progress
+  it logs into, or starts one, before its first commit; a commit worth reading about is one
+  **Entry** in that Session's file; the **Gate** counts the Entries and the placeholders.
+
+## Flagged ambiguities (word conflicts, resolved)
+
+- **ledger** → Session log. The name before ADR-017; it came back once and was retired again. A
+  former name: live prose says Session log; a record written under the old name keeps it.
+- **open** / **closed** — the Session status words before ADR-024; the Status is `in progress` or
+  `done` now. SES-001…007, the ADRs and the analyses keep them as records; live prose uses "open"
+  only as the ordinary verb (open a PR).
+- **check** — Detect and Doctor avoid it; `session check` is the command that runs the Gate. The
+  noun is Gate; "check" names the command only.
+- **session** / **conversation** — one Session holds many Conversations. "This session" in a
+  prompt usually means the Conversation; one agent context is a Conversation.
+- **Step** is an Item's execution within a Run. The plan's unit is a Plan part, never a step.
+
+## Open (not yet canonical — being sharpened)
+
+- None at the moment. Terms asserted here without a decision conversation (Ceremony, Connect
+  phase, Finishing pass, Converge, Section, Kind, Reference clone) are open to challenge.

@@ -103,9 +103,9 @@ bun run compile                  # standalone binary → dist/envsetup
 bun run changelog                # regenerate CHANGELOG.md (git-cliff)
 ```
 
-The session tool (`list`, `new`, `append`, `current`, `check`, `close`) is the `session`
-plugin's, run by the `/session` skill as `bun "${CLAUDE_PLUGIN_ROOT}/skills/session/scripts/session.ts" …`; by hand,
-`bun ~/Dev/ACMElabs/sessions/skills/session/scripts/session.ts <command>` (ADR-023).
+The session tool (`help`, `init`, `template`, `list`, `new`, `append`, `current`, `check`,
+`close`) is the `brain` plugin's, run by the `/brain:session` skill; by hand,
+`bun ~/Dev/ACMElabs/brain/skills/session/scripts/cli.ts <command>` (ADR-024).
 
 ## Safety when running it
 

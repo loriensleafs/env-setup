@@ -26,7 +26,7 @@ Owner: Peter Kloss (github loriensleafs). Public repo. Released: v0.1.9 (2026-08
 | The `brain` plugin ([acmelabs-15/brain](https://github.com/acmelabs-15/brain), ADR-024; the sessions repo's history is merged there) | **`/brain:session start · log · close`** (typed-only commands `/brain:session-start`, `/brain:session-log`, `/brain:session-close`) — the record with three acts: start a session from a description and mark its plan part; append/fill each commit's entry and update what it made stale; close when the Goal is done and mark the part done. Rehydration is the plan's: the read order above, and `/brain:plan PLAN-NNN` once it lands. Built with plugin-kit; the skill, its tool and its evals live there, not here. | plugin-kit (plugin-creator, skill-creator, command-creator) |
 | [CLAUDE.md](../CLAUDE.md) (= `AGENTS.md`) | Always-loaded agent brief: how to rehydrate (reading order), how to work with Peter, how to record, hard rules, architecture essentials, safety. | by hand |
 | [CONTRIBUTING.md](../CONTRIBUTING.md) | Setup, change workflow, conventional commits, **how to cut a release**. | by hand |
-| [docs/sessions/](sessions/README.md) `SES-NNN` | **What was done, session by session** — a session is a stream of work toward one Goal, `in progress` until `done`, spanning conversations (ADR-020, ADR-024): Goal / Status / Plan / Outcome, a Narrative (asked, tried, abandoned, verified), per commit a Summary, Why and a note per touched file. **Read every open one right after "Status".** | the `brain` plugin's tool (`list`, `new <slug>` starts, `check` gates, `close`) + the author |
+| [docs/sessions/](sessions/README.md) `SES-NNN` | **What was done, session by session** — a session is a stream of work toward one Goal, `in progress` until `done`, spanning conversations (ADR-020, ADR-024): Goal / Status / Plan / Outcome, a Narrative (asked, tried, abandoned, verified), per commit a Summary, Why and a note per touched file. **Read the one the plan part names right after "Status".** | the `brain` plugin's tool (`list`, `new <slug>` starts, `check` gates, `close`) + the author |
 | [docs/plan/](plan/README.md) `PRD-NNN` / `PLAN-NNN` | **What we build and why** ([PRD-001](plan/PRD-001-envsetup.md): promise, UX requirements, item catalog with chosen defaults, boundaries, success criteria; its **Plans** table names every plan) and **how** (one plan per feature; each **part** carries `> Status: planned \| in progress (session SES-NNN) \| done (session SES-NNN, sha)` — the pointer a new conversation follows to the session doing the work, ADR-022). | `spec-driven-development`, `planning-and-task-breakdown` skills |
 | [docs/decisions/](decisions/README.md) `ADR-NNN` | **Current truth of every decision** with alternatives and consequences. Read the ADR for the area before touching it. | `documentation-and-adrs`, `grill-with-docs` skills |
 | [docs/analysis/](analysis/README.md) `ANA-NNN` | **What we found out** — research against primary sources and empirical spikes, cited per claim, refutations recorded. | `research` skill / spikes |
@@ -83,7 +83,7 @@ small separate commands, merge commits). The facts below are the ones a rule can
   GitHub release; `install.sh` (served from `main`) downloads `releases/latest`. CI (`ci.yml`) =
   check + tests + gitleaks.
 - **Dev tooling** ([ADR-016](decisions/ADR-016-dev-tooling.md)): Biome, markdownlint-cli2, lefthook,
-  git-cliff, all no-Node. `bun run check|fix|test|compile|changelog|session`.
+  git-cliff, all no-Node. `bun run check|fix|test|compile|changelog`.
 
 ## Key empirical facts (hard-won; do not relearn)
 
@@ -145,8 +145,14 @@ small separate commands, merge commits). The facts below are the ones a rule can
   `/plan [PLAN-NNN]` will own the walk; the session skill keeps the record with three acts
   (`start · log · close`) and one status (`in progress | done`); join / open / leave and `Open at
   end` go. Decided in acmelabs-15/sessions, carried out in acmelabs-15/brain (its PLAN-001), whose
-  `brain` 0.4.0 plugin is now the installed home of `/brain:session`. This repo's docs still say
-  `/session start · entry · end · close` — the sweep to the installed forms is SES-008's next step.
+  `brain` 0.4.0 plugin is now the installed home of `/brain:session`. `repo-brain` replaces
+  `repo-sessions` in `ACMELABS_REPOS` and the marketplace lists brain (`d9398d7`). The sweep to the
+  installed forms landed (`260a510`): `CLAUDE.md` § Rehydrating is the read order alone, § Recording
+  names `log` and `close`; README, this file, `docs/sessions/README.md` and `CONTEXT.md` § The
+  session log say `/brain:session start · log · close`. Its docs(session) commit restores the
+  `CONTEXT.md` tail the hand regeneration cut (§ Secrets, § Relationships, § Flagged ambiguities,
+  § Open, `ledger`'s former-name marker) and sweeps CONTRIBUTING, `CLAUDE.md` § Commands, the run
+  skills and `docs/sessions/CLAUDE.md`.
 - **Parked, not on `main`:** the visual-grouping patch ([PLAN-001](plan/PLAN-001-visual-grouping.md))
   as a WIP commit on local branch `wip/visual-grouping` (unverified, never run under a PTY).
 
@@ -165,8 +171,8 @@ small separate commands, merge commits). The facts below are the ones a rule can
 
 ## How to resume work
 
-1. Orient — the order in CLAUDE.md "Rehydrating": this file ("Status", "Next up") → every open
-   [session](sessions/README.md) in full → the [ADR](decisions/README.md) / [PRD](plan/PRD-001-envsetup.md)
+1. Orient — the order in CLAUDE.md "Rehydrating": this file ("Status", "Next up") → the
+   [session](sessions/README.md) the plan part names, in full → the [ADR](decisions/README.md) / [PRD](plan/PRD-001-envsetup.md)
    section / [analysis](analysis/README.md) for the area you will touch → `git show <sha>` only
    when the exact diff matters.
 2. Read down from the plan as CLAUDE.md § Rehydrating says (`/brain:plan PLAN-NNN` once it lands); the part's

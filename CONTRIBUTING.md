@@ -30,16 +30,17 @@ bun test                             # bun:test suite
 
 ## Making a change
 
-1. **Rehydrate, then join or open a session.** `/session start [PLAN-NNN]` (alias `/session-start`; the
-   `sessions` plugin, ADR-023) reads the docs system in order, then — before the first commit — joins
-   the open session the plan part's status line names, or opens one: `session new <slug> --plan
-   "PLAN-NNN · part N"` (creates `docs/sessions/SES-<next>-<slug>.md`) and sets the part to
-   `in progress (session SES-NNN)` (ADR-022); set the file's title and `Goal`. `session` here is
-   the plugin's tool — the skill runs it; by hand it is
-   `bun ~/Dev/ACMElabs/sessions/skills/session/scripts/session.ts`.
-   A session is a stream of work, open until closed, and may outlive this conversation (ADR-020);
-   a conversation that changes nothing needs none. Keep its Narrative as things happen (requests,
-   decisions, dead ends, what was verified and how).
+1. **Rehydrate, then name your session.** Read the docs system in the order CLAUDE.md
+   § Rehydrating gives (`/brain:plan PLAN-NNN` once it lands — ADR-024); the plan part's status
+   line names the session `in progress` that every `/brain:session log` writes into. New work:
+   `/brain:session start <description> --plan "PLAN-NNN · part N"` runs `session new <slug>
+   --plan …` (creates `docs/sessions/SES-<next>-<slug>.md`), sets the part to
+   `in progress (session SES-NNN)` (ADR-022) and writes the file's title and `Goal`. `session`
+   here is the `brain` plugin's tool — the skill runs it; by hand it is
+   `bun ~/Dev/ACMElabs/brain/skills/session/scripts/cli.ts`.
+   A session is a stream of work, `in progress` until `done`, and may outlive this conversation
+   (ADR-020); a conversation that changes nothing needs none. Keep its Narrative as things happen
+   (requests, decisions, dead ends, what was verified and how).
 
 2. **Branch off `main`** — never commit directly to `main`.
 
@@ -95,9 +96,9 @@ bun test                             # bun:test suite
    placeholder (template in [docs/sessions/README.md](docs/sessions/README.md)); `session current --session SES-NNN` lists what is left; `session
    check --session SES-NNN`; tick the plan part's tasks citing the sha; update `docs/OVERVIEW.md` "Status" / "Next up" and any ADR / PRD / plan / analysis
    / `CONTEXT.md` / nested `CLAUDE.md` the change made stale, citing the sha; commit as
-   `docs(session): …`. `/session entry` (alias `/session-entry`) is this step as a procedure; when
-   you leave, `/session end` checks nothing was deferred and writes the handoff (the session
-   stays open); when the Goal is done, `/session close` writes the Outcome, runs `session
+   `docs(session): …`. `/brain:session log` (typed-only `/brain:session-log`) is this step as a
+   procedure; a conversation that stops does nothing — the session stays `in progress` (ADR-024);
+   when the Goal is done, `/brain:session close SES-NNN` writes the Outcome, runs `session
    close --session SES-NNN` and marks the plan part `done (session SES-NNN, sha)`.
 
 8. **Open a PR** (`gh pr create`). CI (`.github/workflows/ci.yml`) runs the same checks plus a
@@ -136,7 +137,7 @@ git push origin v0.2.0
 gh run watch "$(gh run list --workflow=release.yml --limit 1 --json databaseId -q '.[0].databaseId')" --exit-status
 gh release view v0.2.0 --json assets -q '[.assets[].name] | join(", ")'
 
-# 6. Record it: the release marker lands in the session log (/session entry — the tool appends, then gates)
+# 6. Record it: the release marker lands in the session log (/brain:session log — the tool appends, then gates)
 session append --session SES-NNN && session check --session SES-NNN
 ```
 

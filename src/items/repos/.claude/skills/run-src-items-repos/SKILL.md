@@ -20,7 +20,7 @@ SCRATCH=/tmp/envsetup-repos bun src/items/repos/.claude/skills/run-src-items-rep
 ```
 
 ```text
-ACMELABS_REPOS: repo-skills, repo-ask-user-question, repo-plugin-kit, repo-code-review, repo-code-simplifier
+ACMELABS_REPOS: repo-skills, repo-ask-user-question, repo-plugin-kit, repo-brain, repo-code-review, repo-code-simplifier
 REFERENCE_REPOS: basic-memory, addy-osmani-agent-skills, matt-pocock-skills, rj-murillo-ai-agents
 expandHome("~/Dev") → /Users/peterkloss/Dev
 renderMarketplace(fixture with skills only) → included=skills · 18 lines

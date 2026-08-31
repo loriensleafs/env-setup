@@ -56,7 +56,7 @@ bun run check                              # the full gate (Biome + tsc + markdo
 ## Run (agent path) — session log
 
 ```bash
-bun ~/Dev/ACMElabs/sessions/skills/session/scripts/session.ts check --session SES-NNN    # → session: complete (SES-NNN, open)  (the session plugin's tool)
+bun ~/Dev/ACMElabs/brain/skills/session/scripts/cli.ts check --session SES-NNN    # → session: complete (SES-NNN, in progress)  (the brain plugin's tool)
 ```
 
 Scope the link check to a subdirectory with the argument above.
