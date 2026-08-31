@@ -128,3 +128,15 @@ settled as ADR-021 (`77aa614`): value only, `Also:` lines, the `Session-entry: n
   - `docs/decisions/README.md` (+1/−0) — index row 021
   - `docs/sessions/README.md` (+15/−6) — rule 'the ledger holds value only' and the template's `Also:` line
 - Notes: Verified in a scratch clone with the new tool: a commit made with `-m "Session-entry: none"` appends nothing; a fix-up commit with `- Also: <sha>` under its parent is not reported missing; 15 lib tests pass. First probe was invalid (clone taken before the code was committed, so it ran the old tool) and was redone. Unverified: the skill's new entry-step wording in a run (next eval iteration).
+
+### 2026-08-30 · docs: sweep the claims ADR-020/021 made stale — OVERVIEW modes and run-skill row, run-docs spellings, ADR-017 status note, value-only rule in README and sessions CLAUDE.md · 5ca06eb
+
+- Summary: A sweep for claims ADR-020/021 made stale: OVERVIEW still listed three modes and scripts/, run-docs used the old command spelling, ADR-017 quoted it, README and the sessions CLAUDE.md lacked the value-only rule.
+- Why: Peter: "everything that needs to be updated has been updated including project level CLAUDE.md/README.md/docs/*?" — a grep sweep said no; the glossary/duplicate/shape check was clean.
+- Files:
+  - `README.md` (+1/−1) — the working-on-it line names the value-only rule (ADR-021)
+  - `docs/.claude/skills/run-docs/SKILL.md` (+2/−2) — its two session-tool blocks in subcommand spelling (`check --session`, `new <slug>`); the check block was run
+  - `docs/OVERVIEW.md` (+4/−3) — Status bullet names the four modes and ADR-020/021 with an entry-grain line; the run-skill row no longer lists scripts/
+  - `docs/decisions/ADR-017-docs-system.md` (+6/−0) — dated status note pointing at ADR-020 and ADR-021 (its quoted `-- --flag` commands are the old spelling; the decision stands)
+  - `docs/sessions/CLAUDE.md` (+2/−1) — invariant carries the value-only rule (Also lines, the trailer)
+- Notes: Verified by re-running the sweep (old spellings, three-mode lists, scripts/ mentions, old ADR ranges: none left outside history and dated ADR notes), `bun run check`, link-check (138 links, 0 broken) and verify-agent-docs.py (0 avoid-words, 0 duplicate sentences).
