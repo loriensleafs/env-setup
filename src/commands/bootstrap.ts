@@ -361,6 +361,8 @@ export async function executePlan(
         if (outcome.kind === "succeeded") stop(`${id} installed`);
         else if (outcome.kind === "skipped-installed") stop(`${id} already installed`);
         else if (outcome.kind === "skipped-completed") stop(`${id} done in previous run`);
+        else if (outcome.kind === "deferred")
+          stop(`${id} — attended step, run ${color.bold("envsetup connect")}`);
         else if (outcome.kind === "skipped-dependency") {
           // No spinner was started for skipped steps — surface as a log line.
           p.log.warn(`${id} skipped: ${outcome.because} failed`);
@@ -384,6 +386,13 @@ export async function executePlan(
     );
   } else {
     p.log.success(`Installed ${report.succeeded.length} items in ${runElapsed}s`);
-    p.outro(color.green("all done"));
+    if (report.deferred.length > 0) {
+      p.log.info(
+        `${report.deferred.length} attended step(s) remain (${report.deferred.join(", ")}) — run ${color.bold("envsetup connect")}, then sync again`,
+      );
+      p.outro(color.green("all done here — finish with envsetup connect"));
+    } else {
+      p.outro(color.green("all done"));
+    }
   }
 }
