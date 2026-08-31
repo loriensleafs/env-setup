@@ -1,5 +1,5 @@
 ---
-description: "Alias for `/session end` — check the session log is complete, OVERVIEW Status is current and the tree is clean, then post the closing note. Typed only; never invoked by Claude on its own."
+description: "Alias for `/session end` — leave: check the session log is complete, write the handoff in Open at end, confirm OVERVIEW Status and a clean tree, post the closing note; the session stays open. Typed only; never invoked by Claude on its own."
 disable-model-invocation: true
 ---
 

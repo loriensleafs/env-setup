@@ -1,0 +1,13 @@
+$ git status --short
+
+$ git log --oneline -5
+6b72e66 docs(session): record fa48ee0 (set-favorites.swift re-sync) and the swept-in 66b083d in SES-006
+6726ebc docs(session): start record-eval session
+fa48ee0 fix(finder): re-sync set-favorites.swift with the embedded SET_FAVORITES_SWIFT constant
+66b083d feat(session): sessions are streams of work with status; tool moves into the skill as a subcommand CLI
+ae7c617 Merge pull request #32 from loriensleafs/eval/session-sweeps
+
+$ bun run session check --session SES-006
+$ bun .claude/skills/session/scripts/session.ts check --session "SES-006"
+session: complete (SES-006, open)
+exit: 0

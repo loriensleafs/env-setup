@@ -1,0 +1,36 @@
+diff --git a/docs/OVERVIEW.md b/docs/OVERVIEW.md
+index 6005613..ad6b5f3 100644
+--- a/docs/OVERVIEW.md
++++ b/docs/OVERVIEW.md
+@@ -122,12 +122,16 @@ small separate commands, merge commits). The facts below are the ones a rule can
+   Trigger and tier sweeps run (ANA-009 addendum): the description routes 9/10 on Fable and Opus,
+   6/10 Sonnet, 2/10 Haiku, over-triggers nowhere, and was left unchanged; outcomes 100% Sonnet,
+   95% Opus/Fable, 70% Haiku. Unverified: the `!` injection in a real conversation.
+-- **Session model** (ADR-020): a session is a stream of work with `Status: open | closed` and a
++- **Session model** (ADR-020, `66b083d`, recorded in [SES-006](sessions/SES-006-record-eval.md)): a session is a stream of work with `Status: open | closed` and a
+   `Plan:` line, spanning conversations; the tool selects by status (`list`, `close`,
+   `--plan`) and now lives inside the skill (`.claude/skills/session/scripts/`, pure half
+   `session-lib.ts` with tests; `/run-session-tool` drives it; `scripts/` is gone); the skill gained
+   `close` (`end` = leave). SES-001…003 closed; SES-004 (this docs stream) open; SES-005 left to its
+   conversation.
++- **Finder asset re-synced** ([SES-006](sessions/SES-006-record-eval.md), `6fcd7df`, on `feat/session-model`, PR pending):
++  `src/items/finder/assets/set-favorites.swift` is byte-identical to the embedded `SET_FAVORITES_SWIFT`
++  again (`--list` mode, `LSSharedFileListItemCopyResolvedURL`) — verified by the finder driver's `===`
++  line and a byte comparison; Next-up 5 keeps only the `hooks-format.ts` finding.
+ - **Parked, not on `main`:** the visual-grouping patch ([PLAN-001](plan/PLAN-001-visual-grouping.md))
+   as a WIP commit on local branch `wip/visual-grouping` (unverified, never run under a PTY).
+ 
+@@ -139,10 +143,10 @@ small separate commands, merge commits). The facts below are the ones a rule can
+    bugs; ceremonies were never exercised in one pass. Write `PLAN-003` first if it grows.
+ 3. Persist the binary to `~/.local/bin/envsetup` so re-runs don't re-download (PRD open question).
+ 4. Upstream investigation of the compiled idle-CPU spin.
+-5. **Findings from the run-skill drivers** (SES-004, `ba38081`): `src/items/finder/assets/set-favorites.swift`
+-   is stale vs the embedded `SET_FAVORITES_SWIFT` constant (the constant has `list`; runtime ships the
+-   constant — re-sync the file or generate one from the other); `hooks-format.ts` exits 0 silently when
++5. **Findings from the run-skill drivers** (SES-004, `ba38081`): `hooks-format.ts` exits 0 silently when
+    Biome's config errors (e.g. `vcs.useIgnoreFile` outside a git repo) — consider logging to stderr.
++   (The other finding, `set-favorites.swift` stale vs the embedded constant, is done: re-synced in
++   SES-006, `6fcd7df`; generating one from the other remains optional.)
+ 
+ ## How to resume work
+ 

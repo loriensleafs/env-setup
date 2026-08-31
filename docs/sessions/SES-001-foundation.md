@@ -1,6 +1,7 @@
 # 2026-08-26 04:41 · Foundation — spine, UI, items, orchestrator, first releases
 
 - Goal: Stand up the pure-Bun CLI from scratch: item framework, manifest/journal, clack UI, orchestrator, first item groups, secrets, release pipeline; ship v0.0.1–v0.0.2.
+- Status: closed
 - Outcome: v0.0.1 + v0.0.2 released; `curl … | sh` bootstrap works on Peter's machine; ~40-item registry; dev tooling (Biome, markdownlint, lefthook, git-cliff, CI + gitleaks); config screens; reset-on-drift designed.
 - Open at end: Reset-on-drift (config-conflict consent) built but not released — blocks v0.1.0.
 

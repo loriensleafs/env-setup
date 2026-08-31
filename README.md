@@ -36,8 +36,8 @@ what is missing.
 
 ## Working on it
 
-Humans and agents start the same way (agents: `/session start` does it; `/session entry` after every commit, `/session end` to close): [docs/OVERVIEW.md](docs/OVERVIEW.md) (map, status, next up)
-→ the newest session in [docs/sessions/](docs/sessions/README.md) (what was done, with a note per
+Humans and agents start the same way (agents: `/session start` does it; `/session entry` after every commit, `/session end` to leave, `/session close` when the Goal is done): [docs/OVERVIEW.md](docs/OVERVIEW.md) (map, status, next up)
+→ the open sessions in [docs/sessions/](docs/sessions/README.md) (what was done, with a note per
 touched file) → [CONTEXT.md](CONTEXT.md) (the words) → [docs/decisions/](docs/decisions/README.md)
 (ADRs, the current truth of every decision) · [docs/plan/PRD-001-envsetup.md](docs/plan/PRD-001-envsetup.md)
 (requirements and the item catalog) · [docs/analysis/](docs/analysis/README.md) (research, cited).
@@ -55,7 +55,7 @@ Pure-Bun toolchain (no Node runtime). `bun install` also wires the git hooks (vi
 | `bun run check` | Biome (format + lint) · `tsc` typecheck · markdownlint |
 | `bun run fix` | Auto-fix everything (Biome `--write` + markdownlint `--fix`) |
 | `bun run test` | Bun test suite |
-| `bun run session` | Session log tool behind `/session start · entry · end`: `-- --new <slug>` starts a file, `-- --session SES-NNN` appends entries into it, `-- --current` lists placeholders, `-- --check` gates |
+| `bun run session` | Session log tool behind `/session start · entry · end · close`: `list` shows sessions and status, `new <slug>` opens one, `append --session SES-NNN` appends entries into it, `current` lists placeholders, `check` gates, `close` closes |
 | `bun run changelog` | Regenerate `CHANGELOG.md` from conventional commits (git-cliff) |
 | `bun run compile` | Build the standalone binary |
 

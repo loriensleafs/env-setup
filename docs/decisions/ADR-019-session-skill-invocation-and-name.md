@@ -5,7 +5,10 @@
 Accepted — revised 2026-08-30: the middle mode is `entry` (the artifact it writes; `start`/`end` stay
 verbs) and three typed-only aliases `/session-start`, `/session-entry`, `/session-end` exist as
 `.claude/commands/*.md` with `disable-model-invocation: true` (zero listing cost; Peter's call for
-discoverability in the `/` menu). Earlier text below says `record`.
+discoverability in the `/` menu). Earlier text below says `record`. Revised again the same day by
+[ADR-020](ADR-020-session-model.md): a session is a stream of work rather than a conversation, so
+`end` became *leave* (the session stays open) and a fourth mode `close` (with `/session-close`)
+closes it; `start` joins, opens, or states that no session is needed.
 
 ## Date
 

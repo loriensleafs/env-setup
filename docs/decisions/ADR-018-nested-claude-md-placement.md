@@ -32,7 +32,9 @@ scored all 56 directories against four criteria.
    Written: `src`, `src/commands`, `src/items`, `src/orchestrator`, `src/ui`, `src/items/chrome`,
    `src/items/claude-code` (with `assets/`), `src/items/defs`, `src/items/finder` (with `assets/`),
    `docs` and each docs subdirectory (a pointer to its README plus its one invariant), `.github`,
-   `scripts`. Not written: `exec`, `paths`, `ceremonies`, `quick-actions`, `typora`, `vendor`,
+   `scripts` (retired 2026-08-30 with ADR-020: the session tool moved into
+   `.claude/skills/session/scripts/`, the directory is gone, and `.claude/skills/session/CLAUDE.md`
+   carries its invariants). Not written: `exec`, `paths`, `ceremonies`, `quick-actions`, `typora`, `vendor`,
    `.github/workflows`, every `__tests__` (the sibling-tests convention is a root rule).
 2. **Cross-cutting facts that belong to a file type, not a directory, are path rules**:
    `.claude/rules/drivers.md` (`**/.claude/skills/**`: safe calls only, not typechecked, every

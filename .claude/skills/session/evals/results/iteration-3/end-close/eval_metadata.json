@@ -1,0 +1,13 @@
+{
+  "eval_id": 3,
+  "eval_name": "end-close",
+  "prompt": "That's it — the review found nothing to fix, so this one is done. Close it out.",
+  "expectations": [
+    "session-file.md has Outcome and Open at end written (no _(fill in)_ on either line), `- Status: closed`, and its Narrative mentions this closing; git-state.txt or transcript.md shows `bun run session close --session SES-006` printing `session: closed SES-006`",
+    "git-state.txt shows `bun run session check` printing session: complete and an empty git status --short",
+    "reply.md is at most 60 words and states what shipped in the conversation and the first thing to do next time",
+    "overview.diff is 'no change', or changes only Status/Next up with a reason in transcript.md grounded in this conversation's own work (not in fixture scaffolding commits)",
+    "docs/sessions/SES-005-rehydration.md is untouched (git-state.txt / commit shows no change to it) and no second session file was created",
+    "transcript.md shows no push, no PR opened, no merge"
+  ]
+}

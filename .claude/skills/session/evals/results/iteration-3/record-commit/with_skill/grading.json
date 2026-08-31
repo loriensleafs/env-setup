@@ -1,0 +1,142 @@
+{
+  "expectations": [
+    {
+      "text": "commit.diff shows HEAD is a commit whose subject starts with docs(session): and the fix(finder) commit is an ancestor",
+      "passed": true,
+      "evidence": "commit.diff header: 'commit 6b72e66ac54f…' subject 'docs(session): record fa48ee0 (set-favorites.swift re-sync) and the swept-in 66b083d in SES-006'. Fixture verified: `git log --oneline -6` = 6b72e66 docs(session) → 6726ebc docs(session): start → fa48ee0 fix(finder) → 66b083d; `git merge-base --is-ancestor fa48ee0 HEAD` exits 0; reflog shows exactly one new commit after the harness's two (no amend, no reset)."
+    },
+    {
+      "text": "session-file.md holds an entry for the fix(finder) commit whose src/items/finder/assets/set-favorites.swift line mentions --list or LSSharedFileListItemCopyResolvedURL (a specific phrase, not 'updated')",
+      "passed": true,
+      "evidence": "session-file.md entry '### 2026-08-30 · fix(finder): re-sync set-favorites.swift … · fa48ee0', file line: '`src/items/finder/assets/set-favorites.swift` (+21/−2) — gains the `--list` mode (`--list` as the first argument prints the current favorites' file paths … flags 3 = NoUserInteraction | DoNotMountVolumes, then exits 0) and the `LSSharedFileListItemCopyResolvedURL` binding (`SFLItemURLFn` typealias + `itemURL` in the dlsym guard); argument parsing split into `args` / `listMode` / `paths` …'. Fixture verified against `git show fa48ee0`: the diff adds `typealias SFLItemURLFn`, `let listMode = args.first == \"--list\"`, `sym(\"LSSharedFileListItemCopyResolvedURL\")` and the `if listMode {` block; numstat is 21/2. The phrase is diff-grounded, not the skill's example copied."
+    },
+    {
+      "text": "session-file.md's entry Notes state how the fix's claim was verified (a driver run, a byte comparison or swiftc), and transcript.md shows that verification command was actually run",
+      "passed": true,
+      "evidence": "session-file.md fa48ee0 Notes: 'Verified in this conversation by `bun src/items/finder/.claude/skills/run-src-items-finder/driver.ts` → `SET_FAVORITES_SWIFT === assets/set-favorites.swift ✓`, `swiftc -typecheck` ✓ for the file and the constant; `wc -l` = 83 …; `bun test src/items/finder/__tests__` → 2 pass.' transcript.md step 9 lists that driver run with its output lines, `wc -l` → 83 and the finder tests 2 pass. Grader re-ran the driver in the fixture: it prints exactly 'SET_FAVORITES_SWIFT === assets/set-favorites.swift ✓', both `swiftc -typecheck` ✓, 'OK', exit 0; `wc -l` = 83. Caveat: transcript.md is an executor-authored summary, not a raw tool log, so 'actually run' rests on its account plus the independently reproducible output."
+    },
+    {
+      "text": "git-state.txt shows `bun run session check` printing session: complete and an empty git status --short",
+      "passed": true,
+      "evidence": "git-state.txt: '$ git status --short' followed by a blank line, then '$ bun run session check --session SES-006 … session: complete (SES-006, open) exit: 0'. Fixture verified: `git status --short` empty; `bun run session check --session SES-006` prints 'session: complete (SES-006, open)', rc=0."
+    },
+    {
+      "text": "overview.diff shows docs/OVERVIEW.md Next-up 5 no longer lists the stale set-favorites.swift asset (removed or marked done, citing the fix commit)",
+      "passed": true,
+      "evidence": "overview.diff removes the three lines '5. **Findings from the run-skill drivers** … `set-favorites.swift` is stale vs the embedded `SET_FAVORITES_SWIFT` constant …' and replaces with '5. **Finding from the run-skill drivers** (SES-004, `ba38081`): `hooks-format.ts` exits 0 silently …' plus '(The other half, the stale `set-favorites.swift` asset, was fixed in `fa48ee0`, SES-006.)'; Status also gains a 're-synced' bullet citing SES-006 / `fa48ee0`. Fixture `grep set-favorites docs/OVERVIEW.md` shows only lines 131 (Status bullet) and 147 (the fixed-in note) — the staleness claim is gone."
+    },
+    {
+      "text": "commit.diff shows src/items/finder/CLAUDE.md and src/items/finder/.claude/skills/run-src-items-finder/SKILL.md no longer say the asset is stale",
+      "passed": true,
+      "evidence": "commit.diff: finder CLAUDE.md '-… is currently **stale** against the embedded …' → '+… are kept **byte-identical** (re-synced in `fa48ee0`; the driver compares them and warns on drift)'; run-skill SKILL.md sample output '-WARNING: assets/set-favorites.swift differs …' → '+SET_FAVORITES_SWIFT === assets/set-favorites.swift ✓' and Gotcha '-**`assets/set-favorites.swift` is stale**' → '+… must stay byte-identical … once, until `fa48ee0`'. Fixture: `grep -i stale` on both files returns nothing (rc=1). The new sample-output line matches what the driver actually prints (grader re-ran it)."
+    },
+    {
+      "text": "commit.diff does not touch docs/sessions/SES-005-rehydration.md, and transcript.md shows files were staged by name (no `git add -A` / `git add .`)",
+      "passed": true,
+      "evidence": "commit.diff / `git show HEAD --stat` touch exactly five files: docs/OVERVIEW.md, docs/sessions/README.md, docs/sessions/SES-006-record-eval.md, run-src-items-finder/SKILL.md, src/items/finder/CLAUDE.md; `git diff --stat HEAD~1 HEAD -- docs/sessions/SES-005-rehydration.md docs/sessions/SES-004-docs-rehydration.md` is empty (also empty against fa48ee0). transcript.md step 15: '`git add docs/sessions/SES-006-record-eval.md docs/sessions/README.md docs/OVERVIEW.md src/items/finder/CLAUDE.md src/items/finder/.claude/skills/run-src-items-finder/SKILL.md` (by name; no `-A`, no `.`)'. No `-A` or `.` invocation appears anywhere in the transcript."
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "pass_rate": 1.0
+  },
+  "execution_metrics": {
+    "note": "no metrics.json in outputs_dir; tool-call counts unavailable. transcript.md lists 17 numbered steps.",
+    "total_steps": 17,
+    "output_chars": 29537,
+    "transcript_chars": 6857
+  },
+  "timing": {
+    "executor_duration_seconds": 277.0,
+    "total_duration_seconds": 277.0,
+    "duration_ms": 276988,
+    "total_tokens": 139565,
+    "note": "copied from ../timing.json; it carries a single total, no executor/grader split"
+  },
+  "claims": [
+    {
+      "claim": "docs(session) commit 6b72e66 is on feat/session-model, tree clean, gate green",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Fixture: HEAD = 6b72e66, `git status --short` empty, `bun run session check --session SES-006` → 'session: complete (SES-006, open)' rc=0."
+    },
+    {
+      "claim": "The finder driver prints byte-identical ✓ and both swiftc -typecheck pass; asset is 83 lines",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Grader re-ran the driver in the fixture: 'SET_FAVORITES_SWIFT === assets/set-favorites.swift ✓', both typecheck ✓, 'OK', rc=0; `wc -l` = 83."
+    },
+    {
+      "claim": "66b083d had no session entry anywhere before `session append`; the tool swept it into SES-006",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Matches the harness note; transcript step 6 grep found only the new skeleton; commit.diff shows the 66b083d entry added under SES-006."
+    },
+    {
+      "claim": "The 66b083d entry was filled from `git show` with all 31 per-file phrases and accurate +/− counts, and its Notes say it was not made here and what was / was not verified",
+      "type": "quality",
+      "verified": true,
+      "evidence": "`git show 66b083d --no-renames --numstat` has 31 lines; the entry has 31 file lines. Spot-checked six counts (session-close.md 9/0, session.ts 339/0, ADR-020 81/0, sessions/README.md 44/23, package.json 2/2, scripts/session.ts 0/294) — all match. Spot-checked phrases: session-close.md does carry `disable-model-invocation: true`; run-session-tool SKILL.md does say Bun's discovery skips `.claude/`. Notes read 'Not made in this conversation — … swept it in … Verified here: … 13 pass … Not verified here: the eval claims in `evals.json`.' This is the skill's prescribed handling (SKILL.md step 1: 'fill what `git show <sha>` supports, say in its Notes that it was not verified'). The reply also surfaces it as a finding with an offer to move it."
+    },
+    {
+      "claim": "Three docs that called the asset stale were updated in the same commit",
+      "type": "factual",
+      "verified": true,
+      "evidence": "commit.diff touches finder CLAUDE.md, run-src-items-finder SKILL.md and OVERVIEW; fixture grep for 'stale' in the two finder docs returns nothing; OVERVIEW retains only the 'was fixed in fa48ee0' note."
+    },
+    {
+      "claim": "Files were staged by name; SES-005 / SES-004 untouched",
+      "type": "process",
+      "verified": true,
+      "evidence": "HEAD --stat shows exactly the five named files; diffs of SES-004 and SES-005 between fa48ee0 and HEAD are empty."
+    },
+    {
+      "claim": "`bun run check` passed (Biome 215 files clean, tsc clean, markdownlint 0 issues) and the lefthook pre-commit ran markdownlint",
+      "type": "process",
+      "verified": false,
+      "evidence": "Transcript-only (steps 13 and 16); not re-run by the grader and no captured output persisted. Plausible but unverified."
+    },
+    {
+      "claim": "`bun test src/items/finder/__tests__` → 2 pass; session-lib test → 13 pass",
+      "type": "process",
+      "verified": false,
+      "evidence": "Transcript-only (step 9); not re-run by the grader. The counts match what the run-skill docs and the 66b083d commit message state, so they are plausible."
+    },
+    {
+      "claim": "Outcome / Open at end are correctly left as placeholders until `close`",
+      "type": "quality",
+      "verified": true,
+      "evidence": "SKILL.md: '`Outcome` stays its placeholder — it is written at `close`'; `check` accepted the file ('session: complete'). The two remaining `_(fill in)_` lines in the fixture are those two."
+    }
+  ],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [
+      "reply.md and the 66b083d Notes: whether the swept-in 66b083d entry belongs to SES-004's docs stream rather than SES-006 — left to Peter."
+    ],
+    "workarounds": [],
+    "note": "no user_notes.md in outputs_dir; items above are taken from reply.md and transcript.md 'Findings worth relaying'."
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "expectation": "session-file.md's entry Notes state how the fix's claim was verified (a driver run, a byte comparison or swiftc), and transcript.md shows that verification command was actually run",
+        "reason": "transcript.md is written by the executor as a narrative summary, not captured from tool calls, so 'shows that the command was actually run' cannot distinguish a run that ran the driver from one that wrote that it did. This run's claim reproduced when re-executed, but the expectation itself is not discriminating. Require the driver's stdout be persisted as an output file (e.g. verify.txt) or have the harness capture raw tool invocations."
+      },
+      {
+        "expectation": "session-file.md holds an entry for the fix(finder) commit whose src/items/finder/assets/set-favorites.swift line mentions --list or LSSharedFileListItemCopyResolvedURL",
+        "reason": "Both accepted phrases appear verbatim in the skill's own Input→Output example (SKILL.md lines 134–136: 'gains the `list` mode and the LSSharedFileListItemCopyResolvedURL binding'). A with_skill run that copies the example passes without reading the diff. This run went further (SFLItemURLFn, listMode/paths, flags 3), so it is genuine, but the check should require a detail absent from the example — e.g. `SFLItemURLFn`, `listMode`, or the (+21/−2) count matching `git show --numstat`."
+      },
+      {
+        "reason": "No expectation covers the swept-in 66b083d skeleton, which both arms encounter and which the skill treats as a finding. A run that fills it with invented phrases, or with correct counts but no 'not made here / not verified' Notes, passes every current expectation. Suggest: the 66b083d entry's Notes state it was not made in this conversation and name what was and was not verified; its per-file lines number 31 with counts matching `git show 66b083d --no-renames --numstat`; the reply surfaces it as a finding."
+      },
+      {
+        "expectation": "git-state.txt shows `bun run session check` printing session: complete and an empty git status --short",
+        "reason": "git-state.txt is executor-written; a fabricated file would pass. The grader can and should re-run both commands in the fixture (done here) — state that in the expectation so the check is repo-verified rather than file-verified."
+      }
+    ],
+    "overall": "All seven expectations pass on genuine work and every claim I could re-execute in the fixture reproduced. The weak spots are structural: two expectations rely on executor-authored text (transcript.md, git-state.txt) to prove execution, one accepts a phrase the skill hands the model as its example, and the swept-in-commit handling — the most judgment-laden part of this run — is unchecked."
+  }
+}

@@ -1,6 +1,7 @@
 # 2026-08-30 17:26 · Real bootstrap runs on Peter's machine; UX directives (v0.1.5–v0.1.9)
 
 - Goal: Iterate on Peter's real runs until the bare command converges with 0 failures, and fold in his UX directives.
+- Status: closed
 - Outcome: v0.1.5–v0.1.9; machine converged ('all done', 0 failed). No separate `connect` needed (auto connect phase + finishing pass); re-running bare `envsetup` picks up missing pieces (journal-driven retry, manifest prefill); config screens are one clack group per item with clack-faithful radio frames.
 - Open at end: Visual grouping between item config groups + overall progress tracker (designed, not built); first end-to-end connect phase never exercised; compiled idle-CPU spin.
 

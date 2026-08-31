@@ -25,6 +25,9 @@ naming the session and release that shipped it).
 - **Facts** come from [../analysis/](../analysis/README.md); a plan cites analyses, it does not
   re-research.
 - A finished plan is not deleted: add `Status: done — shipped in vX.Y.Z (session …)` at the top.
+- **Plans and sessions point at each other** (ADR-020): a session's `Plan:` line names the plan
+  and the part it serves; the plan's task ticks cite the entry sha that did them and its status
+  line the session that shipped it. Progress is read from the session entries, not tracked twice.
 - **Produced with** the `spec-driven-development` skill (PRD; surface assumptions first, reframe
   vague asks as success criteria) and the `planning-and-task-breakdown` skill (feature plans:
   dependency graph, vertical slices, tasks with acceptance criteria, checkpoints). Use

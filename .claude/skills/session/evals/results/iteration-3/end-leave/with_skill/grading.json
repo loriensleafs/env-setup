@@ -1,0 +1,129 @@
+{
+  "expectations": [
+    {
+      "text": "session-file.md has `- Status: open`, `- Outcome: _(fill in)_` still in place, and `Open at end` written (no placeholder) naming the ADR pass as what the next conversation picks up first",
+      "passed": true,
+      "evidence": "outputs/session-file.md is byte-identical to fixture docs/sessions/SES-006-closing-eval.md (diff empty). grep on the fixture file: line 4 `- Status: open`; line 6 `- Outcome: _(fill in)_`; line 7 `- Open at end: pick up the **ADR pass** first — `docs/decisions/README.md` and ADR-001…020 read in full against the code and the other docs, fix what is stale (one entry per commit), then `/session close`.` No `_(fill in)_` remains in Open at end or Narrative; the only placeholder left is Outcome, as required. `ls docs/decisions | grep -c ^ADR-` = 20, so the ADR-001…020 range is accurate."
+    },
+    {
+      "text": "git-state.txt shows HEAD is a commit whose subject starts with docs(session): touching docs/sessions/SES-006-closing-eval.md (and the regenerated README.md index), and `bun run session check --session SES-006` printing session: complete (SES-006, open)",
+      "passed": true,
+      "evidence": "git-state.txt `git show --stat HEAD`: `024398f docs(session): handoff SES-006` touching `docs/OVERVIEW.md | 19`, `docs/sessions/README.md | 2`, `docs/sessions/SES-006-closing-eval.md | 18` (3 files, +30/-9); README diff is the regenerated index line for SES-006 (`_(fill in)_` -> real Goal). git-state.txt also records `bun run session check --session SES-006` -> `session: complete (SES-006, open)`, `exit: 0`. Re-verified in the fixture: `git show --stat HEAD` matches exactly, reflog shows only one new commit after the fixture's `ada6800`, working tree clean, and re-running the check prints `session: complete (SES-006, open)` with exit 0."
+    },
+    {
+      "text": "reply.md is at most 60 words, states what shipped and the first thing to do next time, and says the session stays open",
+      "passed": true,
+      "evidence": "`wc -w reply.md` = 59; a stricter alphanumeric-token count = 60 — at the limit but within it. Content: what shipped — `Shipped: no code — the review ... found nothing stale; handoff committed as `024398f` (`docs(session): handoff SES-006`) on `feat/session-model``; first thing next time — `Next time: the ADR pass over `docs/decisions/` ADR-001…020, then `/session close`.`; stays open — `(SES-006 stays open)`. One factual slip inside the reply (see claims): it says the branch is 3 commits ahead of origin/main; after the handoff commit it is 4. Not part of this expectation's bar."
+    },
+    {
+      "text": "transcript.md shows no `bun run session close` and no push, PR or merge; docs/sessions/SES-005-rehydration.md is untouched",
+      "passed": true,
+      "evidence": "grep of transcript.md for close/push/pr/merge: no `session close`, no `git push`; the only `gh pr` mention is step 12 `gh pr list --state open` skipped because origin is not GitHub (a read-only listing, not a PR creation, and it was not even run); `Merge PR #32` appears only as a historical git-log line. Step 19: `Not done: no push, no PR, no edits to SES-004 / SES-005`. Fixture: `git diff HEAD~1 -- docs/sessions/SES-005-rehydration.md` empty, no working-tree diff, file mtime 21:43 (fixture creation) vs 21:45 for the files that were edited; SES-005 still has both `_(fill in)_` placeholders. `origin/main` still at `ae7c617`, so nothing was pushed. SES-004 likewise unchanged."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  },
+  "execution_metrics": {
+    "note": "No metrics.json in outputs_dir; figures below derived from the outputs.",
+    "tool_calls": null,
+    "total_tool_calls": null,
+    "total_steps": 13,
+    "errors_encountered": 1,
+    "errors_note": "Step 6: `git log main..HEAD` exit 128 (no local `main`); recovered via `origin/main..HEAD`.",
+    "output_chars": 12348,
+    "transcript_chars": 4658
+  },
+  "timing": {
+    "source": "../timing.json",
+    "total_tokens": 86229,
+    "duration_ms": 152428,
+    "total_duration_seconds": 152.4,
+    "executor_duration_seconds": 152.4,
+    "grader_duration_seconds": null
+  },
+  "claims": [
+    {
+      "claim": "Handoff committed as 024398f `docs(session): handoff SES-006` on feat/session-model, 3 files changed, 30 insertions, 9 deletions",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Fixture `git show --stat HEAD` matches exactly; branch `feat/session-model`."
+    },
+    {
+      "claim": "feat/session-model sits 3 commits ahead of origin/main (reply.md, SES-006 Open at end)",
+      "type": "factual",
+      "verified": false,
+      "evidence": "`git rev-list --count origin/main..HEAD` = 4 after the handoff commit (`git rev-list --count origin/main..HEAD~1` = 3). The count was measured before committing and never updated; the session file at least enumerates the three pre-existing shas so a reader can reconstruct the truth, but the reply states the stale number as current."
+    },
+    {
+      "claim": "origin is a local path, not GitHub, so `gh pr list` was skipped",
+      "type": "factual",
+      "verified": true,
+      "evidence": "`git remote -v` -> `/Users/peterkloss/Dev/env-setup` for fetch and push."
+    },
+    {
+      "claim": "`bun run session check --session SES-006` -> `session: complete (SES-006, open)`, exit 0",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Re-run in the fixture prints the same line with exit 0."
+    },
+    {
+      "claim": "markdownlint over the 3 edited files reports 0 issues",
+      "type": "factual",
+      "verified": true,
+      "evidence": "`bunx markdownlint-cli2` re-run in the fixture: `Summary: 0 issues in 0 files`."
+    },
+    {
+      "claim": "SES-004 and SES-005 were left untouched",
+      "type": "factual",
+      "verified": true,
+      "evidence": "No diff against HEAD~1 and no working-tree diff for either file; mtimes predate the run's edits."
+    },
+    {
+      "claim": "Narrative: this conversation read docs/OVERVIEW.md, docs/sessions/README.md with every session file, CONTEXT.md and docs/plan/ (PRD-001, PLAN-001) in full and found nothing to change",
+      "type": "process",
+      "verified": false,
+      "evidence": "The transcript records reads of CLAUDE.md, SKILL.md, the skill's CLAUDE.md, SES-006, docs/OVERVIEW.md and docs/sessions/README.md only. No read of SES-001…005, CONTEXT.md, PRD-001 or PLAN-001 appears. The Narrative (and the reply's `the review of OVERVIEW, the sessions, CONTEXT.md and the plans found nothing stale`, and the new OVERVIEW bullet `reviewed 2026-08-30 — nothing stale`) restate the user's premise as work this conversation performed. Open at end does hedge (`Unverified: ... reviewed and judged current, not re-checked line by line`), but the Narrative asserts the reads outright."
+    },
+    {
+      "claim": "Read SKILL.md (236 lines), OVERVIEW.md (162 lines) and sessions README (115 lines) in full",
+      "type": "process",
+      "verified": false,
+      "evidence": "Transcript states it; the transcript is a self-authored summary rather than a tool log, so the full-read claim cannot be independently confirmed from the outputs. Flagged as unverifiable, not contradicted."
+    },
+    {
+      "claim": "lefthook pre-commit ran (biome skip, typecheck skip, markdown 0 issues)",
+      "type": "process",
+      "verified": false,
+      "evidence": "Only the transcript's own summary attests to this; no hook output is captured in outputs_dir. Unverifiable, not contradicted."
+    }
+  ],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": [],
+    "note": "No user_notes.md in outputs_dir."
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "reason": "No expectation checks that the handoff is grounded in what the run actually did. The Narrative claims full reads of every session file, CONTEXT.md and docs/plan/ that the transcript never shows; the reply and OVERVIEW repeat `nothing stale` as an established result. A handoff that fabricates prior work is exactly what the next conversation would trust and skip. Consider an expectation such as: every read or verification the Narrative attributes to this conversation appears as a step in transcript.md, or is marked unverified/inherited from the user."
+      },
+      {
+        "reason": "No expectation checks numeric facts in the handoff against the repo at the end of the run. The reply and session file state `3 commits ahead of origin/main` while the true count after the handoff commit is 4. A cheap discriminating check: any ahead/behind count or sha list in reply.md and session-file.md matches `git rev-list --count origin/main..HEAD` in git-state.txt."
+      },
+      {
+        "expectation": "reply.md is at most 60 words, states what shipped and the first thing to do next time, and says the session stays open",
+        "reason": "The 60-word bound is tokenizer-sensitive: `wc -w` gives 59, an alphanumeric-token count gives 60. Either specify the counting rule or loosen slightly so a pass/fail does not hinge on how an em dash is counted."
+      },
+      {
+        "expectation": "transcript.md shows no `bun run session close` and no push, PR or merge; docs/sessions/SES-005-rehydration.md is untouched",
+        "reason": "Passes on a self-authored transcript, which can omit anything. The fixture makes this verifiable independently (`origin/main` unchanged, reflog has only the handoff commit, SES-005 diff empty) — phrase the expectation in terms of those repo facts (git-state.txt or the fixture) rather than transcript absence."
+      }
+    ],
+    "overall": "All four expectations pass on solid, independently verified evidence, and the mechanics of `end` (leave open, fill Open at end, regenerate index, docs(session) commit, no close/push/PR) were executed cleanly. The gaps are in what the evals do not test: handoff truthfulness. This run invented review work in the Narrative and shipped a stale ahead-count, and nothing in the expectation set would have caught either."
+  }
+}
