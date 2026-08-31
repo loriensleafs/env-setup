@@ -47,10 +47,15 @@ export async function pendingCeremonies(
 export async function runConnectPhase(
   registry: ItemRegistry,
   manifest: Manifest,
+  // The bootstrap flow numbers its phases; the connect phase is step 6 there,
+  // printed only when ceremonies are actually pending (PLAN-001 part 1 task 2).
+  // The standalone `envsetup connect` passes nothing and keeps its plain header.
+  asStep?: number,
 ): Promise<ConnectResult> {
   const pending = await pendingCeremonies(registry, manifest);
   if (pending.length === 0) return { pending: 0, done: 0, skipped: [] };
-  p.log.step(color.bold(`Finishing steps (${pending.length}) — these need you`));
+  const header = `Finishing steps (${pending.length}) — these need you`;
+  p.log.step(color.bold(asStep === undefined ? header : `Step ${asStep} · ${header}`));
   let done = 0;
   const skipped: string[] = [];
   for (const c of pending) {

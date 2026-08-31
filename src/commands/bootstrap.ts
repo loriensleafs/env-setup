@@ -409,7 +409,7 @@ export async function executePlan(
   // depend on what the ceremonies created (the Dock on the web-app bundles)
   // pick them up.
   if (interactiveCapable()) {
-    const connect = await runConnectPhase(registry, manifest);
+    const connect = await runConnectPhase(registry, manifest, 6);
     if (connect.done > 0) {
       p.log.step("Finishing up");
       await executePlan(manifest, { finishing: true });
