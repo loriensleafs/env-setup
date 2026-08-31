@@ -1,3 +1,4 @@
+import { CANCEL_SYMBOL } from "@clack/core";
 import * as p from "@clack/prompts";
 import { z } from "zod";
 import type { Item } from "../items/item.ts";
@@ -38,21 +39,25 @@ export async function promptItemConfig(
   const props = json.properties ?? {};
   const current = (stored ?? item.defaultConfig ?? {}) as Record<string, unknown>;
 
+  // Rendered as ONE clack group (Peter, 2026-08-31): the item's title, then
+  // every field flowing under a single connected bar — instead of each field
+  // as its own standalone prompt with its own header.
   p.log.step(item.title);
-  const answers: Record<string, unknown> = {};
+  const prompts: Record<string, () => Promise<unknown>> = {};
   for (const [key, prop] of Object.entries(props)) {
     const label = humanize(key);
     const initial = current[key] ?? prop.default;
 
     if (prop.type === "boolean") {
-      const v = await radioGroup({
-        input: promptInput(),
-        message: label,
-        options: [{ value: "yes" }, { value: "no" }],
-        initialValue: initial === false ? "no" : "yes",
-      });
-      if (p.isCancel(v)) return v;
-      answers[key] = v === "yes";
+      prompts[key] = async () => {
+        const v = await radioGroup({
+          input: promptInput(),
+          message: label,
+          options: [{ value: "yes" }, { value: "no" }],
+          initialValue: initial === false ? "no" : "yes",
+        });
+        return p.isCancel(v) ? v : v === "yes";
+      };
       continue;
     }
 
@@ -61,44 +66,52 @@ export async function promptItemConfig(
         prop.minimum !== undefined || prop.maximum !== undefined
           ? ` (${prop.minimum ?? "…"}–${prop.maximum ?? "…"})`
           : "";
-      const v = await p.text({
-        input: promptInput(),
-        message: `${label}${bounds}`,
-        initialValue: String(initial ?? ""),
-        validate: (value) => {
-          const n = Number(value ?? "");
-          if (!Number.isFinite(n)) return "enter a number";
-          if (prop.minimum !== undefined && n < prop.minimum) return `minimum ${prop.minimum}`;
-          if (prop.maximum !== undefined && n > prop.maximum) return `maximum ${prop.maximum}`;
-          return undefined;
-        },
-      });
-      if (p.isCancel(v)) return v;
-      answers[key] = Number(v);
+      prompts[key] = async () => {
+        const v = await p.text({
+          input: promptInput(),
+          message: `${label}${bounds}`,
+          initialValue: String(initial ?? ""),
+          validate: (value) => {
+            const n = Number(value ?? "");
+            if (!Number.isFinite(n)) return "enter a number";
+            if (prop.minimum !== undefined && n < prop.minimum) return `minimum ${prop.minimum}`;
+            if (prop.maximum !== undefined && n > prop.maximum) return `maximum ${prop.maximum}`;
+            return undefined;
+          },
+        });
+        return p.isCancel(v) ? v : Number(v);
+      };
       continue;
     }
 
     // strings (incl. enums small enough for the radio)
     if (prop.enum && prop.enum.length >= 2 && prop.enum.length <= 4) {
-      const v = await radioGroup({
-        input: promptInput(),
-        message: label,
-        options: prop.enum.map((e) => ({ value: String(e) })),
-        initialValue: String(initial ?? prop.enum[0]),
-      });
-      if (p.isCancel(v)) return v;
-      answers[key] = v;
+      const choices = prop.enum.map((e) => ({ value: String(e) }));
+      prompts[key] = () =>
+        radioGroup({
+          input: promptInput(),
+          message: label,
+          options: choices,
+          initialValue: String(initial ?? prop.enum?.[0]),
+        });
       continue;
     }
-    const v = await p.text({
-      input: promptInput(),
-      message: label,
-      initialValue: String(initial ?? ""),
-      validate: (value) => ((value ?? "").trim() === "" ? `${label} is required` : undefined),
-    });
-    if (p.isCancel(v)) return v;
-    answers[key] = v;
+    prompts[key] = () =>
+      p.text({
+        input: promptInput(),
+        message: label,
+        initialValue: String(initial ?? ""),
+        validate: (value) => ((value ?? "").trim() === "" ? `${label} is required` : undefined),
+      });
   }
+
+  let cancelled = false;
+  const answers = (await p.group(prompts, {
+    onCancel: () => {
+      cancelled = true;
+    },
+  })) as Record<string, unknown>;
+  if (cancelled) return CANCEL_SYMBOL;
 
   const parsed = schema.safeParse(answers);
   if (!parsed.success) {
