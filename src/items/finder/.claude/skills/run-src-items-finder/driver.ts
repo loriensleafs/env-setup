@@ -30,4 +30,20 @@ console.log(
 console.log(
   `item ${finderFavorites.id}: kind=${finderFavorites.kind} deps=${finderFavorites.deps}`,
 );
+// Typecheck the asset file AND the embedded constant (the item compiles the constant);
+// never run either — set-favorites rewrites the Finder sidebar.
+const tmp = `${process.env.SCRATCH ?? "/tmp"}/set-favorites.embedded.swift`;
+await Bun.write(tmp, SET_FAVORITES_SWIFT);
+for (const [label, path] of [
+  [
+    "assets/set-favorites.swift",
+    new URL("../../../assets/set-favorites.swift", import.meta.url).pathname,
+  ],
+  ["embedded SET_FAVORITES_SWIFT", tmp],
+]) {
+  const tc = Bun.spawnSync(["xcrun", "swiftc", "-typecheck", path]);
+  if (tc.exitCode !== 0)
+    throw new Error(`swiftc -typecheck ${label} failed:\n${tc.stderr.toString()}`);
+  console.log(`swiftc -typecheck ${label} ✓`);
+}
 console.log("OK");

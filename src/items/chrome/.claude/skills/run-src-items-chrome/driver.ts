@@ -20,6 +20,15 @@ const asset = await Bun.file(
 if (asset !== INSTALL_SWIFT)
   throw new Error("INSTALL_SWIFT drifted from assets/install-web-app.swift");
 console.log("INSTALL_SWIFT === assets/install-web-app.swift ✓");
+// Typecheck only — running the helper installs a real Chrome app.
+const tc = Bun.spawnSync([
+  "xcrun",
+  "swiftc",
+  "-typecheck",
+  new URL("../../../assets/install-web-app.swift", import.meta.url).pathname,
+]);
+if (tc.exitCode !== 0) throw new Error(`swiftc -typecheck failed:\n${tc.stderr.toString()}`);
+console.log("swiftc -typecheck install-web-app.swift ✓");
 for (const item of [chromeConfig, chromePwas]) {
   const d = await item.detect(ctx);
   console.log(`${item.id}.detect → installed=${d.installed}${d.differs ? " differs" : ""}`);

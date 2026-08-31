@@ -66,7 +66,11 @@ in [docs/sessions/README.md](docs/sessions/README.md)):
 - Notes: optional — gotchas, follow-ups, what was verified and how
 ```
 
-Other: contribution & release workflow in [CONTRIBUTING.md](CONTRIBUTING.md).
+Nested `CLAUDE.md` files load when you work under their directory and carry only that area's
+conventions and gotchas: `src/` (+ `commands/`, `items/`, `orchestrator/`, `ui/`, `items/{chrome,
+claude-code,defs,finder}/`), `docs/` (+ each subdirectory), `.github/`, `scripts/`; `.claude/rules/`
+adds file-type rules for run-skill drivers and `__tests__` (ADR-018). Contribution & release
+workflow: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Hard rules (do not violate)
 

@@ -291,3 +291,69 @@ the start timestamp), source comments repointed from `docs/PLAN.md` to the ADR/P
   - `docs/OVERVIEW.md` (+4/−0) — Next-up 5: stale `set-favorites.swift` asset; `hooks-format.ts` silent no-op on Biome config error
   - `install.sh` (+4/−0) — `rm -f \"$DEST\"` before `curl`, with the why
 - Notes: Not reproduced deterministically — an immediate second in-place overwrite ran fine, and the unified log had no entry for the kill; the fix is cheap and removes the failure mode either way. The real fix is Next-up 3 (persist the binary to `~/.local/bin`).
+
+### 2026-08-30 · docs(agents): nested CLAUDE.md where a directory has unwritten conventions; path rules; run skills pruned to real drivers (ADR-018) · 990820a
+
+- Summary: 17 nested CLAUDE.md files where a directory has unwritten conventions (folding weak dirs into `src/` and `src/items/`), two path-scoped rules for drivers and tests, and the run skills pruned from 56 to the 28 with a real driver — decided in ADR-018, tracked in PLAN-002.
+- Why: Peter: "evaluate all the nested .claude dirs and figure out where a nested CLAUDE.md would make more sense, and write it… take time to think… create tasks for yourself"; then chose option one plus docs subdirectories and asked to remove nested `.claude` where it makes sense.
+- Files:
+  - `.claude/rules/drivers.md` (+13/−0) — new — path rule for **/.claude/skills/**: safe calls only, not typechecked, blocks were run
+  - `.claude/rules/tests.md` (+12/−0) — new — path rule for **/**tests**/**: temp dirs via XDG/ENVSETUP_SECRETS_FILE overrides, mock Runner, substring filter
+  - `.github/CLAUDE.md` (+9/−0) — new — release only by tag, macos-14 checks job, gh pr checks lag
+  - `.github/workflows/.claude/skills/run-github-workflows/SKILL.md` (+0/−50) — removed — a copy of the .github skill
+  - `CLAUDE.md` (+5/−1) — one pointer paragraph naming the nested files and rules (ADR-018)
+  - `docs/CLAUDE.md` (+8/−0) — new — README-first, naming, link checker after moves, OVERVIEW in the same step
+  - `docs/OVERVIEW.md` (+4/−1) — doc-map rows for nested CLAUDE.md + rules and the pruned skill count; Status: unreleased line
+  - `docs/analysis/.claude/skills/run-docs-analysis/SKILL.md` (+0/−18) — removed — the docs checker with an argument
+  - `docs/analysis/CLAUDE.md` (+6/−0) — new — the directory's one invariant + pointer to its README
+  - `docs/archive/.claude/skills/run-docs-archive/SKILL.md` (+0/−23) — removed — the docs checker with an argument
+  - `docs/archive/CLAUDE.md` (+4/−0) — new — the directory's one invariant + pointer to its README
+  - `docs/decisions/.claude/skills/run-docs-decisions/SKILL.md` (+0/−18) — removed — the docs checker with an argument
+  - `docs/decisions/ADR-018-nested-claude-md-placement.md` (+72/−0) — new — cited load semantics, four criteria, path rules, the pruning rule, alternatives
+  - `docs/decisions/CLAUDE.md` (+6/−0) — new — the directory's one invariant + pointer to its README
+  - `docs/decisions/README.md` (+1/−0) — index row for ADR-018
+  - `docs/plan/.claude/skills/run-docs-plan/SKILL.md` (+0/−18) — removed — the docs checker with an argument
+  - `docs/plan/CLAUDE.md` (+6/−0) — new — the directory's one invariant + pointer to its README
+  - `docs/plan/PLAN-002-nested-claude-md.md` (+75/−0) — new — the task list for this work (research → inventory → placement question → write → verify → record); status done
+  - `docs/plan/README.md` (+1/−0) — index row for PLAN-002
+  - `docs/sessions/.claude/skills/run-docs-sessions/SKILL.md` (+0/−28) — removed — the docs checker with an argument
+  - `docs/sessions/CLAUDE.md` (+6/−0) — new — the directory's one invariant + pointer to its README
+  - `scripts/CLAUDE.md` (+6/−0) — new — session.ts invariants and what a format change also touches
+  - `src/CLAUDE.md` (+36/−0) — new — entry guards (0-width PTY pin, closePromptInput, citty root-run quirk) + one-liners for auth/ceremonies/journal/manifest/secrets/exec/paths
+  - `src/auth/__tests__/.claude/skills/run-src-auth-tests/SKILL.md` (+0/−27) — removed — `bun test <dir>` in prose earned no slash command
+  - `src/ceremonies/__tests__/.claude/skills/run-src-ceremonies-tests/SKILL.md` (+0/−16) — removed — `bun test <dir>` in prose earned no slash command
+  - `src/commands/CLAUDE.md` (+19/−0) — new — nothing before Proceed?, safe defaults for pre-confirm prompts, input threading, presentOption, spinner/deferred
+  - `src/commands/__tests__/.claude/skills/run-src-commands-tests/SKILL.md` (+0/−27) — removed — `bun test <dir>` in prose earned no slash command
+  - `src/exec/__tests__/.claude/skills/run-src-exec-tests/SKILL.md` (+0/−27) — removed — `bun test <dir>` in prose earned no slash command
+  - `src/items/CLAUDE.md` (+36/−0) — new — blast radius, differs⇔installed:false, deps/registration, ask optional, install-method research; editors/factories/ghostty/repos/quick-actions/typora folded in
+  - `src/items/__tests__/.claude/skills/run-src-items-tests/SKILL.md` (+0/−28) — removed — `bun test <dir>` in prose earned no slash command
+  - `src/items/chrome/.claude/skills/run-src-items-chrome/SKILL.md` (+2/−0) — notes that the Swift asset is covered by this driver, typecheck only
+  - `src/items/chrome/.claude/skills/run-src-items-chrome/driver.ts` (+9/−0) — runs `xcrun swiftc -typecheck` on install-web-app.swift (folded from the removed assets skill)
+  - `src/items/chrome/CLAUDE.md` (+16/−0) — new — quit/reopen blast radius, filename-only rename, INSTALL_SWIFT constant, pins not HMAC-protected (re-verify)
+  - `src/items/chrome/__tests__/.claude/skills/run-src-items-chrome-tests/SKILL.md` (+0/−28) — removed — `bun test <dir>` in prose earned no slash command
+  - `src/items/chrome/assets/.claude/skills/run-src-items-chrome-assets/SKILL.md` (+0/−45) — removed — typecheck folded into the parent item's driver
+  - `src/items/chrome/assets/.claude/skills/run-src-items-chrome-assets/driver.ts` (+0/−15) — removed — typecheck folded into the parent item's driver
+  - `src/items/claude-code/CLAUDE.md` (+21/−0) — new — ASSET_PATHS only, generated settings, deep-compare detect; assets/ contracts and the notify/format gotchas
+  - `src/items/claude-code/__tests__/.claude/skills/run-src-items-claude-code-tests/SKILL.md` (+0/−27) — removed — `bun test <dir>` in prose earned no slash command
+  - `src/items/defs/CLAUDE.md` (+18/−0) — new — largest blast radius, gpgsign ordering, hotkey takeover, blob compare, re-capture on upgrades, dotfiles factory
+  - `src/items/defs/__tests__/.claude/skills/run-src-items-defs-tests/SKILL.md` (+0/−32) — removed — `bun test <dir>` in prose earned no slash command
+  - `src/items/editors/__tests__/.claude/skills/run-src-items-editors-tests/SKILL.md` (+0/−27) — removed — `bun test <dir>` in prose earned no slash command
+  - `src/items/factories/__tests__/.claude/skills/run-src-items-factories-tests/SKILL.md` (+0/−27) — removed — `bun test <dir>` in prose earned no slash command
+  - `src/items/finder/.claude/skills/run-src-items-finder/SKILL.md` (+2/−0) — notes that the Swift asset is covered by this driver, typecheck only
+  - `src/items/finder/.claude/skills/run-src-items-finder/driver.ts` (+16/−0) — typechecks set-favorites.swift AND the embedded constant (folded from the removed assets skill)
+  - `src/items/finder/CLAUDE.md` (+12/−0) — new — stale asset vs constant, swiftc not swift, OpaquePointer sentinel
+  - `src/items/finder/__tests__/.claude/skills/run-src-items-finder-tests/SKILL.md` (+0/−27) — removed — `bun test <dir>` in prose earned no slash command
+  - `src/items/finder/assets/.claude/skills/run-src-items-finder-assets/SKILL.md` (+0/−46) — removed — typecheck folded into the parent item's driver
+  - `src/items/finder/assets/.claude/skills/run-src-items-finder-assets/driver.ts` (+0/−25) — removed — typecheck folded into the parent item's driver
+  - `src/items/ghostty/__tests__/.claude/skills/run-src-items-ghostty-tests/SKILL.md` (+0/−27) — removed — `bun test <dir>` in prose earned no slash command
+  - `src/items/quick-actions/__tests__/.claude/skills/run-src-items-quick-actions-tests/SKILL.md` (+0/−27) — removed — `bun test <dir>` in prose earned no slash command
+  - `src/items/repos/__tests__/.claude/skills/run-src-items-repos-tests/SKILL.md` (+0/−27) — removed — `bun test <dir>` in prose earned no slash command
+  - `src/journal/__tests__/.claude/skills/run-src-journal-tests/SKILL.md` (+0/−27) — removed — `bun test <dir>` in prose earned no slash command
+  - `src/manifest/__tests__/.claude/skills/run-src-manifest-tests/SKILL.md` (+0/−29) — removed — `bun test <dir>` in prose earned no slash command
+  - `src/orchestrator/CLAUDE.md` (+15/−0) — new — the encoded failure policy, UI-agnostic, deferred, transitiveDependents signature
+  - `src/orchestrator/__tests__/.claude/skills/run-src-orchestrator-tests/SKILL.md` (+0/−27) — removed — `bun test <dir>` in prose earned no slash command
+  - `src/paths/__tests__/.claude/skills/run-src-paths-tests/SKILL.md` (+0/−27) — removed — `bun test <dir>` in prose earned no slash command
+  - `src/secrets/__tests__/.claude/skills/run-src-secrets-tests/SKILL.md` (+0/−28) — removed — `bun test <dir>` in prose earned no slash command
+  - `src/ui/CLAUDE.md` (+17/−0) — new — extend core prompts, input option, state-aware frames, schema-derived screens, PTY strong oracle
+  - `src/ui/__tests__/.claude/skills/run-src-ui-tests/SKILL.md` (+0/−29) — removed — `bun test <dir>` in prose earned no slash command
+- Notes: Research first (claude-code-guide agent, cited in ADR-018): nested files load lazily when Claude reads files under the directory and concatenate after the root; `AGENTS.md` is not read by Claude Code; `.claude/rules/*.md` with `paths:` load on read (v2.1.198+). Observed: the harness discovered `/run-docs-plan` the instant PLAN-002 was written under docs/plan — nested skills are picked up on touch. Two inventory forks scored all 56 directories (9 strong / 14 weak / 33 none). Verification: 18 CLAUDE.md files, largest nested 36 lines, 0 sentences shared between any two, 0 broken links, `bun run check` green, both folded drivers run. Unverified: whether `**/.claude/skills/**` matches dot-directories (fallback globs recorded in ADR-018).
