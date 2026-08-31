@@ -376,3 +376,25 @@ A blanket replace briefly rewrote Peter's quoted words in ADR-010 — restored; 
 - Why: Peter: "does the docs directory need a README.md that docs/CLAUDE.md references?" and "do any of the other nested CLAUDE.md files need sibling README.md files?"
 - Files:
   - `docs/CLAUDE.md` (+6/−2) — header names OVERVIEW.md as the map; subdirectory READMEs as rules/index/template
+
+### 2026-08-30 · feat(glossary): CONTEXT.md — canonical vocabulary; doctor/bootstrap labels aligned (Satisfied/Missing/Drifted/Untracked, Picked/Wanted, Applied) · 2eb5648
+
+- Summary: `CONTEXT.md` glossary seeded from the code and ADRs; three collisions settled with Peter (item states Satisfied/Missing/Drifted/Untracked; Picked vs Wanted; Applied vs Present) and the code, prompts, drivers and docs aligned to the words.
+- Why: Peter invoked `/domain-modeling`; the same concepts wore different names in `doctor`, bootstrap, the code flags and the docs, and `doctor` was filing drifted items under "missing".
+- Files:
+  - `.claude/skills/run-envsetup/SKILL.md` (+2/−2) — expected outro shape and picker wording
+  - `.claude/skills/run-envsetup/smoke.mjs` (+4/−4) — doctor needle 'satisfied' and outro regex with 'drifted'
+  - `CLAUDE.md` (+6/−2) — rehydration step 4: use CONTEXT.md's words; settle terms with domain-modeling first
+  - `CONTEXT.md` (+196/−0) — new — the glossary: machine/items, running, item states, configuration, secrets; Avoid lists; Open section
+  - `README.md` (+1/−1) — picker hint text → "applied — settings differ"
+  - `docs/OVERVIEW.md` (+5/−1) — doc-map row for CONTEXT.md; hint wording; Status: unreleased code change (doctor/labels)
+  - `docs/decisions/ADR-010-reset-on-drift-config-model.md` (+1/−1) — decision text uses 'applied — settings differ'; Peter's quoted words left as spoken
+  - `docs/plan/PRD-001-envsetup.md` (+3/−3) — doctor states named per CONTEXT.md; success criterion wording
+  - `docs/sessions/SES-004-docs-rehydration.md` (+12/−0) — narrative of the domain-modeling conversation
+  - `src/.claude/skills/run-src/driver.ts` (+1/−1) — doctor needle 'satisfied'
+  - `src/commands/__tests__/bootstrap-presentation.test.ts` (+1/−1) — expects the 'applied — settings differ' hint
+  - `src/commands/bootstrap.ts` (+4/−4) — hint 'applied — settings differ'; summary 'already applied (untouched — unchecking an applied item changes nothing)'; 'already applied' outcome; deferred message no longer says run connect
+  - `src/commands/doctor.ts` (+27/−21) — missing / drifted / untracked arrays and notes; 'satisfied' count; 'every wanted item is satisfied'
+  - `src/items/item.ts` (+2/−1) — DetectResult.installed documented as Applied; hint text in the differs doc
+  - `src/orchestrator/orchestrator.ts` (+1/−1) — journal skip reason 'already applied'
+- Notes: The on-disk manifest field stays `selected` (renaming is a migration) and `DetectResult.installed` stays as the flag name (~65 items); both are spoken of as Wanted / Applied. Terms asserted without a conversation (Ceremony, Connect phase, Finishing pass, Converge, Section, Kind) are listed as open to challenge. No ADR: vocabulary is cheap to reverse. The doctor/label changes are code and ship with v0.1.10.
