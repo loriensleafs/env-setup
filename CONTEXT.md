@@ -184,7 +184,7 @@ _Avoid_: dotfiles (the item's name), rc lines
 **Session log**:
 The `docs/sessions/` files together: the append-only record of every change that reached `main`
 and the narrative around it — what a conversation reads to rehydrate.
-_Avoid_: ledger (the pre-ADR-017 name), history, changelog (that is the generated CHANGELOG.md)
+_Avoid_: ledger (former name, retired by ADR-017), history, changelog (that is the generated CHANGELOG.md)
 
 **Session**:
 A bounded stream of work toward one Goal, recorded in one `docs/sessions/SES-NNN` file; **open**
@@ -249,6 +249,29 @@ _Avoid_: vault, keychain (that is macOS's, where the API key ends up)
 A per-app activation key held in the secret store; applied by writing it (scriptable apps) or by a
 paste ceremony (online-validated apps).
 _Avoid_: key (alone), serial
+
+## Relationships
+
+- A **Machine** has one **Manifest**; the Manifest says which **Items** are **Wanted** and with
+  which **Config**; the **Effective config** is that Config or the **Defaults**.
+- A **Run** executes the **Picked** Items as **Steps**; a Step that needs a human queues a
+  **Ceremony** for the **Connect phase**; the **Journal** records every Step.
+- A **Session** serves at most one **Plan part**; a **Conversation** joins or opens one Session
+  before its first commit; a commit worth reading about is one **Entry** in that Session's file;
+  the **Gate** counts the Entries and the placeholders; the **Handoff** is what a Conversation
+  leaves behind.
+
+## Flagged ambiguities (word conflicts, resolved)
+
+- **ledger** → Session log. The name before ADR-017; it came back once and was retired again. A
+  former name: live prose says Session log; a record written under the old name keeps it.
+- **Open** is a status (Open / Closed) and a move (Join / Open / Leave / Close). "An open session"
+  is the status; "open a session" is the move.
+- **check** — Detect and Doctor avoid it; `session check` is the command that runs the Gate. The
+  noun is Gate; "check" names the command only.
+- **session** / **conversation** — one Session holds many Conversations. "This session" in a
+  prompt usually means the Conversation; one agent context is a Conversation.
+- **Step** is an Item's execution within a Run. The plan's unit is a Plan part, never a step.
 
 ## Open (not yet canonical — being sharpened)
 
