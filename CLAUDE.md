@@ -9,16 +9,16 @@ pointers below.
 runs the attended ceremonies, and **converges** on re-run; `doctor` is the read-only diff; `sync`
 applies the manifest without the picker. Owner: Peter Kloss (github `loriensleafs`).
 
-## Rehydrating — at session start, run `/session start` (alias `/session-start`)
+## Rehydrating — the read order (the procedure is `/brain:plan PLAN-NNN`, once acmelabs-15/brain PLAN-001 Part 4 lands)
 
-The `/session` skill — the `sessions` plugin from the ACMElabs marketplace (ADR-023), not a file in
-this repo — is the one home of the session ritual: `start [PLAN-NNN]` reads the docs system in
-the right order — OVERVIEW (Status, Next up, Key facts) → the plan and the PRD it serves → every
-**open** `SES-NNN` serving it in full → [CONTEXT.md](CONTEXT.md) → the tree checked against the
-log → the ADRs / ANAs the plan cites and the nested `CLAUDE.md` — then joins the open session the
-plan part names, opens one for it and marks the part in progress, or states that nothing will
-change, and ends in a brief (ADR-022). A session is a stream of work
-toward one Goal, open until closed, and may span many conversations (ADR-020); a conversation
+Read, in this order and in full: `docs/OVERVIEW.md` (Status, Next up, Key facts) → the plan and
+the PRD it serves (`docs/plan/`) → the session the plan part's status line names, in
+`docs/sessions/` (its Narrative, then the entries newest-first, then the files the last entries
+name) → [CONTEXT.md](CONTEXT.md) → the tree checked against the log → the ADRs / ANAs the plan
+cites and the nested `CLAUDE.md`. The session skill (`/brain:session`, the `brain` plugin from the
+ACMElabs marketplace — ADR-024, superseding ADR-023's home) keeps the record only; where the plan
+stands and what comes next is the plan's (ADR-024). A session is a stream of work toward one
+Goal, `in progress` until `done`, and may span many conversations (ADR-020); a conversation
 needs one before its first commit, not before its first answer. **Every file it names is read in
 full, to the end, with no sampling**; a truncated read is continued with `offset`, never
 summarized. Do **not** rebuild history from the code or `git log`; the docs system exists so you
@@ -41,20 +41,20 @@ never have to. Every doc is `<TYPE>-<NNN>-<kebab-title>.md` in its directory; ea
 - Talk plain: a line of context, then Simplified Technical English in `CONTEXT.md`'s words
   (`/wait-what` re-pitches what did not land).
 
-## Recording — after every commit `/session entry`; leaving `/session end`; Goal done `/session close`
+## Recording — after every commit `/brain:session log`; Goal done `/brain:session close`
 
-`entry` appends and fills the commit's entry and updates everything the change made stale in the
+`log` appends and fills the commit's entry and updates everything the change made stale in the
 same step (OVERVIEW, ADR, PRD, plan, analysis, `CONTEXT.md`, a directory's `CLAUDE.md`), then
 commits it as `docs(session): …`. The glossary is alive when `CONTEXT.md` changes during the
 conversation that changes the model and gets shorter as often as longer (ANA-010);
 `bun docs/.claude/skills/run-docs/avoid-check.ts` refuses a retired word in the live prose. The session log holds value only (ADR-021): a fix-up gets no entry
 (its parent's `Also:` line vouches for it) and a commit with nothing to record carries the trailer
-`Session-entry: none`; `end` checks the log, Status and the tree and leaves the
-session open with a handoff; `close` writes the Outcome, runs `session close`, and
-marks the plan part `done (session SES-NNN, sha)`. The procedure lives in the skill, the template in
-`docs/sessions/README.md`; `/session-start`, `/session-entry`, `/session-end` and
-`/session-close` are typed-only aliases. Never put it off; the next conversation's `start`
-depends on it.
+`Session-entry: none`. A conversation that stops does nothing — the session stays `in progress`
+(ADR-024, no handoff line); `start <description> --plan "PLAN-NNN · part N"` creates a session and
+marks its part; `close` writes the Outcome, runs `session close`, and marks the plan part
+`done (session SES-NNN, sha)`. The procedure lives in the skill, the template in
+`docs/sessions/README.md`; `/brain:session-start`, `/brain:session-log` and `/brain:session-close`
+are typed-only commands, one act each. Never put it off; the next conversation depends on it.
 
 ## Hard rules (do not violate)
 

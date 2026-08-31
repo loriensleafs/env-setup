@@ -184,96 +184,53 @@ _Avoid_: dotfiles (the item's name), rc lines
 **Session log**:
 The `docs/sessions/` files together: the append-only record of every change that reached `main`
 and the narrative around it — what a conversation reads to rehydrate.
-_Avoid_: ledger (former name, retired by ADR-017), history, changelog (that is the generated CHANGELOG.md)
+_Avoid_: ledger, history, changelog (that is the generated one)
 
 **Session**:
-A bounded stream of work toward one Goal, recorded in one `docs/sessions/SES-NNN` file; **open**
-from the moment it is opened until it is **closed** with its Outcome written. It may span any
-number of conversations and may serve a plan (its `Plan:` line).
+A bounded stream of work toward one Goal, recorded in one `docs/sessions/SES-NNN` file;
+`in progress` from `start` until `close` writes `done` with its Outcome. It may span any
+number of conversations and may serve a plan part (its `Plan:` line).
 _Avoid_: conversation (for this), sitting, chat, the newest file (as the definition of current)
 
 **Conversation**:
-One agent context or one human sitting. A participant in a session: it joins the open session
-whose Goal is its work, or opens one, before its first commit; a conversation that changes nothing
+One agent context or one human sitting. A participant in a session: it names the session in
+progress it logs into, or starts one, before its first commit; a conversation that changes nothing
 needs none.
 _Avoid_: session (for this)
 
-**Open** / **Closed** (session status):
-Open — work toward the Goal may still land; the tool appends entries and gates it. Closed — the
-Goal is done or abandoned, the Outcome says which; nothing is appended to it again.
-_Avoid_: current (as the status word), active, done (for the status), finished
+**Status** (one vocabulary for session, plan and plan part):
+A session is `in progress` from `session new` until `session close` writes `done` — the Outcome says
+whether the Goal was met or abandoned; nothing is appended to a done session. A plan part is
+`planned`, `in progress (session SES-NNN)` or `done (session SES-NNN, sha)`; a plan is `planned`,
+`in progress` or `done`. Tickets and ADRs carry their own words (triage roles; Accepted / Superseded).
+_Avoid_: open, closed (the pre-ADR-024 session words, still read), active, current, finished, complete (as a status)
 
-**Join** / **Open** / **Leave** / **Close** (a conversation's moves):
-Join — take an open session as yours because you will record entries into it and its Goal is your
-work; never a session another conversation owns. Open — start a new session for new work. Leave —
-stop for now with the log complete and a handoff written; the session stays open. Close — the
-Goal is done: Outcome written, status flipped to closed.
-_Avoid_: end (for close), finish, resume (for join), create (for open)
+**Start** / **Log** / **Close** (the three acts of the session skill):
+Start — a new session from a description: its Goal, its `Plan:` line, its plan part marked in
+progress. Log — a commit's entry into a session in progress, with everything the change made
+stale. Close — the Goal is done: Outcome written, status `done`, the plan part done. The act is
+inferred from the arguments; close is always named. A conversation that stops does nothing.
+_Avoid_: join, open, leave, end, add, record, entry (as the act name)
 
 **Plan part**:
 One `### Part N` of a plan in `docs/plan/`, with its own status line — `planned`, `in progress
 (session SES-NNN)` or `done (session SES-NNN, sha)` — the pointer a new conversation follows from
-the plan to the session that holds its story (ADR-022). One session per part.
+the plan to the session that holds its story. One session per part.
 _Avoid_: phase (as the heading word), step, milestone, ticket
 
-**Handoff**:
-The `Open at end` line of an open session: what the next conversation picks up first and what is
-unverified, written when a conversation leaves.
-_Avoid_: notes, todo, next steps (as the field name)
-
 **Gate**:
-`session check` (the plugin's tool): exit 0 only when every commit on the branch is accounted for and your
-session has no placeholder the gate counts. Its exit status is the verdict; nothing is piped after
-it.
+`session check`: exit 0 only when every commit on the branch is accounted for and your session has
+no placeholder the gate counts. Its exit status is the verdict; nothing is piped after it.
 _Avoid_: check (as the noun), lint, validation
 
 **Entry**:
 The block a change worth reading about gets in a session file — Summary, Why, one line per
-touched file, Notes — written by `/session entry` right after the commit. The session log holds
-value only: a fix-up commit gets no entry and is vouched for by its parent's `Also:` line; a commit with
-nothing to record says so itself (`Session-entry: none`) and gets none.
+touched file, Notes — written by the `log` act right after the commit. The session log holds
+value only: a fix-up commit gets no entry and is vouched for by its parent's `Also:` line; a commit
+with nothing to record says so itself (`Session-entry: none`) and gets none.
 _Avoid_: log entry, note, update, record (as the noun), commit (as the unit — a commit is git's)
 
 **Record** (verb):
 To write the entry and update everything the commit made stale, in the same step; the practice
 the docs system depends on.
 _Avoid_: update, log, document (as the verb for this)
-
-## Secrets
-
-**Secret store**:
-The age-encrypted `secrets.json.age` committed to the repo, unlocked by one passphrase.
-_Avoid_: vault, keychain (that is macOS's, where the API key ends up)
-
-**License**:
-A per-app activation key held in the secret store; applied by writing it (scriptable apps) or by a
-paste ceremony (online-validated apps).
-_Avoid_: key (alone), serial
-
-## Relationships
-
-- A **Machine** has one **Manifest**; the Manifest says which **Items** are **Wanted** and with
-  which **Config**; the **Effective config** is that Config or the **Defaults**.
-- A **Run** executes the **Picked** Items as **Steps**; a Step that needs a human queues a
-  **Ceremony** for the **Connect phase**; the **Journal** records every Step.
-- A **Session** serves at most one **Plan part**; a **Conversation** joins or opens one Session
-  before its first commit; a commit worth reading about is one **Entry** in that Session's file;
-  the **Gate** counts the Entries and the placeholders; the **Handoff** is what a Conversation
-  leaves behind.
-
-## Flagged ambiguities (word conflicts, resolved)
-
-- **ledger** → Session log. The name before ADR-017; it came back once and was retired again. A
-  former name: live prose says Session log; a record written under the old name keeps it.
-- **Open** is a status (Open / Closed) and a move (Join / Open / Leave / Close). "An open session"
-  is the status; "open a session" is the move.
-- **check** — Detect and Doctor avoid it; `session check` is the command that runs the Gate. The
-  noun is Gate; "check" names the command only.
-- **session** / **conversation** — one Session holds many Conversations. "This session" in a
-  prompt usually means the Conversation; one agent context is a Conversation.
-- **Step** is an Item's execution within a Run. The plan's unit is a Plan part, never a step.
-
-## Open (not yet canonical — being sharpened)
-
-- None at the moment. Terms asserted here without a decision conversation (Ceremony, Connect
-  phase, Finishing pass, Converge, Section, Kind, Reference clone) are open to challenge.

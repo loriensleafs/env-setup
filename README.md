@@ -36,7 +36,7 @@ what is missing.
 
 ## Working on it
 
-Humans and agents start the same way (agents: `/session start` does it; `/session entry` after every commit, `/session end` to leave, `/session close` when the Goal is done; the session log holds value only — ADR-021): [docs/OVERVIEW.md](docs/OVERVIEW.md) (map, status, next up)
+Humans and agents start the same way (agents: the read order in CLAUDE.md § Rehydrating; `/brain:session log` after every commit, `/brain:session close` when the Goal is done; the session log holds value only — ADR-021): [docs/OVERVIEW.md](docs/OVERVIEW.md) (map, status, next up)
 → the open sessions in [docs/sessions/](docs/sessions/README.md) (what was done, with a note per
 touched file) → [CONTEXT.md](CONTEXT.md) (the words) → [docs/decisions/](docs/decisions/README.md)
 (ADRs, the current truth of every decision) · [docs/plan/PRD-001-envsetup.md](docs/plan/PRD-001-envsetup.md)
@@ -55,7 +55,7 @@ Pure-Bun toolchain (no Node runtime). `bun install` also wires the git hooks (vi
 | `bun run check` | Biome (format + lint) · `tsc` typecheck · markdownlint |
 | `bun run fix` | Auto-fix everything (Biome `--write` + markdownlint `--fix`) |
 | `bun run test` | Bun test suite |
-| `/session start · entry · end · close` | The `sessions` plugin (ACMElabs marketplace): the session ritual and the tool behind it (`list`, `new <slug>` opens, `append --session SES-NNN`, `current`, `check` gates, `close`) — ADR-022/023 |
+| `/brain:session start · log · close` | The `brain` plugin (ACMElabs marketplace): the record and the tool behind it (`list`, `new <slug>` starts, `append --session SES-NNN`, `current`, `check` gates, `close`) — ADR-022/024 |
 | `bun run changelog` | Regenerate `CHANGELOG.md` from conventional commits (git-cliff) |
 | `bun run compile` | Build the standalone binary |
 
