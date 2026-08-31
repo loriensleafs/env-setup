@@ -37,7 +37,7 @@ bun run check                              # the full gate (Biome + tsc + markdo
 ## Run (agent path) — session log
 
 ```bash
-bun run session -- --check                 # → session: complete
+bun run session check --session SES-NNN    # → session: complete (SES-NNN, open)
 ```
 
 Scope the link check to a subdirectory with the argument above.
@@ -49,4 +49,4 @@ Scope the link check to a subdirectory with the argument above.
   any move or rename.
 - markdownlint's config (`.markdownlint-cli2.jsonc`) relaxes MD013/MD025/MD033/MD041/MD049 for long-form
   docs; `CHANGELOG.md`, `vendor/`, `dist/` are ignored.
-- `bun run session -- --new <slug>` creates a file — do not run it as a test.
+- `bun run session new <slug>` creates a file — do not run it as a test.

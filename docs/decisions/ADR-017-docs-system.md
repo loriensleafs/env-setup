@@ -4,6 +4,12 @@
 
 Accepted
 
+Revised 2026-08-30 by [ADR-020](ADR-020-session-model.md) (a session is a stream of work with a
+status, not a conversation; the tool lives in the skill as a subcommand CLI — `bun run session
+new | append | check | close`, not the `-- --flag` spellings quoted below) and by
+[ADR-021](ADR-021-entry-grain.md) (the ledger holds value only: fix-ups and valueless commits get
+no entry). The layout and the never-deferred rule stand.
+
 ## Date
 
 2026-08-30 (session `SES-004-docs-rehydration.md`; supersedes the single "living plan"
