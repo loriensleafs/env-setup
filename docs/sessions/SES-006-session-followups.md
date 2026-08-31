@@ -140,3 +140,28 @@ settled as ADR-021 (`77aa614`): value only, `Also:` lines, the `Session-entry: n
   - `docs/decisions/ADR-017-docs-system.md` (+6/−0) — dated status note pointing at ADR-020 and ADR-021 (its quoted `-- --flag` commands are the old spelling; the decision stands)
   - `docs/sessions/CLAUDE.md` (+2/−1) — invariant carries the value-only rule (Also lines, the trailer)
 - Notes: Verified by re-running the sweep (old spellings, three-mode lists, scripts/ mentions, old ADR ranges: none left outside history and dated ADR notes), `bun run check`, link-check (138 links, 0 broken) and verify-agent-docs.py (0 avoid-words, 0 duplicate sentences).
+
+### 2026-08-30 · docs(context): Session log, Join/Open/Leave/Close, Handoff and Gate defined; 'ledger' retired again · 2dd1455
+
+- Summary: CONTEXT.md defines the four session-log words the docs used without definition (Gate, Join/Open/Leave/Close, Handoff, Session log) and retires 'ledger' again; eight live lines now say session log.
+- Why: Peter: does CONTEXT.md need updating? A usage count said yes — gate 30×, join 26×, leave 17×, handoff 15× undefined, ledger 15× against the retired name.
+- Files:
+  - `.claude/skills/session/SKILL.md` (+1/−1) — entry step 1 says session log
+  - `CLAUDE.md` (+1/−1) — Recording line says session log
+  - `CONTEXT.md` (+25/−2) — new terms Session log (Avoid: ledger), Join/Open/Leave/Close, Handoff, Gate; Entry says session log
+  - `CONTRIBUTING.md` (+1/−1) — step 7 says session log
+  - `README.md` (+1/−1) — working-on-it line says session log
+  - `docs/OVERVIEW.md` (+1/−1) — Status entry-grain line says session log
+  - `docs/decisions/README.md` (+1/−1) — ADR-021 index row says session log
+  - `docs/sessions/CLAUDE.md` (+1/−1) — invariant says session log
+  - `docs/sessions/README.md` (+1/−1) — the value-only rule says session log (the SES-004 title and the migration note keep the historical word)
+- Notes: Verified: verify-agent-docs.py with 'ledger' added to its avoid list reports only the two historical uses; check, link-check and the gate green. Decision on the spot: 'leave' is the canonical word for `/session end` (the mode name stays `end`; the glossary lists end under Avoid for close only).
+
+### 2026-08-30 · docs(analysis): ANA-010 — how the reference skills keep CONTEXT.md current (no automation; a reading rule from setup; one skill owns the write) · 67f40d6
+
+- Summary: ANA-010: how the reference skills repo keeps CONTEXT.md current — no automation anywhere; the setup skill installs a reading rule (docs/agents/domain.md) that defers creation to /domain-modeling; one skill owns the write, reached by delegation from four others; the reference's own docs admit the discipline leaks; envsetup never received the setup hook and has the same discipline with the same leak.
+- Why: Peter: "Why didn't those things get automatically added to CONTEXT.md? … do a complete and comprehensive analysis of ~/Dev/reference/matt-pocock-skills … is it part of the install stack?"
+- Files:
+  - `docs/analysis/ANA-010-context-md-maintenance-in-the-reference-skills.md` (+122/−0) — the analysis: findings A–E with file:line citations to the reference at 6654f6b, refuted claim, unverifiable, four implications
+  - `docs/analysis/README.md` (+1/−0) — index row for ANA-010
+- Notes: Sources verified by reading the cited files at the cited lines (setup SKILL.md, domain.md, domain-modeling SKILL.md + CONTEXT-FORMAT.md, the four delegating skills, .agents/invocation.md, docs/engineering/domain-modeling.md, the glossary's git log) plus an Explore agent's full pass; the only unverifiable claim is how often the discipline fires in other users' repos. Decision left to Peter: which of the four implications to act on (avoid-word check, the two extra CONTEXT.md sections).
