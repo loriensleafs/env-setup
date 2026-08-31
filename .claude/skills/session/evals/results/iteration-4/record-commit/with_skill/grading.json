@@ -1,0 +1,139 @@
+{
+  "expectations": [
+    {
+      "text": "commit.diff shows HEAD is a commit whose subject starts with docs(session): and the fix(finder) commit is an ancestor",
+      "passed": true,
+      "evidence": "commit.diff opens with `commit ef7092bd17d4…` and subject `docs(session): record 128cc0c — set-favorites.swift re-synced …`; fixture `git rev-parse HEAD` = ef7092bd17d4… (matches). `git merge-base --is-ancestor 128cc0c HEAD` → yes; `git log --oneline -6` = ef7092b, 99b60eb, 128cc0c, 2a815ac, 0459c1a, 85fa12a. Reflog shows one new commit on top of the fixture's 99b60eb, no amend/reset."
+    },
+    {
+      "text": "session-file.md holds an entry for the fix(finder) commit whose src/items/finder/assets/set-favorites.swift line mentions --list or LSSharedFileListItemCopyResolvedURL (a specific phrase, not 'updated')",
+      "passed": true,
+      "evidence": "session-file.md has `### 2026-08-30 · fix(finder): re-sync set-favorites.swift … · 128cc0c` whose Files line reads `src/items/finder/assets/set-favorites.swift (+21/−2) — re-synced with the embedded SET_FAVORITES_SWIFT: new SFLItemURLFn typealias and LSSharedFileListItemCopyResolvedURL dlsym binding; --list argument parsing (listMode, empty paths); a --list block that prints the current favorites' file paths … and exits 0 before the clear-and-insert path`. The +21/−2 matches `git show --stat 128cc0c` (21 insertions, 2 deletions). Same content is in the fixture's docs/sessions/SES-006-record-eval.md."
+    },
+    {
+      "text": "session-file.md's entry Notes state how the fix's claim was verified (a driver run, a byte comparison or swiftc), and transcript.md shows that verification command was actually run",
+      "passed": true,
+      "evidence": "Notes: `Verified byte-identical three ways — the finder driver (bun src/items/finder/.claude/skills/run-src-items-finder/driver.ts) now prints SET_FAVORITES_SWIFT === assets/set-favorites.swift ✓ … cmp of the asset against the constant written to a file exits 0, sha256 22ea5dcd… on both, 83 lines each; xcrun swiftc -typecheck on the asset exits 0`. verify.txt (captured stdout) shows the driver run with `SET_FAVORITES_SWIFT === assets/set-favorites.swift ✓ … OK exit=0`, `cmp exit=0`, identical sha256 22ea5dcdae70… on both files, 83 lines each, `swiftc exit=0`, `bun test` 2 pass. Transcript steps 12–16 match. Grader re-ran the driver in the fixture: identical output, exit 0; re-ran shasum (22ea5dcdae70…), wc -l (83), bun test (2 pass, 0 fail). verify.txt also honestly records the first cmp attempt failing due to an unexported variable before the corrected re-run."
+    },
+    {
+      "text": "git-state.txt shows `bun run session check` printing session: complete and an empty git status --short",
+      "passed": true,
+      "evidence": "git-state.txt: `$ git status --short` followed by a blank line, then `$ bun run session check --session SES-006` → `session: complete (SES-006, open)` / `exit=0`. Grader re-ran both in the fixture: status empty, check prints `session: complete (SES-006, open)` exit 0. The stray `undefined/` dir the transcript admits creating is gone (`ls undefined` → No such file)."
+    },
+    {
+      "text": "overview.diff shows docs/OVERVIEW.md Next-up 5 no longer lists the stale set-favorites.swift asset (removed or marked done, citing the fix commit)",
+      "passed": true,
+      "evidence": "overview.diff removes `5. … set-favorites.swift is stale vs the embedded SET_FAVORITES_SWIFT constant …` and replaces it with `5. Findings from the run-skill drivers (SES-004, ba38081): hooks-format.ts exits 0 silently …` plus `Done: src/items/finder/assets/set-favorites.swift re-synced with the embedded SET_FAVORITES_SWIFT constant ([SES-006](sessions/SES-006-record-eval.md), 128cc0c).` A Status bullet `Unreleased on main (SES-006, 128cc0c)` was also added. The diff is identical to the docs/OVERVIEW.md hunk in commit.diff."
+    },
+    {
+      "text": "commit.diff shows src/items/finder/CLAUDE.md and src/items/finder/.claude/skills/run-src-items-finder/SKILL.md no longer say the asset is stale",
+      "passed": true,
+      "evidence": "commit.diff: CLAUDE.md `- assets/set-favorites.swift is currently **stale** …` → `+ … are **byte-identical** (re-synced in 128cc0c, SES-006)`; SKILL.md expected output `-WARNING: assets/set-favorites.swift differs …` → `+SET_FAVORITES_SWIFT === assets/set-favorites.swift ✓`, and Gotcha `-**assets/set-favorites.swift is stale**` → `+**… must stay byte-identical to the embedded constant.** This driver found it stale once … re-synced in 128cc0c (SES-006)`. Fixture grep: CLAUDE.md has zero 'stale' hits; SKILL.md has one hit at line 47, `found it stale once`, which is past-tense history in a sentence that asserts the asset is now re-synced — it does not say the asset is stale."
+    },
+    {
+      "text": "commit.diff does not touch docs/sessions/SES-005-rehydration.md, and transcript.md shows files were staged by name (no `git add -A` / `git add .`)",
+      "passed": true,
+      "evidence": "commit.diff / `git diff --name-only HEAD~1 HEAD` lists exactly docs/OVERVIEW.md, docs/sessions/README.md, docs/sessions/SES-006-record-eval.md, run-src-items-finder/SKILL.md, src/items/finder/CLAUDE.md. `git log -1 -- docs/sessions/SES-005-rehydration.md` = 1187acc (pre-fixture); SES-004 last touched at 0459c1a. Transcript step 27 quotes the exact invocation: `git add docs/sessions/SES-006-record-eval.md docs/sessions/README.md docs/OVERVIEW.md src/items/finder/CLAUDE.md src/items/finder/.claude/skills/run-src-items-finder/SKILL.md`; no `-A` or `.` appears anywhere in the transcript. Caveat: transcript.md is executor-authored prose, not a raw tool log, so the add form is self-reported; the resulting commit is consistent with it."
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "pass_rate": 1.0
+  },
+  "execution_metrics": null,
+  "timing": {
+    "executor_duration_seconds": 206.9,
+    "total_duration_seconds": 206.9,
+    "total_tokens": 107227
+  },
+  "claims": [
+    {
+      "claim": "The asset and the embedded SET_FAVORITES_SWIFT constant are byte-identical (driver ✓, cmp exit 0, sha256 22ea5dcd… on both, 83 lines each)",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Grader re-ran the driver: `SET_FAVORITES_SWIFT === assets/set-favorites.swift ✓ … OK`, exit 0; shasum of the asset = 22ea5dcdae700be23a7af7aabe2bdd2119ac050a68b27ed08a7d13f888a9f475, wc -l = 83. verify.txt shows the same sha on the written-out constant."
+    },
+    {
+      "claim": "bun run session check --session SES-006 prints session: complete; Outcome / Open at end placeholders are allowed while open",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Re-run: `session: complete (SES-006, open)` exit 0 while `session current` still reports placeholders: 2 (lines 6, 7). The tool does not count those two for an open session."
+    },
+    {
+      "claim": "bun run check is clean (Biome 238 files, tsc, markdownlint 101 files 0 issues)",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Grader re-ran `bun run check` in the fixture: `Checked 238 files … No fixes applied`, tsc silent, `markdownlint … Linting: 101 files, Summary: 0 issues`."
+    },
+    {
+      "claim": "bun test src/items/finder/__tests__ → 2 pass, 0 fail",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Re-run: `2 pass / 0 fail / 9 expect() calls`."
+    },
+    {
+      "claim": "The stray ./undefined/ directory from the first cmp attempt was removed and the tree was clean before staging",
+      "type": "process",
+      "verified": true,
+      "evidence": "`ls -d undefined` → No such file or directory; `git status --short` empty; commit touches only the five named files (no stray path)."
+    },
+    {
+      "claim": "SES-005 (another conversation's open session) and SES-004's historical entries were left untouched",
+      "type": "process",
+      "verified": true,
+      "evidence": "`git diff 99b60eb HEAD --stat -- SES-005-rehydration.md SES-004-docs-rehydration.md` is empty; last commits touching them predate the fixture (1187acc, 0459c1a)."
+    },
+    {
+      "claim": "The asset was 19 lines behind the constant (64 vs 83) before the fix; the fix is +21/−2",
+      "type": "factual",
+      "verified": true,
+      "evidence": "`git show --stat 128cc0c` = 21 insertions, 2 deletions on one file; 83 − 64 = 19 is consistent with net +19."
+    },
+    {
+      "claim": "Only the driver's warning keeps asset and constant in sync; no test asserts byte-equality (follow-up recorded)",
+      "type": "quality",
+      "verified": true,
+      "evidence": "The finder test suite has 2 tests / 9 expects and the driver does the comparison; the run recorded this as a follow-up in Notes and in reply.md rather than silently fixing it, which is the right scope for a record step."
+    },
+    {
+      "claim": "The helper binary was not compiled-and-executed because it rewrites the Finder sidebar",
+      "type": "process",
+      "verified": true,
+      "evidence": "Stated in verify.txt 'Not run' section and Notes; nothing in the transcript executes the helper. Cannot be disproven; the reasoning is correct given driver.ts only typechecks."
+    },
+    {
+      "claim": "No push, no PR, nothing written outside the fixture and outputs dir except two scratchpad temp files",
+      "type": "process",
+      "verified": true,
+      "evidence": "Reflog shows only the commit; branch main has no upstream activity in the transcript; scratchpad holds embedded-constant.swift as described."
+    }
+  ],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": [
+      "No user_notes.md was produced. The transcript and verify.txt self-report one executor mistake: the first direct cmp attempt used an unexported shell variable so `bun -e` wrote the constant to ./undefined/ inside the repo; it was deleted, the tree confirmed clean, and the comparison re-run correctly. Not a skill defect."
+    ]
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "expectation": "commit.diff shows src/items/finder/CLAUDE.md and src/items/finder/.claude/skills/run-src-items-finder/SKILL.md no longer say the asset is stale",
+        "reason": "The passing SKILL.md still contains the token 'stale' (line 47, 'found it stale once' — historical). A grader doing a literal grep would fail a correct output, and a grader reading semantically passes it. State the oracle: e.g. 'the Gotcha no longer asserts the asset IS stale and the expected-output block no longer shows the WARNING line', or 'the only remaining mention of stale is past-tense and cites the fix sha'."
+      },
+      {
+        "expectation": "commit.diff does not touch docs/sessions/SES-005-rehydration.md, and transcript.md shows files were staged by name (no `git add -A` / `git add .`)",
+        "reason": "transcript.md is executor-authored prose, so the staging form is self-reported and would look identical if the executor had run `git add -A` and written 'staged by name'. In this fixture only the five intended files were modified, so the resulting commit cannot distinguish the two. Either capture the raw shell log (as verify.txt does for verification) or plant a decoy: an untracked/modified file the run must leave out of the commit, so `git add -A` produces an observable wrong commit."
+      },
+      {
+        "reason": "No expectation checks that the fixture's docs/sessions/README.md index line for SES-006 was regenerated by the tool (it changed from `_(fill in)_` to the Goal). It is tool-owned, so a hand-edit there would be a hard-rule violation the current set would not catch; a cheap expectation is 'README.md index change for SES-006 is byte-identical to what `bun run session append` regenerates'."
+      },
+      {
+        "reason": "Expectation 3's 'transcript.md shows that verification command was actually run' is now well served by verify.txt (captured stdout); the expectation text should name verify.txt as the evidence so future graders don't fall back to the transcript's prose."
+      }
+    ],
+    "overall": "Strong run; all seven expectations pass on repo-verified evidence and every claim in reply.md held up under re-execution. Two expectations rely on the executor's own prose (the 'stale' wording and the git add form) where a stricter oracle is cheap to add."
+  }
+}

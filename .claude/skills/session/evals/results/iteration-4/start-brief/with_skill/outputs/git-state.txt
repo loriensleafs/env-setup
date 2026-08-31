@@ -1,0 +1,34 @@
+$ git rev-parse --short HEAD
+2a815ac
+
+$ git status --short
+(end of status)
+
+$ git log --oneline -5
+2a815ac Merge pull request #34 from loriensleafs/docs/session-open-items
+0459c1a docs(session): close SES-004 — the docs-system stream is done
+85fa12a docs(session): record a8f44b2
+a8f44b2 docs(skill): literal-injection gotcha (verified under claude -p); transcript-evidence expectations
+c332772 Merge pull request #33 from loriensleafs/feat/session-model
+
+$ bun run session list
+$ bun .claude/skills/session/scripts/session.ts list
+SES-001  closed  Foundation — spine, UI, items, orchestrator, first releases
+            Stand up the pure-Bun CLI from scratch: item framework, manifest/journal, clack UI, orchestrator, first item groups, secrets, release pipeline; ship v0.0.1–v0.0.2.
+SES-002  closed  curl|sh interactivity root-caused; first full bootstrap failures fixed (v0.1.0–v0.1.4)
+            Release v0.1.0 with reset-on-drift, then make the one-liner actually work interactively and survive Peter's first real bootstrap.
+SES-003  closed  Real bootstrap runs on Peter's machine; UX directives (v0.1.5–v0.1.9)
+            Iterate on Peter's real runs until the bare command converges with 0 failures, and fold in his UX directives.
+SES-004  closed  Docs for rehydration — OVERVIEW, ledger → granular entries → sessions, continuous upkeep
+            Make a fresh session able to pick up exactly where the last one stopped: a handoff overview, a complete record of what was done (with files), and a discipline that keeps it all current.
+SES-005  open    Session rehydration — read the docs system end to end, verify the repo is green
+            Rehydrate a fresh session exactly as CLAUDE.md prescribes — OVERVIEW, the newest session back to the v0.1.9 release marker, CONTEXT.md, the PLAN/ADRs/PRD for the area next up — and confirm the repo's state matches what the docs claim before taking any work.
+open: SES-005
+
+$ git rev-parse --short v0.1.9
+2384b88
+
+$ bun run session check --session SES-005
+$ bun .claude/skills/session/scripts/session.ts check --session "SES-005"
+session: complete (SES-005, open)
+exit=0

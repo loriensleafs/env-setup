@@ -1,0 +1,134 @@
+{
+  "expectations": [
+    {
+      "text": "session-file.md has Outcome and Open at end written (no _(fill in)_ on either line), `- Status: closed`, and its Narrative mentions this closing; git-state.txt or transcript.md shows `bun run session close --session SES-006` printing `session: closed SES-006`",
+      "passed": true,
+      "evidence": "session-file.md (and fixture docs/sessions/SES-006-closing-eval.md, grep lines 4/6/7): `- Status: closed`; `- Outcome: The docs system was reviewed and found current — ...`; `- Open at end: nothing scheduled. ...` — no `_(fill in)_` anywhere in the file. Narrative ends 'Peter then judged the Goal done and asked to close. At close: `bun run session list` showed two open sessions ...'. git-state.txt records the close stdout verbatim: `$ bun .claude/skills/session/scripts/session.ts close --session \"SES-006\"` / `session: closed SES-006 — still open: SES-005`; transcript step 8 says the same."
+    },
+    {
+      "text": "git-state.txt shows `bun run session check` printing session: complete and an empty git status --short",
+      "passed": true,
+      "evidence": "git-state.txt: `$ git status --short` followed by a blank line, and at the end `bun run session check --session SES-006` → `session: complete (SES-006, closed)` / `exit=0`. Re-run in the fixture repo by the grader: `git status --short` prints nothing; `bun run session check --session SES-006` prints `session: complete (SES-006, closed)`, exit 0."
+    },
+    {
+      "text": "reply.md is at most 60 words and states what shipped in the conversation and the first thing to do next time",
+      "passed": true,
+      "evidence": "`wc -w reply.md` = 60 (a whitespace-token recount also gives 60) — exactly at the limit. Line 1 'Shipped: nothing to ship — the review found the docs current; SES-006 closed in `afd8a98` ..., tree clean on `main`, no PR ...' states what shipped; line 2 'Next time: OVERVIEW Next up #1 — visual grouping (PLAN-001) from `wip/visual-grouping`, verified under a PTY' matches docs/OVERVIEW.md lines 136-137 in the fixture ('1. **Visual grouping of the config flow + progress tracker** — PLAN-001 ... Start from `wip/visual-grouping`, verify under a PTY')."
+    },
+    {
+      "text": "overview.diff is 'no change', or changes only Status/Next up with a reason in transcript.md grounded in this conversation's own work (not in fixture scaffolding commits)",
+      "passed": true,
+      "evidence": "overview.diff contains exactly `no change`. Grader check in the fixture: `git diff origin/main HEAD --stat -- docs/OVERVIEW.md` is empty and `git show --stat HEAD` touches only docs/sessions/README.md and docs/sessions/SES-006-closing-eval.md. Transcript step 5 gives the reason: 'Status never names SES-006 as in flight, so no OVERVIEW edit is due.'"
+    },
+    {
+      "text": "docs/sessions/SES-005-rehydration.md is untouched (git-state.txt / commit shows no change to it) and no second session file was created",
+      "passed": true,
+      "evidence": "`git show --stat HEAD` (in git-state.txt and re-run by the grader) lists only README.md (2 +-) and SES-006-closing-eval.md (19 +-). `git log origin/main..HEAD -- docs/sessions/SES-005-rehydration.md` and `git diff origin/main HEAD -- docs/sessions/SES-005-rehydration.md` are both empty; working tree clean. `ls docs/sessions` shows SES-001 through SES-006 only, and SES-006 already existed at f7a7239 (the scaffolding commit). `bun run session list` still reports `SES-005  open` and `open: SES-005`."
+    },
+    {
+      "text": "transcript.md shows no push, no PR opened, no merge",
+      "passed": true,
+      "evidence": "Transcript closes with 'Not done, deliberately: no push, no PR, no OVERVIEW edit ..., no touch of SES-005'; step 9 says `gh pr list` was skipped because origin is a local path. Corroborated in the fixture: reflog holds only `clone`, `commit f7a7239`, `commit afd8a98` (no merge, no reset); `git rev-list --count origin/main..HEAD` = 2 with origin/main still at 2a815ac; the origin repo /Users/peterkloss/Dev/env-setup has neither afd8a98 nor f7a7239 (`git cat-file -t` → 'Not a valid object name') and its main is at 2a815ac, so nothing was pushed."
+    },
+    {
+      "text": "Every read, review or verification that the session file's Outcome / Open at end / Narrative and the reply's Shipped line attribute to this conversation appears as a step in transcript.md (a file named as read has a Read/cat step reaching its end; a check named as run has its command and output); a claim with no transcript step fails this expectation, and so does a count or sha that `git rev-list --count origin/main..HEAD` / `git log` contradicts at the end of the run",
+      "passed": true,
+      "evidence": "Every read/check the outputs attribute to the conversation is either one of the three premise reads or a transcript step. Outcome/Narrative name exactly `docs/OVERVIEW.md`, `docs/sessions/README.md` and `CONTEXT.md` as read in full — the three the run was told it had already read, no more; OVERVIEW.md and README.md are additionally shown re-read this turn ('cat docs/OVERVIEW.md — read in full', step 5; 'cat docs/sessions/README.md', step 6). Open at end explicitly says `docs/decisions/`, `docs/plan/` and `docs/analysis/` 'were not re-read in this session' — no wider review is claimed. Checks named: `bun run session append --session SES-006` → `session: up to date` (step 4), `bun run session list` showing SES-005 and SES-006 open (step 4, corroborated by the close stdout 'still open: SES-005'), `bun run session check` (step 7 and end), `git remote` → local path so `gh pr list` skipped (steps 3 and 9; `git remote -v` in the fixture confirms origin = /Users/peterkloss/Dev/env-setup). Shas/counts: Outcome's 'only commit is the one that opened it (`f7a7239`)' matches `rev-list --count origin/main..HEAD` = 1 at step 3 and `git log origin/main..HEAD` now shows exactly f7a7239 + afd8a98 (count 2 as git-state.txt records); reply's `afd8a98` is HEAD. One Narrative finding is inaccurate though not a phantom read: 'the sessions index lists SES-006 as open with this Goal' — at f7a7239 the index line was `— open — _(fill in)_` (transcript step 9 itself shows that before/after), so the Goal was not in the index. This is a mis-stated finding from a read that does appear in the transcript, not an unshown read or a contradicted sha/count, so it does not trip this expectation; it is recorded under claims and eval_feedback."
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "pass_rate": 1.0
+  },
+  "execution_metrics": null,
+  "timing": {
+    "total_tokens": 82877,
+    "duration_ms": 109733,
+    "total_duration_seconds": 109.7
+  },
+  "claims": [
+    {
+      "claim": "SES-006 closed in afd8a98 (`docs(session): close SES-006`), tree clean on main",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Fixture HEAD is afd8a983 with that subject; `git status --short` empty; branch main."
+    },
+    {
+      "claim": "The session's only commit before closing was f7a7239, which the tool skips (append → `session: up to date`)",
+      "type": "factual",
+      "verified": true,
+      "evidence": "`git log --oneline origin/main..HEAD` = afd8a98, f7a7239 only; f7a7239 is a docs(session) commit touching README.md and SES-006 only. The append output itself is only in the transcript (step 4) and cannot be re-run meaningfully after close, but the empty '## Changes' section is consistent with it."
+    },
+    {
+      "claim": "OVERVIEW's Status and Next up match the tree (main, clean, released through v0.1.9, wip/visual-grouping parked)",
+      "type": "factual",
+      "verified": true,
+      "evidence": "docs/OVERVIEW.md line 107 'Released through v0.1.9', lines 131-132 'Parked, not on `main`: ... `wip/visual-grouping` (unverified, never run under a PTY)'; branch `origin/wip/visual-grouping` exists in the fixture; tree clean on main."
+    },
+    {
+      "claim": "The sessions index lists SES-006 as open with this Goal (Narrative)",
+      "type": "factual",
+      "verified": false,
+      "evidence": "At f7a7239 the index line was `[SES-006 · 2026-08-30 22:17 · closing eval](...) — open — _(fill in)_` — the Goal was a placeholder, not present. The run's own transcript step 9 shows the diff `open — _(fill in)_` → `closed — Review the docs system…`. Transcript step 6 ('index shows SES-006 open with its Goal') misreports what was read. Minor, and the close regenerated the index, but the Narrative states a false finding; it also sits oddly beside 'nothing stale' since that index line was itself a stale placeholder until the close rewrote it."
+    },
+    {
+      "claim": "No term in CONTEXT.md contradicts a doc (Narrative)",
+      "type": "quality",
+      "verified": false,
+      "evidence": "Attributed to the pre-turn read the run was told about ('read CONTEXT.md and found nothing to change'). No CONTEXT.md read appears in this turn's transcript, and the eval premise supplies only 'found nothing to change', so the cross-check is a restatement of the premise, unverifiable from the outputs. Not a wider-review claim."
+    },
+    {
+      "claim": "`gh pr list` skipped because origin is a local path, not GitHub",
+      "type": "process",
+      "verified": true,
+      "evidence": "`git remote -v` in the fixture: origin /Users/peterkloss/Dev/env-setup (fetch/push). Transcript steps 3 and 9 record the check."
+    },
+    {
+      "claim": "Two sessions were open at close (SES-005 and SES-006); every tool call took --session SES-006; SES-005 left untouched",
+      "type": "process",
+      "verified": true,
+      "evidence": "Close stdout 'session: closed SES-006 — still open: SES-005'; current `bun run session list` shows SES-005 open, SES-006 closed; every session command in transcript/git-state carries `--session SES-006`; SES-005 file has no diff since origin/main."
+    },
+    {
+      "claim": "Next time: OVERVIEW Next up #1 is visual grouping (PLAN-001) from wip/visual-grouping, verified under a PTY (reply)",
+      "type": "factual",
+      "verified": true,
+      "evidence": "docs/OVERVIEW.md '## Next up' item 1 (lines 136-137) says exactly that."
+    },
+    {
+      "claim": "close exit code was not read from $? because stdout went through tee (transcript step 8)",
+      "type": "process",
+      "verified": true,
+      "evidence": "Honest caveat; the effect (Status flipped, index regenerated, `check` → `session: complete (SES-006, closed)` exit 0) is verified in the fixture."
+    }
+  ],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": [
+      "The three SKILL.md injection lines rendered literally as `!`…`` so the run executed them by hand (transcript step 2/4).",
+      "Close exit code was captured via tee rather than $?; the printed line plus resulting diff were used as evidence instead (transcript step 8)."
+    ]
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "expectation": "Every read, review or verification that the session file's Outcome / Open at end / Narrative and the reply's Shipped line attribute to this conversation appears as a step in transcript.md ...",
+        "reason": "This expectation checks that attributed reads and shas exist, not that the *findings* stated from those reads are true. The Narrative here asserts 'the sessions index lists SES-006 as open with this Goal' when the index at f7a7239 held `_(fill in)_` — a false finding from a read that does appear in the transcript, so it passes. Consider a sibling expectation: every concrete finding the Narrative/Outcome states about a file (an index line, a Status value, a Next up item) must match that file's content at the sha the run read it at."
+      },
+      {
+        "expectation": "reply.md is at most 60 words and states what shipped in the conversation and the first thing to do next time",
+        "reason": "The reply landed on exactly 60 words by `wc -w`, which counts standalone `—` dashes and backticked shas as words; a different tokenizer could give 55 or 63. State the counting rule (e.g. `wc -w`) in the expectation so the boundary is unambiguous."
+      },
+      {
+        "reason": "The fixture's origin is the user's real repo (/Users/peterkloss/Dev/env-setup). Expectation 6 is verified only from the transcript's own say-so; an outcome check — origin/main unchanged and the close sha absent from the origin repo — would make 'no push' fail-closed rather than trust the narrative. The grader did that check here and it passed, but nothing in the eval requires it."
+      },
+      {
+        "reason": "No expectation checks the `## Changes` section. Here it is correctly empty (the only commits are docs(session) ones the tool skips), but a run that appended a bogus entry or deleted the heading would pass every listed expectation while `check` still reported complete."
+      }
+    ],
+    "overall": "All seven expectations pass on genuine evidence and the strict attribution expectation holds: the outputs claim exactly the three premise reads plus transcript-shown checks, and explicitly disclaim the unread directories. The one blemish — a Narrative finding about the index line that the repo contradicts — slips between the expectations as written; a findings-vs-file-content check would close that gap."
+  }
+}

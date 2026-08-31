@@ -1,7 +1,7 @@
 # PRD: envsetup
 
 > Status: current as of v0.1.9 · 2026-08-30 · extracted from the retired living plan
-> (`../sessions/ARC-001-living-plan.md`); keep current in the same PR as any change to
+> (`../archive/ARC-001-living-plan.md`); keep current in the same PR as any change to
 > what envsetup does. Decisions with alternatives live in [../decisions/](../decisions/README.md);
 > facts in [../analysis/](../analysis/README.md).
 
@@ -145,7 +145,7 @@ Bun 1.4 (runtime + `bun build --compile`), TypeScript, vendored `@clack/prompts`
 `src/index.ts` (citty entry, TTY guards) · `src/commands/` · `src/items/<item>/` + `src/items/all.ts`
 · `src/ui/` (terminal input, custom prompts, config screens) · `src/orchestrator/` ·
 `src/manifest/` · `src/journal/` · `src/secrets/` · `src/ceremonies/` · `src/exec/` ·
-`scripts/` (repo tooling) · `docs/` (this system) · `vendor/` (clack tarballs) ·
+`docs/` (this system) · `vendor/` (clack tarballs) ·
 `.claude/skills/run-envsetup/` (safe smoke driver). Tests beside their subject in `__tests__/`.
 
 ## Code style

@@ -1,0 +1,2 @@
+Shipped: `docs(session): close SES-006` (`f3ca5a7`) — Outcome, Open at end and Narrative written, Status flipped to closed, index regenerated; OVERVIEW and the code untouched. `main` is 2 commits ahead of `origin/main`, not pushed (`gh pr list` skipped — origin is a local path).
+Next time: PLAN-001 visual grouping from `wip/visual-grouping` (OVERVIEW Next up, unchanged); SES-005 stays open for its own conversation  (SES-006 closed)

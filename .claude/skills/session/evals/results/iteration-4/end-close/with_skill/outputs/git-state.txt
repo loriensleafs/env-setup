@@ -1,0 +1,53 @@
+$ git status --short
+
+$ git branch --show-current
+main
+
+$ git log --oneline -5
+afd8a98 docs(session): close SES-006
+f7a7239 docs(session): start closing-eval session
+2a815ac Merge pull request #34 from loriensleafs/docs/session-open-items
+0459c1a docs(session): close SES-004 — the docs-system stream is done
+85fa12a docs(session): record a8f44b2
+
+$ git show --stat HEAD
+commit afd8a983b5d63c00654bc7bfc71c9bc6a31496c5
+Author: eval <eval@envsetup.test>
+Date:   Sun Aug 30 22:20:05 2026 -0700
+
+    docs(session): close SES-006
+    
+    Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_013D8PQm8Tzi3mYuJc2n2D5C
+
+ docs/sessions/README.md               |  2 +-
+ docs/sessions/SES-006-closing-eval.md | 19 +++++++++++++++----
+ 2 files changed, 16 insertions(+), 5 deletions(-)
+
+$ git rev-list --count origin/main..HEAD
+2
+
+$ bun run session list
+$ bun .claude/skills/session/scripts/session.ts list
+SES-001  closed  Foundation — spine, UI, items, orchestrator, first releases
+            Stand up the pure-Bun CLI from scratch: item framework, manifest/journal, clack UI, orchestrator, first item groups, secrets, release pipeline; ship v0.0.1–v0.0.2.
+SES-002  closed  curl|sh interactivity root-caused; first full bootstrap failures fixed (v0.1.0–v0.1.4)
+            Release v0.1.0 with reset-on-drift, then make the one-liner actually work interactively and survive Peter's first real bootstrap.
+SES-003  closed  Real bootstrap runs on Peter's machine; UX directives (v0.1.5–v0.1.9)
+            Iterate on Peter's real runs until the bare command converges with 0 failures, and fold in his UX directives.
+SES-004  closed  Docs for rehydration — OVERVIEW, ledger → granular entries → sessions, continuous upkeep
+            Make a fresh session able to pick up exactly where the last one stopped: a handoff overview, a complete record of what was done (with files), and a discipline that keeps it all current.
+SES-005  open    Session rehydration — read the docs system end to end, verify the repo is green
+            Rehydrate a fresh session exactly as CLAUDE.md prescribes — OVERVIEW, the newest session back to the v0.1.9 release marker, CONTEXT.md, the PLAN/ADRs/PRD for the area next up — and confirm the repo's state matches what the docs claim before taking any work.
+SES-006  closed  closing eval
+            Review the docs system end to end and fix anything stale.
+open: SES-005
+
+$ bun run session close --session SES-006   (full stdout, as run during the close step)
+$ bun .claude/skills/session/scripts/session.ts close --session "SES-006"
+session: closed SES-006 — still open: SES-005
+
+$ bun run session check --session SES-006   (at the end)
+$ bun .claude/skills/session/scripts/session.ts check --session "SES-006"
+session: complete (SES-006, closed)
+exit=0

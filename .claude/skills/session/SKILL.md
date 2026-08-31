@@ -29,9 +29,11 @@ Paths are relative to the repo root; a shell you open needs `export PATH="$HOME/
 
 ## Gotchas
 
-- **If the three lines above still show `` !`…` `` literally, the injection did not run** (verified
-  under `claude -p`: the Skill tool delivers the file unrendered). Run those three commands once
-  yourself, then treat their output as the injected state — nothing else changes.
+- **If the three lines above still show `` !`…` `` literally, the injection did not run.** Verified
+  in an interactive session and under `claude -p`: whenever this skill arrives through the Skill
+  tool — the model's own invocation, or a `/session-*` alias — the file is delivered unrendered.
+  Run those three commands once yourself, then treat their output as the injected state — nothing
+  else changes.
 - **No sampling.** Every file a step names is read to its last line; when the Read tool truncates,
   continue with `offset`. A file you did not finish is a file you did not read.
 - **Your session is the one you joined or opened, never "the newest".** Another conversation may
@@ -82,8 +84,11 @@ Start progress:
    `grep -rn <file-or-keyword> docs/sessions/`. A directory's own `CLAUDE.md` loads when you read
    files there.
 6. The session, one of three outcomes:
-   - **join** — an open session's Goal *is* this work (a second conversation on the same plan
-     part): use `--session SES-NNN` from here on and say so in the brief;
+   - **join** — this conversation will record entries into an open session whose Goal is the
+     work it is about to do (a second conversation on the same plan part): use
+     `--session SES-NNN` from here on and say so in the brief. A session another conversation
+     owns — its placeholders unfilled, its Outcome not yours to write — is never joined, whatever
+     its title says; and a question that changes nothing is `none`, not a join;
    - **open** — the work is new: `bun run session new <slug> [--plan "PLAN-NNN · <part>"]`
      (slug = the work ahead, kebab-case), then set the title and `Goal` in the file it names;
    - **none** — the user asked a question, a review, a check, and nothing will change: say so;

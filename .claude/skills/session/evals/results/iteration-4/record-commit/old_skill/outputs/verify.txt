@@ -1,0 +1,34 @@
+$ bun src/items/finder/.claude/skills/run-src-items-finder/driver.ts
+FAVORITES: /Applications · ~ · ~/Desktop · ~/Documents · ~/Downloads · ~/Dev · ~/.claude
+expandedFavorites → /Users/peterkloss … (7)
+sameOrder(same)=true sameOrder(reversed)=false
+SET_FAVORITES_SWIFT === assets/set-favorites.swift ✓
+item finder-favorites: kind=system deps=xcode-clt
+swiftc -typecheck assets/set-favorites.swift ✓
+swiftc -typecheck embedded SET_FAVORITES_SWIFT ✓
+OK
+exit=0
+
+$ bun -e 'import {SET_FAVORITES_SWIFT} from "./src/items/finder/finder-favorites.ts"; await Bun.write(process.env.SCR+"/embedded.swift", SET_FAVORITES_SWIFT)' && cmp src/items/finder/assets/set-favorites.swift $SCR/embedded.swift && echo "cmp: byte-identical"
+cmp: byte-identical
+exit=0
+
+$ wc -l src/items/finder/assets/set-favorites.swift /private/tmp/claude-501/-Users-peterkloss/211a0921-7933-4013-9a20-930f5108ba00/scratchpad/embedded.swift && shasum -a 256 src/items/finder/assets/set-favorites.swift /private/tmp/claude-501/-Users-peterkloss/211a0921-7933-4013-9a20-930f5108ba00/scratchpad/embedded.swift
+      83 src/items/finder/assets/set-favorites.swift
+      83 /private/tmp/claude-501/-Users-peterkloss/211a0921-7933-4013-9a20-930f5108ba00/scratchpad/embedded.swift
+     166 total
+22ea5dcdae700be23a7af7aabe2bdd2119ac050a68b27ed08a7d13f888a9f475  src/items/finder/assets/set-favorites.swift
+22ea5dcdae700be23a7af7aabe2bdd2119ac050a68b27ed08a7d13f888a9f475  /private/tmp/claude-501/-Users-peterkloss/211a0921-7933-4013-9a20-930f5108ba00/scratchpad/embedded.swift
+
+$ xcrun swiftc -typecheck src/items/finder/assets/set-favorites.swift && echo "swiftc -typecheck: ok"
+swiftc -typecheck: ok
+exit=0
+
+$ bun test src/items/finder/__tests__
+bun test v1.4.0 (34cbb9a40)
+
+ 2 pass
+ 0 fail
+ 9 expect() calls
+Ran 2 tests across 1 file. [11.00ms]
+exit=0

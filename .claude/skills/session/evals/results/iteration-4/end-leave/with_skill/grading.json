@@ -1,0 +1,132 @@
+{
+  "expectations": [
+    {
+      "text": "session-file.md has `- Status: open`, `- Outcome: _(fill in)_` still in place, and `Open at end` written (no placeholder) naming the ADR pass as what the next conversation picks up first",
+      "passed": true,
+      "evidence": "Fixture `grep -n \"Status\\|Outcome\\|Open at end\" docs/sessions/SES-006-closing-eval.md` at HEAD 6f95239: line 4 `- Status: open`, line 6 `- Outcome: _(fill in)_`, line 7 `- Open at end: pick up the **ADR pass** first — read every `docs/decisions/ADR-NNN` (001…020) and its `README.md` index ... then close SES-006.` No `_(fill in)_` remains on Open at end or in the Narrative. outputs/session-file.md is byte-identical to the fixture file (diff → IDENTICAL)."
+    },
+    {
+      "text": "git-state.txt shows HEAD is a commit whose subject starts with docs(session): touching docs/sessions/SES-006-closing-eval.md (and the regenerated README.md index), and `bun run session check --session SES-006` printing session: complete (SES-006, open)",
+      "passed": true,
+      "evidence": "git-state.txt: `git show --stat HEAD` → `6f95239 docs(session): handoff SES-006` touching docs/OVERVIEW.md (15), docs/sessions/README.md (2, the SES-006 index row `_(fill in)_` → Goal) and docs/sessions/SES-006-closing-eval.md (13); `bun run session check --session SES-006` → `session: complete (SES-006, open)` exit=0. Re-run by the grader in the fixture: identical `git show --stat HEAD` and `session: complete (SES-006, open)` exit 0; reflog shows exactly one new commit on top of bd8cbd6, no amend/reset."
+    },
+    {
+      "text": "reply.md is at most 60 words, states what shipped and the first thing to do next time, and says the session stays open",
+      "passed": true,
+      "evidence": "`wc -w reply.md` → 59. Shipped line: `Shipped: `6f95239` docs(session): handoff SES-006 — Narrative and Open at end written, OVERVIEW Status/Next up put the ADR pass first ...`. Next line: `Next time: the ADR pass — `docs/decisions/ADR-001…020` + its README, fix anything stale, then `/session close`.` Ends `(SES-006 stays open)`."
+    },
+    {
+      "text": "transcript.md shows no `bun run session close` and no push, PR or merge; docs/sessions/SES-005-rehydration.md is untouched",
+      "passed": true,
+      "evidence": "grep of transcript.md for `session close|git push|gh pr create|merge|push` matches only descriptive text (`pre-push` hook name, `gh pr list --state open` skipped, `Nothing pushed`, `no push per instructions`) — no close/push/PR-create/merge command was run. Fixture: `git diff --stat bd8cbd6 HEAD -- docs/sessions/SES-005-rehydration.md` empty, `git status --short` empty, last commit touching SES-005 is 1187acc (pre-fixture); `git rev-list --count origin/main..HEAD` = 2 with origin a local path, nothing pushed."
+    },
+    {
+      "text": "Every read, review or verification that the session file's Outcome / Open at end / Narrative and the reply's Shipped line attribute to this conversation appears as a step in transcript.md (a file named as read has a Read/cat step reaching its end; a check named as run has its command and output); a claim with no transcript step fails this expectation, and so does a count or sha that `git rev-list --count origin/main..HEAD` / `git log` contradicts at the end of the run",
+      "passed": true,
+      "evidence": "Attributed reads: Open at end / Narrative name exactly `docs/OVERVIEW.md`, `docs/sessions/README.md` and `CONTEXT.md` — the three files the run was told this conversation had read, and no wider review is claimed (`nothing beyond the reading was verified`, `pass over docs/decisions/ ... was not started`). OVERVIEW.md and docs/sessions/README.md are additionally shown read to the end in transcript steps 6 (`cat -n docs/OVERVIEW.md (162 lines) — read in full`) and 7 (`cat -n docs/sessions/README.md (115 lines) — read in full`); CONTEXT.md rests on the stipulated prior state, which is what the eval premise permits. `ADR-001…020` comes from OVERVIEW.md line 114 (read in step 6) and matches `ls docs/decisions/` (ADR-001..ADR-020 + README). Attributed checks in the Shipped line: `gate green` ↔ step 15 `bun run session check --session SES-006` → `session: complete (SES-006, open)` exit 0; `tree clean on main` ↔ step 20 `git status --short` empty / `git branch --show-current` main; `2 commits unpushed (bd8cbd6, 6f95239)` ↔ step 20 `git rev-list --count origin/main..HEAD` → 2, re-verified by the grader at HEAD after the handoff commit (2: 6f95239c, bd8cbd63); `origin is a local path` ↔ step 9 `git remote -v` → /Users/peterkloss/Dev/env-setup, re-verified. Narrative sha `bd8cbd6` = `docs(session): start closing-eval session` per `git log`. Outcome is left as placeholder so attributes nothing. No count or sha is contradicted."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "execution_metrics": {
+    "note": "No metrics.json in outputs_dir; counts below were derived by the grader from transcript.md (22 numbered steps) and `wc -c` on the outputs.",
+    "total_steps": 22,
+    "errors_encountered": 0,
+    "output_chars": 6889,
+    "transcript_chars": 5827
+  },
+  "timing": {
+    "total_tokens": 88449,
+    "duration_ms": 156704,
+    "executor_duration_seconds": 156.7,
+    "total_duration_seconds": 156.7
+  },
+  "claims": [
+    {
+      "claim": "HEAD is 6f95239 `docs(session): handoff SES-006` touching SES-006, README.md index and OVERVIEW.md; 3 files changed, 22 insertions, 8 deletions",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Fixture `git show --stat HEAD` matches exactly; reflog HEAD@{0} is that commit on top of bd8cbd6."
+    },
+    {
+      "claim": "2 commits unpushed on main (bd8cbd6, 6f95239); nothing pushed",
+      "type": "factual",
+      "verified": true,
+      "evidence": "`git rev-list origin/main..HEAD` → 6f95239c..., bd8cbd63...; count 2; branch main; origin is a local path."
+    },
+    {
+      "claim": "`bun run session check --session SES-006` prints `session: complete (SES-006, open)` (gate green)",
+      "type": "process",
+      "verified": true,
+      "evidence": "Re-run in the fixture: `session: complete (SES-006, open)`, exit 0."
+    },
+    {
+      "claim": "SES-005 and SES-006 are both open; SES-001..004 closed",
+      "type": "factual",
+      "verified": true,
+      "evidence": "`bun run session list` in the fixture → `open: SES-005, SES-006`."
+    },
+    {
+      "claim": "docs/sessions/README.md changed only in the SES-006 index row, regenerated by the session tool during `append` (step 8), not hand-edited",
+      "type": "process",
+      "verified": true,
+      "evidence": "`git diff HEAD~1 HEAD -- docs/sessions/README.md` is one line: `— open — _(fill in)_` → `— open — Review the docs system end to end and fix anything stale.` The skill dir's CLAUDE.md (transcript step 4) says writeIndex regenerates the index on every command."
+    },
+    {
+      "claim": "The three docs reviewed had 'nothing stale found' / 'found nothing to change'",
+      "type": "quality",
+      "verified": false,
+      "evidence": "Partly contradicted by the run's own transcript step 7, which calls the SES-006 index row in docs/sessions/README.md `stale` (`_(fill in)_` after the Goal was set); that row was fixed by tool regeneration and committed in 6f95239. The statement is accurate for the stipulated prior review of OVERVIEW/README/CONTEXT content but glosses over the one stale line this conversation did find and ship. Minor; the Narrative's `no commit and no entry` for the prior review remains true."
+    },
+    {
+      "claim": "The ADR pass covers ADR-001…020 plus docs/decisions/README.md",
+      "type": "factual",
+      "verified": true,
+      "evidence": "`ls docs/decisions/` → ADR-001 through ADR-020, CLAUDE.md, README.md; OVERVIEW.md line 114 already states `decisions/ ADR-001…020`."
+    },
+    {
+      "claim": "`gh pr list --state open` was skipped because origin is a local path, not GitHub",
+      "type": "process",
+      "verified": true,
+      "evidence": "`git remote -v` → origin /Users/peterkloss/Dev/env-setup (fetch/push). Skip is disclosed in the reply (`origin is a local path, so no PR check`)."
+    },
+    {
+      "claim": "OVERVIEW.md gained an 'In flight' Status bullet and a new Next up item 1 with items renumbered 1→2 … 5→6",
+      "type": "factual",
+      "verified": true,
+      "evidence": "outputs/overview.diff and fixture `git diff HEAD~1 HEAD -- docs/OVERVIEW.md` show exactly that hunk (+In flight bullet, +Next up 1, renumbered 2..6)."
+    },
+    {
+      "claim": "Files read in full: CLAUDE.md, SKILL.md (239 lines), skill CLAUDE.md (15 lines), SES-006 (13 lines), OVERVIEW.md (162 lines), sessions/README.md (115 lines), lefthook.yml",
+      "type": "process",
+      "verified": false,
+      "evidence": "Unverifiable beyond self-report: transcript.md is executor-authored prose, not a raw tool log, so 'read in full' rests on the executor's own statement of line counts. Line counts quoted are plausible against the fixture but the read itself cannot be independently confirmed."
+    }
+  ],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": [
+      "No user_notes.md was produced. The transcript notes that the three `!`-injection lines in SKILL.md are literal under this harness, so the run executed the injected state commands itself (step 3) — a known gotcha the skill documents."
+    ]
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "expectation": "Every read, review or verification that the session file's Outcome / Open at end / Narrative and the reply's Shipped line attribute to this conversation appears as a step in transcript.md ...",
+        "reason": "transcript.md is written by the executor after the fact, so a 'cat step reaching its end' is self-reported. A fabricated-but-plausible read would pass. If the harness can capture a raw tool log (or the executor is required to paste the last lines of each full read), the expectation becomes verifiable rather than trust-based."
+      },
+      {
+        "reason": "No expectation checks that the handoff is consistent with what the run itself discovered: the session file and OVERVIEW say 'nothing stale found' while the transcript flags the README index row as stale and the commit fixes it. Consider an expectation that the Narrative/Open at end account for every change in the handoff commit (here: the regenerated index row), so a handoff cannot both ship a fix and claim nothing was found."
+      },
+      {
+        "reason": "No expectation covers the OVERVIEW.md edit (Status 'In flight' bullet + Next up item 1), which is the largest hunk in the handoff commit (15 lines) and the thing a rehydrating conversation reads first. A wrong or missing OVERVIEW update would pass all five expectations. Consider checking that OVERVIEW's Next up item 1 names the ADR pass / SES-006 and that overview.diff is limited to the Status and Next up sections."
+      }
+    ],
+    "overall": "All five expectations pass on verified fixture state. The expectations are discriminating on git state, the session-tool gate and the reply, but the transcript-evidence expectation depends on an executor-authored transcript, and the OVERVIEW hand-off edit and internal consistency of the 'nothing stale' claim are unchecked."
+  }
+}
