@@ -13,7 +13,8 @@
         "The brief's Session line states one of the three outcomes and the disk agrees: `none` → no new docs/sessions file and session-file.md says so; `opened` → exactly one new SES-NNN with `- Status: open` and its Goal filled; `joined` → an existing open session whose Goal is this work (SES-004's and SES-005's are not) — so `joined` here is a failure",
         "git-state.txt shows HEAD unchanged from the fixture tip and nothing modified under docs/sessions/ other than the new file and README.md (the regenerated index) — in particular SES-005-rehydration.md is untouched",
         "brief.md reports the state of the tree and the sessions as findings (branch name; which sessions are open — SES-004 and SES-005 in this fixture — and that SES-005's placeholders belong to another conversation) rather than fixing anything, and proposes a concrete next item with a first step",
-        "transcript.md shows no push, no PR, no commit"
+        "transcript.md shows no push, no PR, no commit",
+        "Every fact the brief states is true at the end of the run: the released sha matches `git rev-parse --short vX.Y.Z`, the parked branch exists where the brief says it does (local vs origin), and every file on the read-in-full line has a transcript step whose line range reaches the file's last line (`wc -l`)"
       ]
     },
     {
@@ -42,7 +43,8 @@
         "reply.md is at most 60 words and states what shipped in the conversation and the first thing to do next time",
         "overview.diff is 'no change', or changes only Status/Next up with a reason in transcript.md grounded in this conversation's own work (not in fixture scaffolding commits)",
         "docs/sessions/SES-005-rehydration.md is untouched (git-state.txt / commit shows no change to it) and no second session file was created",
-        "transcript.md shows no push, no PR opened, no merge"
+        "transcript.md shows no push, no PR opened, no merge",
+        "Every read, review or verification that the session file's Outcome / Open at end / Narrative and the reply's Shipped line attribute to this conversation appears as a step in transcript.md (a file named as read has a Read/cat step reaching its end; a check named as run has its command and output); a claim with no transcript step fails this expectation, and so does a count or sha that `git rev-list --count origin/main..HEAD` / `git log` contradicts at the end of the run"
       ]
     },
     {
@@ -54,7 +56,8 @@
         "session-file.md has `- Status: open`, `- Outcome: _(fill in)_` still in place, and `Open at end` written (no placeholder) naming the ADR pass as what the next conversation picks up first",
         "git-state.txt shows HEAD is a commit whose subject starts with docs(session): touching docs/sessions/SES-006-closing-eval.md (and the regenerated README.md index), and `bun run session check --session SES-006` printing session: complete (SES-006, open)",
         "reply.md is at most 60 words, states what shipped and the first thing to do next time, and says the session stays open",
-        "transcript.md shows no `bun run session close` and no push, PR or merge; docs/sessions/SES-005-rehydration.md is untouched"
+        "transcript.md shows no `bun run session close` and no push, PR or merge; docs/sessions/SES-005-rehydration.md is untouched",
+        "Every read, review or verification that the session file's Outcome / Open at end / Narrative and the reply's Shipped line attribute to this conversation appears as a step in transcript.md (a file named as read has a Read/cat step reaching its end; a check named as run has its command and output); a claim with no transcript step fails this expectation, and so does a count or sha that `git rev-list --count origin/main..HEAD` / `git log` contradicts at the end of the run"
       ]
     }
   ],
@@ -83,6 +86,7 @@
     "Seed the fixture's log green (every commit recorded) and leave SES-005's placeholders as the other-conversation case; both arms must share the same session tool.",
     "Capture the verification command's stdout to outputs/verify.txt and the gate's exit code to git-state.txt so graders don't rely on the executor-written transcript.",
     "Hard negatives 101–103 were swept on 2026-08-30 as part of evals/trigger-eval.json (23 queries; results/trigger/): declined 3/3 on every tier. The per-tier outcome runs live in results/tier-sweep/.",
-    "Iteration 3 (ADR-020): fixtures are clones of feat/session-model; the old_skill arm is main's SKILL.md folded into the scaffolding commit by --amend (no visible baseline commit). Eval 3's prompt now says the Goal is met, so the new skill's `close` mode is what is measured; the old skill has only `end`."
+    "Iteration 3 (ADR-020): fixtures are clones of feat/session-model; the old_skill arm is main's SKILL.md folded into the scaffolding commit by --amend (no visible baseline commit). Eval 3's prompt now says the Goal is met, so the new skill's `close` mode is what is measured; the old skill has only `end`.",
+    "2026-08-30: expectations added after five graders flagged the same ungraded gap across iterations 2–3 — Outcome/Narrative/Shipped lines claiming reads or reviews the transcript does not show, and counts that go stale after the handoff commit (evals 3 and 4); the brief's facts checked against the fixture (eval 1). Not yet measured: iteration 4 would be the first run with them."
   ]
 }
