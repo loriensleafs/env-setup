@@ -1,7 +1,7 @@
 # 2026-08-30 18:00 · Docs for rehydration — OVERVIEW, ledger → granular entries → sessions, continuous upkeep
 
 - Goal: Make a fresh session able to pick up exactly where the last one stopped: a handoff overview, a complete record of what was done (with files), and a discipline that keeps it all current.
-- Outcome: OVERVIEW.md; a git-derived change record that evolved (one line per commit → files touched → Summary/Why + a note per file → per-session files); `bun run session` tooling with `--check`; CLAUDE.md rehydration reading order; continuous-upkeep hard rule; then the whole docs system — `plan/` (PRD-001, PLAN-001), `analysis/` (ANA-001…008), `decisions/` (ADR-001…017), `archive/` — with one naming convention `<TYPE>-<NNN>-<kebab-title>.md`, the living plan retired.
+- Outcome: OVERVIEW.md; a git-derived change record that evolved (one line per commit → files touched → Summary/Why + a note per file → per-session files); `bun run session` tooling with `--check`; CLAUDE.md rehydration reading order; continuous-upkeep hard rule; then the whole docs system — `plan/` (PRD-001, PLAN-001), `analysis/` (ANA-001…008), `decisions/` (ADR-001…017), `archive/` — with one naming convention `<TYPE>-<NNN>-<kebab-title>.md`, the living plan retired; and a `/run-*` skill with a verified driver in every directory (56), the root one walking the real bootstrap TUI under `expect` up to the confirm.
 - Open at end: Next-up 1 (visual grouping, PLAN-001) from `wip/visual-grouping`; first real connect-phase run.
 
 ## Narrative
@@ -282,3 +282,12 @@ the start timestamp), source comments repointed from `docs/PLAN.md` to the ADR/P
   - `src/paths/.claude/skills/run-src-paths/driver.ts` (+45/−0) — new — direct invocation of this module's safe functions (mocked Runner / temp dirs / fixtures; detect() read-only; never install/configure/network)
   - … +9 more (`git show --stat ba38081`)
 - Notes: Two forked agents built the per-module drivers in parallel. Drivers under `.claude/` are Biome-checked and executed but NOT typechecked (tsconfig `include: ["src"]` skips dot-dirs). Findings for follow-up: `src/items/finder/assets/set-favorites.swift` is stale vs the embedded `SET_FAVORITES_SWIFT` (the constant has `--list`; the file does not — runtime ships the constant); `hooks-format.ts` exits 0 silently when Biome's config errors (e.g. `vcs.useIgnoreFile` outside a git repo); and `sh install.sh …` re-run on this machine died with SIGKILL (exit 137) because it overwrites a previously-executed signed binary in place — fixed in the next PR.
+
+### 2026-08-30 · fix(install): always download to a fresh file — an in-place overwrite of a previously executed binary can be SIGKILLed · 855bfd6
+
+- Summary: `install.sh` removes the previous download before fetching so the binary always lands on a fresh inode; OVERVIEW Next-up 5 records the two findings the run-skill drivers surfaced.
+- Why: While verifying the root run skill, `sh install.sh --help` re-run over the binary left by an earlier run was SIGKILLed (exit 137) right after the download; a fresh download of the same release ran fine.
+- Files:
+  - `docs/OVERVIEW.md` (+4/−0) — Next-up 5: stale `set-favorites.swift` asset; `hooks-format.ts` silent no-op on Biome config error
+  - `install.sh` (+4/−0) — `rm -f \"$DEST\"` before `curl`, with the why
+- Notes: Not reproduced deterministically — an immediate second in-place overwrite ran fine, and the unified log had no entry for the kill; the fix is cheap and removes the failure mode either way. The real fix is Next-up 3 (persist the binary to `~/.local/bin`).
