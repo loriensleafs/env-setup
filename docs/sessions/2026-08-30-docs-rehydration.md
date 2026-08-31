@@ -85,3 +85,22 @@ in these entries depend on that — never squash).
   - `docs/LEDGER.md` (+3/−2) — "Continuously, after every commit" replaces "before merge"; OVERVIEW/PLAN updated in the same step with the sha
   - `docs/OVERVIEW.md` (+6/−2) — Status block carries the never-defer note and cites unreleased entries by sha
   - `docs/PLAN.md` (+20/−2) — new CURRENT STATUS (2026-08-31) with ledger refs and the decisions settled since; the 2026-08-26 block demoted to a snapshot; purpose banner says update in the same commit
+
+### 2026-08-30 · docs: per-session change log replaces the single ledger (docs/sessions/, bun run session) · db47945
+
+- Summary: _(fill in)_
+- Why: _(fill in)_
+- Files:
+  - `CLAUDE.md` (+30/−20) — _(fill in)_
+  - `CONTRIBUTING.md` (+9/−8) — _(fill in)_
+  - `README.md` (+2/−2) — _(fill in)_
+  - `docs/OVERVIEW.md` (+13/−11) — _(fill in)_
+  - `docs/PLAN.md` (+6/−6) — _(fill in)_
+  - `docs/{LEDGER.md => sessions/2026-08-26-foundation.md}` (+21/−320) — _(fill in)_
+  - `docs/sessions/2026-08-27-curl-sh-interactivity-and-first-bootstrap-fixes.md` (+149/−0) — _(fill in)_
+  - `docs/sessions/2026-08-30-docs-rehydration.md` (+87/−0) — _(fill in)_
+  - `docs/sessions/2026-08-30-real-bootstrap-runs-v0.1.5-to-v0.1.9.md` (+101/−0) — _(fill in)_
+  - `docs/sessions/README.md` (+84/−0) — _(fill in)_
+  - `package.json` (+1/−1) — _(fill in)_
+  - `scripts/ledger.ts` (+0/−139) — _(fill in)_
+  - `scripts/session.ts` (+230/−0) — _(fill in)_
