@@ -365,7 +365,16 @@ messages (`git show -s <sha>`) hold the why.
 ### 2026-08-30 · docs: OVERVIEW.md — project map, status, and handoff for new sessions · bb46dcb
 
 - Files: `CLAUDE.md`, `docs/OVERVIEW.md`
+- Why: Peter asked (2026-08-30, at 99% context) for an overview/PRD-style handoff that points to the other docs so a fresh session can resume without re-deriving the project.
+- Notes: OVERVIEW carries the empirical facts (curl|sh + /dev/tty, 0-width PTY OOM, CPU spin) and the visual-grouping design.
 
 ### 2026-08-30 · docs: add LEDGER.md and the update discipline; record docs-restructure plan · 7439bec
 
 - Files: `CLAUDE.md`, `CONTRIBUTING.md`, `docs/LEDGER.md`, `docs/OVERVIEW.md`
+- Why: Peter asked for a continuously updated ledger of everything done, and whether PLAN.md / CONFIG-COMPAT-PLAN.md should be reworked into a PRD — the restructure plan (PRD / DECISIONS / LEDGER / research; retire PLAN) is recorded as OVERVIEW Next-up 2 rather than done.
+
+### 2026-08-30 · docs: ledger with files touched + bun run ledger; startup pointers for agents · ee5e336
+
+- Files: `CLAUDE.md`, `CONTRIBUTING.md`, `README.md`, `docs/LEDGER.md`, `docs/OVERVIEW.md`, `package.json`, `scripts/ledger.ts`
+- Why: Peter: the one-line ledger was not complete enough to rehydrate a session — it needs a template, maintenance instructions, how to read it against OVERVIEW Status/Next up, the files touched per change, and CLAUDE.md/README must point agents at it on startup.
+- Notes: the body is generated (append-only) by `scripts/ledger.ts`; underscores in subjects are escaped (`__tests__` rendered as bold). The visual-grouping patch found uncommitted in the working tree was parked on local branch `wip/visual-grouping`, unverified.
