@@ -14,7 +14,9 @@ applies the manifest without the picker. Owner: Peter Kloss (github `loriensleaf
 The `/rehydrate` skill (`.claude/skills/rehydrate/`) is the one home of the reading order and its
 completion criterion: OVERVIEW (Status, Next up, Key facts) → the newest `SES-NNN` in full →
 [CONTEXT.md](CONTEXT.md) → the tree checked against the log → the area's PLAN / ADRs / ANAs and its
-nested `CLAUDE.md` → this conversation's session file → a brief to the user. Do **not** rebuild
+nested `CLAUDE.md` → this conversation's session file → a brief to the user. **Every file it
+names is read in full, to the end, with no sampling** — a truncated read is continued with
+`offset`, never summarized. Do **not** rebuild
 history from the code or `git log`; the docs system exists so you never have to. Every doc is
 `<TYPE>-<NNN>-<kebab-title>.md` in its directory; each directory's `README.md` holds its rules,
 index and template; `docs/archive/` is history only. At the end of a conversation `/wrap-up` checks
