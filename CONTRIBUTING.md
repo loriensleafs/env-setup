@@ -2,7 +2,7 @@
 
 envsetup is a pure-Bun macOS environment-setup CLI. This doc covers how to set up, make a
 change, and cut a release. Start with [docs/OVERVIEW.md](docs/OVERVIEW.md) (map, status, next up) and
-[docs/LEDGER.md](docs/LEDGER.md) (what was done, with files). The always-loaded agent brief is
+[docs/sessions/](docs/sessions/README.md) (what was done, session by session, with files). The always-loaded agent brief is
 [CLAUDE.md](CLAUDE.md); the design record is [docs/PLAN.md](docs/PLAN.md).
 
 ## Ground rules
@@ -67,13 +67,14 @@ If `bun` isn't found, add it to PATH: `export PATH="$HOME/.bun/bin:$PATH"`.
    blocking only on un-auto-fixable lint or type errors. The **pre-push** hook runs the full
    check + tests.
 
-5. **Record it** (part of the PR, not after). `bun run ledger` appends an entry skeleton per new
-   commit to [docs/LEDGER.md](docs/LEDGER.md): `Summary` / `Why` placeholders and one line per
-   touched file (every file — code, docs, config, CI, scripts). Fill in every placeholder (template
-   in the ledger), run `bun run ledger -- --check`, and update `docs/OVERVIEW.md` "Status" /
-   "Next up" if the picture changed. Commit that as `docs(ledger): …` in the same PR (the script
-   skips those commits). After a release tag, run `bun run ledger` once more so the new
-   "Since vX.Y.Z" heading lands.
+5. **Record it — continuously, not after.** At session start `bun run session -- --new <slug>`
+   creates the session file. After every commit `bun run session` appends an entry skeleton to it
+   (`Summary` / `Why` placeholders and one line per touched file — every file: code, docs, config,
+   CI, scripts). Fill in every placeholder (template in [docs/sessions/README.md](docs/sessions/README.md)),
+   write the Narrative as things happen, run `bun run session -- --check`, and update
+   `docs/OVERVIEW.md` "Status" / "Next up" if the picture changed. Commit as `docs(session): …`
+   (the script skips those commits). After a release tag, run `bun run session` once more so the
+   release marker lands.
 
 6. **Open a PR** (`gh pr create`). CI (`.github/workflows/ci.yml`) runs the same checks plus a
    gitleaks secret scan. Merge once green.

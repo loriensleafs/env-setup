@@ -1,0 +1,230 @@
+/**
+ * Session log tooling — docs/sessions/*.md, one file per work session.
+ *
+ *   bun run session -- --new <slug>   start a session file for today (becomes current)
+ *   bun run session                   append entry skeletons for commits no session mentions
+ *   bun run session -- --check        fail if commits are missing or placeholders unfilled
+ *
+ * Append-only: every commit on the current branch (merges excluded) that no
+ * session file mentions gets an entry skeleton in the CURRENT session (the
+ * newest file by its H1 timestamp) — Summary / Why placeholders and one line
+ * per touched file (any file: code, docs, config, CI, scripts, assets) with its
+ * +/− line counts and a placeholder for what changed in it. A release marker is
+ * inserted after each tagged commit. Existing text is never rewritten.
+ * `docs(session): …` commits (the log updates themselves) are skipped so the
+ * entry-writing commit never chases its own sha. The index block in
+ * docs/sessions/README.md is regenerated on every run.
+ */
+import { readdirSync } from "node:fs";
+import { join } from "node:path";
+
+const DIR = new URL("../docs/sessions/", import.meta.url).pathname;
+const INDEX = join(DIR, "README.md");
+const FILL = "_(fill in)_";
+const MAX_FILES = 80;
+const SKIP_PREFIXES = ["docs(session)", "docs(ledger)"];
+
+interface Touched {
+  path: string;
+  added: number | null;
+  deleted: number | null;
+}
+interface Commit {
+  sha: string;
+  date: string;
+  subject: string;
+  files: Touched[];
+}
+interface Session {
+  file: string;
+  name: string;
+  started: string;
+  title: string;
+  goal: string;
+  text: string;
+}
+
+function git(...args: string[]): string {
+  const r = Bun.spawnSync(["git", ...args]);
+  if (r.exitCode !== 0) throw new Error(`git ${args[0]} failed: ${r.stderr.toString()}`);
+  return r.stdout.toString();
+}
+
+function tagsByCommit(): Map<string, string> {
+  const out = git(
+    "for-each-ref",
+    "--format=%(objectname)%09%(*objectname)%09%(refname:short)",
+    "refs/tags",
+  );
+  const map = new Map<string, string>();
+  for (const line of out.split("\n")) {
+    if (!line) continue;
+    const [obj, peeled, tag] = line.split("\t");
+    map.set(peeled || obj, tag);
+  }
+  return map;
+}
+
+function commits(): Commit[] {
+  const out = git(
+    "log",
+    "--reverse",
+    "--no-merges",
+    "--date=short",
+    "--format=%x01%H%x09%ad%x09%s",
+    "--numstat",
+  );
+  const result: Commit[] = [];
+  for (const block of out.split("\x01")) {
+    if (!block.trim()) continue;
+    const [head, ...rest] = block.split("\n");
+    const [sha, date, subject] = head.split("\t");
+    const files: Touched[] = [];
+    for (const line of rest) {
+      const [a, d, path] = line.split("\t");
+      if (!path) continue;
+      files.push({
+        path,
+        added: a === "-" ? null : Number(a),
+        deleted: d === "-" ? null : Number(d),
+      });
+    }
+    result.push({ sha, date, subject, files });
+  }
+  return result;
+}
+
+function stat(f: Touched): string {
+  return f.added === null || f.deleted === null ? "binary" : `+${f.added}/−${f.deleted}`;
+}
+
+function render(c: Commit, tag: string | undefined): string {
+  const short = c.sha.slice(0, 7);
+  const subject = c.subject.replace(/_/g, "\\_");
+  const lines = [
+    `### ${c.date} · ${subject} · ${short}`,
+    "",
+    `- Summary: ${FILL}`,
+    `- Why: ${FILL}`,
+    "- Files:",
+  ];
+  for (const f of c.files.slice(0, MAX_FILES)) {
+    lines.push(`  - \`${f.path}\` (${stat(f)}) — ${FILL}`);
+  }
+  if (c.files.length > MAX_FILES) {
+    lines.push(`  - … +${c.files.length - MAX_FILES} more (\`git show --stat ${short}\`)`);
+  }
+  if (c.files.length === 0) lines.push("  - _(no files)_");
+  lines.push("");
+  if (tag) lines.push(`> **Released ${tag}** — tag on this commit.`, "");
+  return lines.join("\n");
+}
+
+async function sessions(): Promise<Session[]> {
+  const list: Session[] = [];
+  for (const name of readdirSync(DIR)) {
+    if (!/^\d{4}-\d{2}-\d{2}-.+\.md$/.test(name)) continue;
+    const file = join(DIR, name);
+    const text = await Bun.file(file).text();
+    const h1 = text.match(/^# (\d{4}-\d{2}-\d{2} \d{2}:\d{2}) · (.+)$/m);
+    if (!h1) throw new Error(`${name}: first heading must be "# YYYY-MM-DD HH:MM · Title"`);
+    const goal = text.match(/^- Goal: (.+)$/m)?.[1] ?? "";
+    list.push({ file, name, started: h1[1], title: h1[2], goal, text });
+  }
+  return list.sort((a, b) => a.started.localeCompare(b.started));
+}
+
+function template(started: string, title: string): string {
+  return `# ${started} · ${title}
+
+- Goal: ${FILL}
+- Outcome: ${FILL}
+- Open at end: ${FILL}
+
+## Narrative
+
+${FILL} — what was asked, decided, tried and abandoned, verified (and how); cite entries by sha.
+
+## Changes (one entry per commit, in order)
+`;
+}
+
+async function writeIndex(all: Session[]): Promise<void> {
+  const rows = [...all]
+    .reverse()
+    .map((s) => `- [${s.started} · ${s.title}](${s.name}) — ${s.goal}`)
+    .join("\n");
+  const text = await Bun.file(INDEX).text();
+  const START = "<!-- sessions:start -->";
+  const END = "<!-- sessions:end -->";
+  const a = text.indexOf(START);
+  const b = text.indexOf(END);
+  if (a === -1 || b === -1) throw new Error("README.md is missing the sessions:start/end markers");
+  const next = `${text.slice(0, a + START.length)}\n${rows}\n${text.slice(b)}`;
+  if (next !== text) await Bun.write(INDEX, next);
+}
+
+const argv = process.argv.slice(2);
+const all = await sessions();
+
+if (argv[0] === "--new") {
+  const slug = (argv[1] ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  if (!slug) throw new Error("usage: bun run session -- --new <slug>");
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const date = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  const started = `${date} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  const name = `${date}-${slug}.md`;
+  const file = join(DIR, name);
+  if (await Bun.file(file).exists()) throw new Error(`${name} already exists`);
+  const title = slug.replace(/-/g, " ");
+  await Bun.write(file, template(started, title));
+  await writeIndex([...all, { file, name, started, title, goal: FILL, text: "" }]);
+  console.log(`session: started ${name} — set the Goal line and the title.`);
+  process.exit(0);
+}
+
+const known = all.flatMap((s) =>
+  [...s.text.matchAll(/^### .* · ([0-9a-f]{7,40})$/gm)].map((m) => m[1]),
+);
+const missing = commits().filter(
+  (c) =>
+    !SKIP_PREFIXES.some((p) => c.subject.startsWith(p)) && !known.some((k) => c.sha.startsWith(k)),
+);
+
+if (argv[0] === "--check") {
+  let unfilled = 0;
+  for (const s of all) {
+    const n = s.text
+      .split("\n")
+      .filter((l) => /^\s*- |^_\(fill in\)_/.test(l) && l.includes(FILL)).length;
+    if (n > 0) console.log(`unfilled: ${s.name} has ${n} placeholder line(s)`);
+    unfilled += n;
+  }
+  for (const c of missing) console.log(`missing: ${c.sha.slice(0, 7)} ${c.subject}`);
+  if (missing.length > 0 || unfilled > 0) {
+    console.log("session: NOT ready — run `bun run session` and fill in the placeholders.");
+    process.exit(1);
+  }
+  await writeIndex(all);
+  console.log("session: complete");
+  process.exit(0);
+}
+
+await writeIndex(all);
+if (missing.length === 0) {
+  console.log("session: up to date");
+  process.exit(0);
+}
+const current = all.at(-1);
+if (!current) throw new Error("no session file — start one: bun run session -- --new <slug>");
+const tags = tagsByCommit();
+const body = missing.map((c) => render(c, tags.get(c.sha))).join("\n");
+await Bun.write(current.file, `${current.text.replace(/\n+$/, "")}\n\n${body}`);
+for (const c of missing) console.log(`+ ${c.sha.slice(0, 7)} ${c.subject}`);
+console.log(
+  `session: appended ${missing.length} to ${current.name} — fill in every ${FILL} (then \`bun run session -- --check\`).`,
+);
