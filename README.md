@@ -33,9 +33,11 @@ envsetup's defaults is never silently overwritten — it shows in the picker as
 reset; leave it unchecked and your configuration is untouched. `doctor` reports such drift
 as `≠` rather than "missing".
 
-Design + all decisions: **[docs/PLAN.md](docs/PLAN.md)** ·
-research: [docs/RESEARCH-clack-citty-bun.md](docs/RESEARCH-clack-citty-bun.md) ·
-conventions for agents: [CLAUDE.md](CLAUDE.md).
+**Working on it (humans and agents): start at [docs/OVERVIEW.md](docs/OVERVIEW.md)** (map,
+status, next up), then [docs/LEDGER.md](docs/LEDGER.md) (what was done, in order, with files
+touched). Design + all decisions: [docs/PLAN.md](docs/PLAN.md) · research:
+[docs/RESEARCH-clack-citty-bun.md](docs/RESEARCH-clack-citty-bun.md) · agent conventions:
+[CLAUDE.md](CLAUDE.md) (also `AGENTS.md`).
 
 ## Development
 
