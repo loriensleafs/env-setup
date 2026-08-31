@@ -653,3 +653,23 @@ A blanket replace briefly rewrote Peter's quoted words in ADR-010 — restored; 
   - `.claude/skills/session/evals/evals.json` (+6/−0) — `fixture_notes`: invisible baseline swap, green seeded log, verify.txt/exit capture, hard negatives never swept
   - `.claude/skills/session/evals/results/iteration-2/feedback.json` (+15/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
 - Notes: Two reviews, both on the baseline arm; the with-skill runs drew no comment.
+
+### 2026-08-30 · feat(skills): /session start | entry | end (record → entry) and typed-only aliases /session-start, /session-entry, /session-end · ac59b7b
+
+- Summary: The middle mode is `entry` (start | entry | end) and three typed-only aliases `/session-start`, `/session-entry`, `/session-end` exist as `.claude/commands/*.md`; CONTEXT.md gains Entry and Record.
+- Why: Peter: rename `record` to "session update" or "session entry", add slash commands for start/end/entry via the command-creator skill, and check the root CLAUDE.md/README — chose `entry` plus user-only wrappers.
+- Files:
+  - `.claude/commands/session-end.md` (+9/−0) — new — typed-only alias (`disable-model-invocation: true`): calls the Skill tool with `skill: session`, `args: <mode>`; ignores surplus text; description written for /help
+  - `.claude/commands/session-entry.md` (+9/−0) — new — typed-only alias (`disable-model-invocation: true`): calls the Skill tool with `skill: session`, `args: <mode>`; ignores surplus text; description written for /help
+  - `.claude/commands/session-start.md` (+9/−0) — new — typed-only alias (`disable-model-invocation: true`): calls the Skill tool with `skill: session`, `args: <mode>`; ignores surplus text; description written for /help
+  - `.claude/skills/session/SKILL.md` (+8/−7) — mode `entry`; names the aliases
+  - `CLAUDE.md` (+5/−4) — Rehydrating/Recording headings name `/session entry` and the aliases
+  - `CONTEXT.md` (+10/−0) — Entry (the per-commit block) and Record (the act) with Avoid lists
+  - `CONTRIBUTING.md` (+2/−2) — steps 1 and 7 name the aliases
+  - `README.md` (+1/−1) — Working on it: entry / end
+  - `docs/OVERVIEW.md` (+2/−2) — doc-map row and Status line: start · entry · end + aliases
+  - `docs/analysis/ANA-009-skill-workflow-best-practices.md` (+1/−1) — question line notes the rename
+  - `docs/decisions/ADR-019-session-skill-invocation-and-name.md` (+5/−2) — Status revised in place with a dated note (mode renamed, aliases added); older text says record
+  - `docs/decisions/README.md` (+1/−1) — ADR-019 row
+  - `scripts/.claude/skills/run-scripts/SKILL.md` (+1/−1) — exclusion reworded: starting, writing entries, ending
+- Notes: command-creator: commands and skills are the same entry point, the skill wins on a name clash, and a flat command adds only a `/` menu name — so the aliases are `disable-model-invocation: true` (zero listing cost). Validator valid (fail-open warning only); command-reviewer PASS, two minors applied. Unverified until a real conversation types `/session-start`: that the Skill-tool hop adds no permission prompt (reviewer's render check).
