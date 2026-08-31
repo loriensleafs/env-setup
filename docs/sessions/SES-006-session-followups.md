@@ -26,6 +26,12 @@ reading rule, one skill owns the write. Peter had the installed copies under `~/
 line: ADR location follows the project, 16 skills read CONTEXT.md before exploring, 6 route to
 `domain-modeling` (recorded in `~/.claude/skills/LOCAL-CHANGES.md`; outside this repo, so no entry here).
 
+**Correction, 2026-08-30 (late):** the claim above and in entries `631b7f8`/`4d575a4` — that the Skill-tool path
+delivers the skill unrendered — was wrong. The cause was the marker shape: the three lines wrapped the marker in a
+code span (a backtick before the `!`), and a marker is recognised only at line start or after a space, so no path
+ever ran them. With the documented shape both paths render (transcripts of a typed `/session start` and of the
+`/session-start` alias under `claude -p`, 23:53–23:54). The gotcha now states that.
+
 ## Changes (one entry per commit, in order)
 
 ### 2026-08-30 · docs(skill): the Skill-tool path never renders the injection — verified interactive; open SES-006 · 631b7f8

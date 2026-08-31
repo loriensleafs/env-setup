@@ -21,21 +21,21 @@ and the Goal is not done → `end`; the Goal is done → `close`). The user-only
 
 Live state at invocation (injected; do not re-run these to "confirm"):
 
-- Branch: `!`git branch --show-current``
-- Tree: `!`git status --short | head -20 || true``
-- Sessions: `!`PATH="$HOME/.bun/bin:$PATH" bun run session list 2>&1 | grep -v '^ ' || true``
+- Branch: !`git branch --show-current`
+- Tree: !`git status --short | head -20 || true`
+- Sessions: !`PATH="$HOME/.bun/bin:$PATH" bun run --silent session list 2>&1 | grep -v '^ ' || true`
 
 Paths are relative to the repo root; a shell you open needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
 ## Gotchas
 
-- **If the three lines above still show the injection markers (an exclamation mark followed by
-  a backticked command) instead of output, the injection did not run.** Verified: a typed
-  `/session` renders them; the Skill tool — the model's own invocation, or a `/session-*` alias —
-  delivers the file unrendered (interactive and `claude -p` alike). Run those three commands once
-  yourself, then treat their output as the injected state — nothing else changes. (This bullet
-  spells no marker: the harness runs any marker it finds in the body, and a failed one aborts the
-  whole invocation.)
+- **The three lines above arrive as output on every path** — a typed `/session …`, a `/session-*`
+  alias, the model's own invocation (verified 2026-08-30 through the transcripts of both). A marker
+  is recognised only at line start or after a space; wrapped in a code span it is inert, which is
+  why an earlier version of this skill never rendered. If the lines ever show markers instead of
+  output, run those three commands once yourself and treat their output as the injected state.
+  (This bullet spells no marker: the harness runs any it finds in the body, and a failed one
+  aborts the whole invocation.)
 - **No sampling.** Every file a step names is read to its last line; when the Read tool truncates,
   continue with `offset`. A file you did not finish is a file you did not read.
 - **Your session is the one you joined or opened, never "the newest".** Another conversation may
