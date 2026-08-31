@@ -42,6 +42,8 @@ export interface OrchestratorOptions {
   /** Resume: skip steps completed in the latest unfinished run. */
   resume?: boolean;
   runId?: string;
+  /** Interactive yes/no for items that need a user decision mid-step. */
+  ask?: (message: string) => Promise<boolean>;
 }
 
 /** Transitive dependents of `id` within `selection`, using registry deps. */
@@ -100,7 +102,12 @@ export async function orchestrate(opts: OrchestratorOptions): Promise<RunReport>
   for (const id of order) {
     const item = registry.get(id);
     if (!item) continue;
-    const ctx: ItemContext = { manifest, log: (m) => events.onStepLog?.(id, m), run: runner };
+    const ctx: ItemContext = {
+      manifest,
+      log: (m) => events.onStepLog?.(id, m),
+      run: runner,
+      ...(opts.ask ? { ask: opts.ask } : {}),
+    };
 
     if (toSkip.has(id)) {
       const because = toSkip.get(id) as string;
