@@ -57,7 +57,7 @@ export function presentOption(
     return { hint: `installed${d.version ? ` ${d.version}` : ""} — needs update` };
   }
   if (d.differs === true) {
-    return { hint: "installed — settings differ (select to reset)", initialSelected: false };
+    return { hint: "applied — settings differ (select to reset)", initialSelected: false };
   }
   return {};
 }
@@ -246,7 +246,7 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
   p.note(
     [
       `${color.bold(String(toInstall.length))} items will be installed`,
-      `${alreadyThere} already installed (untouched)`,
+      `${alreadyThere} already applied (untouched — unchecking an applied item changes nothing)`,
       `Dev directory: ${devDir}`,
     ]
       .filter(Boolean)
@@ -367,10 +367,10 @@ export async function executePlan(
           spinning = false;
         };
         if (outcome.kind === "succeeded") stop(`${id} installed`);
-        else if (outcome.kind === "skipped-installed") stop(`${id} already installed`);
+        else if (outcome.kind === "skipped-installed") stop(`${id} already applied`);
         else if (outcome.kind === "skipped-completed") stop(`${id} done in previous run`);
         else if (outcome.kind === "deferred")
-          stop(`${id} — attended step, run ${color.bold("envsetup connect")}`);
+          stop(`${id} — attended step, runs in the connect phase`);
         else if (outcome.kind === "skipped-dependency") {
           // No spinner was started for skipped steps — surface as a log line.
           p.log.warn(`${id} skipped: ${outcome.because} failed`);

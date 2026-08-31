@@ -57,10 +57,10 @@ check("auth --help", ["auth", "--help"], { needle: "GitHub" });
 check("connect --help", ["connect", "--help"], { needle: "finishing steps" });
 
 console.log("\nread-only machine diff:");
-const doctor = check("doctor runs and reports a diff", ["doctor"], { needle: "in sync" });
-// doctor's outro is always "<n> in sync · <n> missing · <n> untracked · <n> shell-gap"
-if (/\d+ in sync .* shell-gap/.test(doctor)) {
-  console.log("  ✓ doctor outro shape (in sync · missing · untracked · shell-gap)");
+const doctor = check("doctor runs and reports a diff", ["doctor"], { needle: "satisfied" });
+// doctor's outro is always "<n> satisfied · <n> missing · <n> drifted · <n> untracked · <n> shell-gap"
+if (/\d+ satisfied .* drifted .* shell-gap/.test(doctor)) {
+  console.log("  ✓ doctor outro shape (satisfied · missing · drifted · untracked · shell-gap)");
   pass++;
 } else {
   console.log("  ✗ doctor outro shape not found");

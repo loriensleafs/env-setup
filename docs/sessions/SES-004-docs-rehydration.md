@@ -37,6 +37,18 @@ the files in docs use similar naming conventions — decisions does a good job" 
 everywhere, sessions renumbered `SES-NNN` (the script now numbers and orders by it; the H1 keeps
 the start timestamp), source comments repointed from `docs/PLAN.md` to the ADR/PRD they meant.
 
+Then `/domain-modeling`: the vocabulary was pulled from the code (item kinds, DetectResult fields,
+orchestrator outcomes, doctor/bootstrap labels, ceremony ids) and `CONTEXT.md` seeded with the terms
+the ADRs already settle. Three collisions went to Peter one at a time, each with a scenario: the
+same config-mismatch idea had four names (`differs`, "settings differ", doctor's `drift` array filed
+under "missing", the docs' "drift") → **Satisfied / Missing / Drifted / Untracked**; "selected" meant
+both the picker's choice and the manifest's "this machine should have it" → **Picked / Wanted**
+(unchecking a present item stays a no-op, and the summary now says so); `installed` was stretched
+over configuration → **Applied** (with **Present** for the raw fact). Cross-reference findings fixed
+along the way: `doctor` filed drifted items under "missing" (Peter's machine shows `1 drifted` now),
+and the `deferred` outcome still told the user to run `envsetup connect`, automatic since v0.1.7.
+A blanket replace briefly rewrote Peter's quoted words in ADR-010 — restored; quotes are not labels.
+
 ## Changes (one entry per commit, in order)
 
 ### 2026-08-30 · docs: OVERVIEW.md — project map, status, and handoff for new sessions · bb46dcb
@@ -364,3 +376,36 @@ the start timestamp), source comments repointed from `docs/PLAN.md` to the ADR/P
 - Why: Peter: "does the docs directory need a README.md that docs/CLAUDE.md references?" and "do any of the other nested CLAUDE.md files need sibling README.md files?"
 - Files:
   - `docs/CLAUDE.md` (+6/−2) — header names OVERVIEW.md as the map; subdirectory READMEs as rules/index/template
+
+### 2026-08-30 · feat(glossary): CONTEXT.md — canonical vocabulary; doctor/bootstrap labels aligned (Satisfied/Missing/Drifted/Untracked, Picked/Wanted, Applied) · 2eb5648
+
+- Summary: `CONTEXT.md` glossary seeded from the code and ADRs; three collisions settled with Peter (item states Satisfied/Missing/Drifted/Untracked; Picked vs Wanted; Applied vs Present) and the code, prompts, drivers and docs aligned to the words.
+- Why: Peter invoked `/domain-modeling`; the same concepts wore different names in `doctor`, bootstrap, the code flags and the docs, and `doctor` was filing drifted items under "missing".
+- Files:
+  - `.claude/skills/run-envsetup/SKILL.md` (+2/−2) — expected outro shape and picker wording
+  - `.claude/skills/run-envsetup/smoke.mjs` (+4/−4) — doctor needle 'satisfied' and outro regex with 'drifted'
+  - `CLAUDE.md` (+6/−2) — rehydration step 4: use CONTEXT.md's words; settle terms with domain-modeling first
+  - `CONTEXT.md` (+196/−0) — new — the glossary: machine/items, running, item states, configuration, secrets; Avoid lists; Open section
+  - `README.md` (+1/−1) — picker hint text → "applied — settings differ"
+  - `docs/OVERVIEW.md` (+5/−1) — doc-map row for CONTEXT.md; hint wording; Status: unreleased code change (doctor/labels)
+  - `docs/decisions/ADR-010-reset-on-drift-config-model.md` (+1/−1) — decision text uses 'applied — settings differ'; Peter's quoted words left as spoken
+  - `docs/plan/PRD-001-envsetup.md` (+3/−3) — doctor states named per CONTEXT.md; success criterion wording
+  - `docs/sessions/SES-004-docs-rehydration.md` (+12/−0) — narrative of the domain-modeling conversation
+  - `src/.claude/skills/run-src/driver.ts` (+1/−1) — doctor needle 'satisfied'
+  - `src/commands/__tests__/bootstrap-presentation.test.ts` (+1/−1) — expects the 'applied — settings differ' hint
+  - `src/commands/bootstrap.ts` (+4/−4) — hint 'applied — settings differ'; summary 'already applied (untouched — unchecking an applied item changes nothing)'; 'already applied' outcome; deferred message no longer says run connect
+  - `src/commands/doctor.ts` (+27/−21) — missing / drifted / untracked arrays and notes; 'satisfied' count; 'every wanted item is satisfied'
+  - `src/items/item.ts` (+2/−1) — DetectResult.installed documented as Applied; hint text in the differs doc
+  - `src/orchestrator/orchestrator.ts` (+1/−1) — journal skip reason 'already applied'
+- Notes: The on-disk manifest field stays `selected` (renaming is a migration) and `DetectResult.installed` stays as the flag name (~65 items); both are spoken of as Wanted / Applied. Terms asserted without a conversation (Ceremony, Connect phase, Finishing pass, Converge, Section, Kind) are listed as open to challenge. No ADR: vocabulary is cheap to reverse. The doctor/label changes are code and ship with v0.1.10.
+
+### 2026-08-30 · docs: root files rewritten for the current way of working — CLAUDE.md reading order + working style, CONTRIBUTING workflow, README · edb9bba
+
+- Summary: The four root files rewritten coherently for how agents now work here: CLAUDE.md (reading order, working style, recording, rules, essentials, safety), CONTRIBUTING (the full workflow incl. session start, drivers, merge commits), README (product + reading order); OVERVIEW's rules become a pointer.
+- Why: Peter: "make sure all of the root project files … are as completely up to date as they need to be … make it clear how the agents should be working … including any references to other markdown documents that should be included in the initial reading".
+- Files:
+  - `CLAUDE.md` (+113/−106) — rewritten (148 lines): Rehydrating 1–5, Working with Peter, Recording, Hard rules (ADR refs), Architecture essentials, Commands, Safety
+  - `CONTRIBUTING.md` (+67/−60) — rewritten: reading pointer, ground rules, setup, 8-step workflow (session start first; merge commits), release with step 6
+  - `README.md` (+36/−27) — rewritten: commands in glossary words, drifted paragraph, Working on it reading order, development table with session + run skills
+  - `docs/OVERVIEW.md` (+7/−16) — Hard rules section → pointer to CLAUDE.md; CLAUDE.md doc-map row
+- Notes: Verified 0 duplicated sentences across the 23 root/README/OVERVIEW/CLAUDE files and 0 broken links; the blanket-replace lesson from the glossary commit applied (quotes are not labels).

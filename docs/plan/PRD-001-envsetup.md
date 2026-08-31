@@ -32,7 +32,7 @@ attended moments (start and end) and the same command re-run reports nothing to 
 | Command | Does |
 | --- | --- |
 | `envsetup` | The one command: scan → pick → configure → confirm → install → attended finishing steps → finishing pass. `--show-installed` exposes installed items for cascade inspection; `--defaults` skips config screens. |
-| `envsetup doctor` | Read-only diff of the machine against its manifest: in sync / missing / `≠` drifted / untracked; per-item zsh gaps. |
+| `envsetup doctor` | Read-only diff of the machine against its manifest: satisfied / missing / drifted (`≠`) / untracked; per-item zsh gaps. States are defined in `CONTEXT.md`. |
 | `envsetup sync` | Apply the saved manifest non-interactively (no picker). |
 | `envsetup auth` | GitHub sign-in (device flow). |
 | `envsetup connect` | Re-run attended finishing steps that were skipped. |
@@ -47,7 +47,7 @@ attended moments (start and end) and the same command re-run reports nothing to 
 3. **Picker**: one grouped multiselect over Required / Optional apps / Repos / Fonts / System &
    config sections. Installed-and-matching items are absent (`--show-installed` shows them).
    Everything shown is toggleable; dependents disable in place with a "needs X" hint
-   (ADR-006). A drifted item shows "installed — settings differ (select to reset)", unchecked
+   (ADR-006). A drifted item shows "applied — settings differ (select to reset)", unchecked
    (ADR-010). An item that failed last run shows "failed last run — retry", checked.
 4. **Per-item config screens**: for each selected item with a schema, one clack group: boolean →
    yes/no radio, bounded number → validated text, enum ≤ 4 → radio, string → text; labels
@@ -186,7 +186,7 @@ interactive changes; `envsetup doctor` on Peter's machine as the live read-only 
 ## Success criteria
 
 - Fresh-Mac run: the one-liner completes with 0 failed and two attended moments; a second run
-  reports nothing to do; `doctor` shows all in sync.
+  reports nothing to do; `doctor` shows every wanted item satisfied.
 - Peter's actual machine: converged with 0 failed (achieved v0.1.5+); connect phase exercised
   end-to-end in one pass (pending).
 - Every item with defaults detects drift; no silent overwrite.

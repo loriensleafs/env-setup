@@ -14,7 +14,7 @@ describe("presentOption (simplified reset-on-drift model)", () => {
 
   test("drifted config: marked and UNCHECKED (opt-in reset)", () => {
     const p = presentOption({ installed: false, differs: true });
-    expect(p.hint).toBe("installed — settings differ (select to reset)");
+    expect(p.hint).toBe("applied — settings differ (select to reset)");
     expect(p.initialSelected).toBe(false);
   });
 

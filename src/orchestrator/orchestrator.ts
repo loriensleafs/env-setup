@@ -132,7 +132,7 @@ export async function orchestrate(opts: OrchestratorOptions): Promise<RunReport>
     // Detection short-circuit: present and not version-flagged → nothing to do.
     const detected = await item.detect(ctx).catch(() => ({ installed: false as const }));
     if (detected.installed && detected.satisfies !== false && item.install) {
-      await journal(id, "skipped", 1, "already installed");
+      await journal(id, "skipped", 1, "already applied");
       report.skippedInstalled.push(id);
       events.onStepEnd?.(id, { kind: "skipped-installed", version: detected.version });
       continue;

@@ -53,32 +53,38 @@ export default defineCommand({
       return;
     }
 
-    // Manifest diff: drift = selected-but-missing; extras = present-but-unselected.
-    const drift: string[] = [];
-    const extras: string[] = [];
-    let ok = 0;
+    // Item states relative to the manifest (CONTEXT.md): satisfied = wanted and
+    // present with matching config; missing = wanted, absent; drifted = wanted,
+    // present, config differs; untracked = present, not wanted.
+    const missing: string[] = [];
+    const drifted: string[] = [];
+    const untracked: string[] = [];
+    let satisfied = 0;
     for (const item of registry.all()) {
-      const selected = effective.items[item.id]?.selected ?? false;
+      const wanted = effective.items[item.id]?.selected ?? false;
       const d = detections.get(item.id) ?? { installed: false };
-      if (selected && !d.installed) {
-        // Config drift (installed, values differ) reads differently from absent.
-        drift.push(
-          d.differs
-            ? `${color.yellow("≠")} ${item.title} ${color.dim("(settings differ)")}`
-            : `${color.red("✗")} ${item.title}`,
-        );
-      } else if (!selected && d.installed)
-        extras.push(
+      if (wanted && !d.installed) {
+        if (d.differs)
+          drifted.push(`${color.yellow("≠")} ${item.title} ${color.dim("(settings differ)")}`);
+        else missing.push(`${color.red("✗")} ${item.title}`);
+      } else if (!wanted && d.installed)
+        untracked.push(
           `${color.yellow("+")} ${item.title}${d.version ? color.dim(` ${d.version}`) : ""}`,
         );
-      else if (selected && d.installed) ok++;
+      else if (wanted && d.installed) satisfied++;
     }
-    if (drift.length > 0) p.note(drift.join("\n"), "missing (manifest wants these)");
-    if (extras.length > 0)
-      p.note(extras.join("\n"), "untracked (installed but not in the manifest)");
-    if (drift.length === 0 && extras.length === 0) p.log.success("machine matches its manifest");
+    if (missing.length > 0) p.note(missing.join("\n"), "missing (wanted, not present)");
+    if (drifted.length > 0)
+      p.note(
+        drifted.join("\n"),
+        "drifted (wanted, settings differ — pick it in bootstrap to reset)",
+      );
+    if (untracked.length > 0)
+      p.note(untracked.join("\n"), "untracked (present, not wanted by the manifest)");
+    if (missing.length === 0 && drifted.length === 0 && untracked.length === 0)
+      p.log.success("every wanted item is satisfied");
 
-    // Per-item ~/.zshrc validation: for every SELECTED item that declares zsh
+    // Per-item ~/.zshrc validation: for every WANTED item that declares zsh
     // needs, confirm each of its lines is present in the live ~/.zshrc.
     const zshText = await Bun.file(join(homedir(), ".zshrc"))
       .text()
@@ -96,7 +102,7 @@ export default defineCommand({
     }
 
     p.outro(
-      `${ok} in sync · ${drift.length} missing · ${extras.length} untracked · ${shellGaps.length} shell-gap — \`envsetup sync\` applies the manifest`,
+      `${satisfied} satisfied · ${missing.length} missing · ${drifted.length} drifted · ${untracked.length} untracked · ${shellGaps.length} shell-gap — \`envsetup sync\` applies the manifest`,
     );
   },
 });
