@@ -673,3 +673,21 @@ A blanket replace briefly rewrote Peter's quoted words in ADR-010 — restored; 
   - `docs/decisions/README.md` (+1/−1) — ADR-019 row
   - `scripts/.claude/skills/run-scripts/SKILL.md` (+1/−1) — exclusion reworded: starting, writing entries, ending
 - Notes: command-creator: commands and skills are the same entry point, the skill wins on a name clash, and a flat command adds only a `/` menu name — so the aliases are `disable-model-invocation: true` (zero listing cost). Validator valid (fail-open warning only); command-reviewer PASS, two minors applied. Unverified until a real conversation types `/session-start`: that the Skill-tool hop adds no permission prompt (reviewer's render check).
+
+### 2026-08-30 · docs: every place that describes the session tool now names /session start · entry · end as the procedure and the --session/--current flags · 6b6105c
+
+- Summary: CLAUDE.md's Commands block and README's dev table describe the session tool as what `/session` drives, with `--session` and `--current`.
+- Why: Peter: "was the project CLAUDE.md and README.md updated to include the session skill and when/how to use it? Perhaps files in the docs as well?" — the when/how was there; the raw tool descriptions lacked `--session`/`--current`, and docs/sessions never named the skill.
+- Files:
+  - `CLAUDE.md` (+4/−3) — Commands block: --new (what /session start runs), --session append, --current, --check --session
+  - `README.md` (+1/−1) — dev table row: tool behind /session start · entry · end with all four forms
+
+### 2026-08-30 · docs: CONTRIBUTING step 7, docs/sessions README + CLAUDE.md, scripts/CLAUDE.md name /session as the procedure and the --session/--current flags · f9c5ab0
+
+- Summary: CONTRIBUTING step 7, docs/sessions README (Writing) and CLAUDE.md, and scripts/CLAUDE.md name `/session start · entry · end` as the procedure and the `--session`/`--current` flags.
+- Why: Peter: "was the project CLAUDE.md and README.md updated to include the session skill and when/how to use it? Perhaps files in the docs as well?" — the when/how was there; the raw tool descriptions lacked `--session`/`--current`, and docs/sessions never named the skill.
+- Files:
+  - `CONTRIBUTING.md` (+4/−4) — step 7 uses --session and --current
+  - `docs/sessions/CLAUDE.md` (+3/−0) — framing line: driven by /session
+  - `docs/sessions/README.md` (+6/−1) — Writing section opens by naming the skill and its aliases; --current in the own-file rule
+  - `scripts/CLAUDE.md` (+2/−1) — --current documented

@@ -81,10 +81,10 @@ bun test                             # bun:test suite
    The **pre-commit** hook auto-fixes staged files (Biome + markdownlint) and runs `tsc`, blocking
    only on un-auto-fixable lint or type errors. The **pre-push** hook runs the full check + tests.
 
-7. **Record it — after every commit, not at the end.** `bun run session` appends an entry
-   skeleton (`Summary` / `Why` and one line per touched file, every kind of file); fill every
-   placeholder (template in [docs/sessions/README.md](docs/sessions/README.md)); `bun run session
-   -- --check`; update `docs/OVERVIEW.md` "Status" / "Next up" and any ADR / PRD / plan / analysis
+7. **Record it — after every commit, not at the end.** `bun run session -- --session SES-NNN`
+   (your file) appends an entry skeleton (`Summary` / `Why` and one line per touched file, every kind of file); fill every
+   placeholder (template in [docs/sessions/README.md](docs/sessions/README.md)); `bun run session -- --current --session SES-NNN` lists what is left; `bun run session
+   -- --check --session SES-NNN`; update `docs/OVERVIEW.md` "Status" / "Next up" and any ADR / PRD / plan / analysis
    / `CONTEXT.md` / nested `CLAUDE.md` the change made stale, citing the sha; commit as
    `docs(session): …`. `/session entry` (alias `/session-entry`) is this step as a procedure; at the end of the conversation `/session end` checks nothing was deferred.
 
