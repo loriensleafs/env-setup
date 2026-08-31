@@ -10,12 +10,11 @@ description: Run, invoke and smoke-test src/secrets — the age-encrypted secret
 passphrase and fake values, wrong-passphrase rejection, loader pointed at a temp file. It never
 reads `secrets.json.age` or the real decrypted cache, and never prints a secret.
 
-All paths are relative to the repo root.
+All paths are relative to the repo root; every shell needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
 ## Run (agent path)
 
 ```bash
-export PATH="$HOME/.bun/bin:$PATH"
 bun src/secrets/.claude/skills/run-src-secrets/driver.ts
 ```
 

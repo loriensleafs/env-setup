@@ -5,18 +5,12 @@ description: Run, drive, smoke and test src/items/finder — the Finder sidebar 
 
 `src/items/finder/finder-favorites.ts` sets the Finder sidebar to a decided order through a Swift
 helper it compiles at runtime (`SET_FAVORITES_SWIFT`, embedded so it survives
-`bun build --compile`). Drive it with `.claude/skills/run-src-items-finder/driver.ts`, which
-exercises only the pure helpers. It does **not** call `detect()`: even detect compiles the helper
+`bun build --compile`). Drive it with `src/items/finder/.claude/skills/run-src-items-finder/driver.ts`, which
+exercises the pure helpers and typechecks both `assets/set-favorites.swift` and the embedded
+constant (`xcrun swiftc -typecheck`; neither is executed — they rewrite the sidebar). It does **not** call `detect()`: even detect compiles the helper
 into `~/.config/envsetup` first (a write); `configure()` rewrites the sidebar and restarts Finder.
 
-All paths are relative to the repo root.
-
-## Setup
-
-```bash
-export PATH="$HOME/.bun/bin:$PATH"
-bun install
-```
+All paths are relative to the repo root; every shell needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
 ## Run (agent path)
 
@@ -30,6 +24,8 @@ expandedFavorites → /Users/peterkloss … (7)
 sameOrder(same)=true sameOrder(reversed)=false
 WARNING: assets/set-favorites.swift differs from the embedded SET_FAVORITES_SWIFT (the item compiles the constant)
 item finder-favorites: kind=system deps=xcode-clt
+swiftc -typecheck assets/set-favorites.swift ✓
+swiftc -typecheck embedded SET_FAVORITES_SWIFT ✓
 OK
 ```
 
@@ -53,5 +49,3 @@ bun test src/items/finder/__tests__    # 2 pass, 0 fail
   behaviour is correct — but edit the constant, not the file, until they are re-synced.
 - The helper must be **compiled** (`swiftc`); the `swift <file>` interpreter segfaults on it
   (docs/analysis/ANA-006).
-
-`assets/set-favorites.swift` is covered here too: the driver runs `xcrun swiftc -typecheck` on the file AND on the embedded `SET_FAVORITES_SWIFT` constant (what the item actually compiles) and reports drift between them — it never executes either (they rewrite the Finder sidebar).

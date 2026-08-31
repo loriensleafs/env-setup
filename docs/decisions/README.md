@@ -19,7 +19,7 @@ away) and cite the session entry (sha).
 | [007](ADR-007-manifest-journal-item-architecture.md) | Manifest (decisions) + journal (execution truth) + one module per item; toposorted; failure policy | accepted |
 | [008](ADR-008-secrets-age-encrypted-in-repo.md) | Secrets: age-encrypted file committed to the public repo; one passphrase | accepted |
 | [009](ADR-009-github-auth-and-signing.md) | Own OAuth-app device flow right after confirm; two per-machine SSH keys; SSH commit signing; noreply email | accepted |
-| [010](ADR-010-reset-on-drift-config-model.md) | Config model: reset-on-drift, selection is consent, no conflict checking | accepted (supersedes conflict-consent) |
+| [010](ADR-010-reset-on-drift-config-model.md) | Config model: reset-on-drift, picking is the consent, no conflict checking | accepted (supersedes conflict-consent) |
 | [011](ADR-011-install-method-per-tool.md) | Install method chosen per tool from official docs; transitive prerequisites auto-installed | accepted |
 | [012](ADR-012-per-item-zsh-contributions.md) | Shell config: per-item `zsh()` contributions assembled into one managed block | accepted |
 | [013](ADR-013-claude-code-format-hook-installed-by-cli.md) | Claude Code auto-format hook installed by the CLI (FileChanged), not a repo hook | accepted |

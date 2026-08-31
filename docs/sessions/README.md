@@ -17,7 +17,9 @@ right files or `git show <sha>` instead of re-deriving history from the code.
 - [SES-001 · 2026-08-26 04:41 · Foundation — spine, UI, items, orchestrator, first releases](SES-001-foundation.md) — Stand up the pure-Bun CLI from scratch: item framework, manifest/journal, clack UI, orchestrator, first item groups, secrets, release pipeline; ship v0.0.1–v0.0.2.
 <!-- sessions:end -->
 
-## How to read
+## Rules
+
+### Reading
 
 1. OVERVIEW "Status" and "Next up" first — the summary. Then the **newest session file** in full:
    Goal / Outcome / Open at end, the Narrative, then the Changes. Then earlier sessions back to
@@ -27,7 +29,7 @@ right files or `git show <sha>` instead of re-deriving history from the code.
 3. Taking a "Next up" item: `grep -rn <file-or-keyword> docs/sessions/` finds every prior change to
    it, across sessions.
 
-## How to keep it up to date — continuously, never deferred
+### Writing — continuously, never deferred
 
 - **Session start:** `bun run session -- --new <slug>` creates `SES-<next>-<slug>.md` from the
   template (H1 `# YYYY-MM-DD HH:MM · Title` records when it started; the number orders sessions)

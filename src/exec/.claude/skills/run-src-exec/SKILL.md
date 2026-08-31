@@ -8,12 +8,11 @@ description: Run, invoke and smoke-test src/exec — the injectable command Runn
 it. Drive it with `src/exec/.claude/skills/run-src-exec/driver.ts`, which runs harmless
 commands (`echo`, `sh -c exit 3`, `pwd`) through the real `run`.
 
-All paths are relative to the repo root.
+All paths are relative to the repo root; every shell needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
 ## Run (agent path)
 
 ```bash
-export PATH="$HOME/.bun/bin:$PATH"
 bun src/exec/.claude/skills/run-src-exec/driver.ts
 ```
 

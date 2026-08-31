@@ -6,18 +6,11 @@ description: Run, drive, smoke and test src/items/editors — the shared Cursor/
 `src/items/editors/editor-config.ts` is one factory (`editorConfigItem`) producing `cursor-config`
 and `vscode-config`: merged `settings.json` keys, 12 extensions via `--install-extension`, and the
 `cursor`/`code` CLI symlinked into `~/.local/bin`. Drive it with
-`.claude/skills/run-src-items-editors/driver.ts` — lists the spec and runs both `detect()`s
+`src/items/editors/.claude/skills/run-src-items-editors/driver.ts` — lists the spec and runs both `detect()`s
 (reads each editor's `settings.json`, installed extensions and CLI; read-only). `configure()`
 writes settings and installs extensions — never called here.
 
-All paths are relative to the repo root.
-
-## Setup
-
-```bash
-export PATH="$HOME/.bun/bin:$PATH"
-bun install
-```
+All paths are relative to the repo root; every shell needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
 ## Run (agent path)
 
@@ -50,4 +43,4 @@ bun test src/items/editors/__tests__    # 3 pass, 0 fail
 - Theme is set via `workbench.preferredDark/LightColorTheme`, not `workbench.colorTheme` — the
   latter gets rewritten by `window.autoDetectColorScheme` and would read as drift forever.
 - `detect()` requires the editor's CLI to resolve from the app bundle; a missing app reads as
-  `installed=false` without `differs`.
+  Missing (`installed=false` without `differs`), a hand-edited `settings.json` as Drifted.

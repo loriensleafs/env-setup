@@ -10,12 +10,11 @@ journals every step. Drive it with
 `src/orchestrator/.claude/skills/run-src-orchestrator/driver.ts` — six **fake** items with a
 mocked `Runner` and a temp journal, so the whole policy runs without touching the machine.
 
-All paths are relative to the repo root.
+All paths are relative to the repo root; every shell needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
 ## Run (agent path)
 
 ```bash
-export PATH="$HOME/.bun/bin:$PATH"
 bun src/orchestrator/.claude/skills/run-src-orchestrator/driver.ts
 ```
 

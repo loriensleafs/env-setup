@@ -1,6 +1,4 @@
 # docs/analysis — research and empirical findings
 
-Every claim carries its source (URL, file, or the command run); a claim without one is labelled
-_unverified_. Refuted beliefs stay under "Refuted"; corrections are dated additions, never silent
-edits. Link the ADR / PRD section / plan the finding changed. The `research` skill writes here;
-template and index in `README.md`.
+Invariant: no claim without its source, and a finding is never silently edited — a correction is
+a dated addition, a reversal a status line at the top. Rules, index and template: `README.md`.

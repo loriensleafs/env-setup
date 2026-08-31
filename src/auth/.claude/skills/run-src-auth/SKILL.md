@@ -10,12 +10,11 @@ real `requestDeviceCode` / `pollForToken` (pending → slow_down → token; acce
 `noreplyEmail`, and probes the Keychain **read-only** (`security find-generic-password`),
 printing only present/absent. It never runs `githubAuthCeremony` or hits the network.
 
-All paths are relative to the repo root.
+All paths are relative to the repo root; every shell needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
 ## Run (agent path)
 
 ```bash
-export PATH="$HOME/.bun/bin:$PATH"
 bun src/auth/.claude/skills/run-src-auth/driver.ts
 ```
 

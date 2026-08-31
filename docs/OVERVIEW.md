@@ -9,11 +9,12 @@ recorded here.
 A pure-Bun macOS environment-setup CLI. One command on a fresh Mac
 (`curl -fsSL https://raw.githubusercontent.com/loriensleafs/env-setup/main/install.sh | sh`)
 scans the machine, lets the user pick what to install, installs/configures ~65 items (apps,
-runtimes, fonts, repos, macOS settings, app configs), then runs the attended finishing steps
-(sign-ins, permission grants, license pastes) — and **the same command re-run converges the
-machine** (re-detects state, pre-checks what failed last run). `doctor` diffs the machine
-against its manifest read-only; `sync` applies the manifest non-interactively; `connect`
-re-runs skipped attended steps; `secrets` manages the age-encrypted store.
+runtimes, fonts, repos, macOS settings, app configs), then runs the ceremonies — the attended
+sign-ins, permission grants and license pastes — in the connect phase; **the same command re-run
+converges the machine** (re-detects, pre-checks what failed last run). `doctor` reports each
+wanted item as satisfied, missing or drifted, and what is untracked; `sync` applies the manifest
+without the picker; `connect` re-runs skipped ceremonies; `secrets` manages the age-encrypted
+store. The words are defined in [CONTEXT.md](../CONTEXT.md).
 
 Owner: Peter Kloss (github loriensleafs). Public repo. Released: v0.1.9 (2026-08-30).
 
@@ -48,11 +49,12 @@ small separate commands, merge commits). The facts below are the ones a rule can
 - **Item** (`src/items/item.ts`): `detect`/`install`/`configure`/`verify`, `deps`, `ceremonies`,
   Zod `configSchema` + `defaultConfig`, optional `zsh()` shell contribution. `defineItem`.
   Registry assembled in `src/items/all.ts` (toposorted execution via `deps`). ([ADR-007](decisions/ADR-007-manifest-journal-item-architecture.md))
-- **DetectResult**: `installed`, `version`, `satisfies`, **`differs`** (config present but not
-  matching our effective defaults). Drift-aware `detect()` on every item with defaults.
-- **Reset-on-drift model** ([ADR-010](decisions/ADR-010-reset-on-drift-config-model.md)): an item is
-  off the install list only if installed at the wanted version AND config exactly matches; drifted
-  items show as "applied — settings differ (select to reset)", **unchecked** — selection is the
+- **DetectResult**: `installed` (the item is applied), `version`, `satisfies`, **`differs`**
+  (present, config not matching the effective config → Drifted). Drift-aware `detect()` on every
+  item with defaults.
+- **Reset-on-drift model** ([ADR-010](decisions/ADR-010-reset-on-drift-config-model.md)): a satisfied
+  item (applied at the wanted version, config matching) is absent from the picker; a drifted one
+  shows as "applied — settings differ (select to reset)", **unchecked** — picking it is the
   consent. No conflict checking.
 - **Manifest** (`src/manifest/`): Zod-versioned, auto-migrated on load (`migrations.ts` has the
   recipe). **Journal** (JSONL): resumable runs, `failedSteps` drive "failed last run — retry".
@@ -63,7 +65,7 @@ small separate commands, merge commits). The facts below are the ones a rule can
   `executePlan`): scan (parallel per section) → identity prompts (prefilled from manifest) →
   picker (`ui/group-multi-select.ts`, requires-cascade, [ADR-006](decisions/ADR-006-everything-toggleable-requires-cascade.md))
   → per-item config screens (`ui/config-screens.ts`, one clack `p.group` per item, fields from the
-  Zod schema) → confirm → install (append-only spinner per step) → **connect phase runs
+  Zod schema) → confirm → build (append-only spinner per step) → **connect phase runs
   automatically** (`ceremonies/connect-phase.ts`, deduped) → finishing pass.
 - **Terminal handling** ([ADR-014](decisions/ADR-014-terminal-input-in-process-dev-tty.md); `src/ui/terminal.ts`):
   under `curl | sh` the ONLY working input path is opening `/dev/tty` in-process and passing it as
@@ -73,7 +75,7 @@ small separate commands, merge commits). The facts below are the ones a rule can
   --compile`; use `with { type: "file" }` imports (`items/claude-code/assets-embed.ts`).
 - **Shell config** ([ADR-012](decisions/ADR-012-per-item-zsh-contributions.md)): per-item `zsh()`
   contributions assembled by `items/defs/shell-block.ts` into a managed `~/.zshrc` block.
-- **Ceremonies** (`src/ceremonies/handlers.ts`): attended steps by id (license pastes via
+- **Ceremonies** (`src/ceremonies/handlers.ts`): handlers by ceremony id (license pastes via
   clipboard, accessibility grant, Chrome web-app install via AX automation ([ADR-015](decisions/ADR-015-chrome-web-apps-ax-automation.md)), GitHub device flow ([ADR-009](decisions/ADR-009-github-auth-and-signing.md))).
 - **Release** ([ADR-002](decisions/ADR-002-distribution-curl-one-liner.md)): tag `v*` →
   `.github/workflows/release.yml` compiles darwin arm64/x64 with Bun embedded, attaches to the
@@ -106,16 +108,13 @@ small separate commands, merge commits). The facts below are the ones a rule can
   Chrome for chrome-config, ceremony-only items labelled "attended step".
 - Known issues: compiled idle-CPU spin (above); attended ceremonies have not yet been exercised
   end-to-end on a fresh machine (first full connect run pending).
-- **Unreleased on `main`** ([SES-004](sessions/SES-004-docs-rehydration.md)): docs only — OVERVIEW
-  (`bb46dcb`), the change record (`7439bec` … `db47945`), and the docs system: `sessions/`,
-  `plan/` (PRD-001, PLAN-001), `analysis/` (ANA-001…008), `decisions/` (ADR-001…017),
-  `archive/` (the retired living plan), `<TYPE>-<NNN>` naming everywhere. No code change since
-  v0.1.9 (source comments repointed only).
-- **Unreleased on `main`** (SES-004, after `855bfd6`): nested `CLAUDE.md` files + path rules per
-  ADR-018; run skills pruned to the 28 with real drivers (PLAN-002).
-- **Unreleased code on `main`** (SES-004): `doctor` reports Drifted as its own note and counts
-  "satisfied"; picker/summary/outcome prose says "applied"; the deferred message no longer tells
-  the user to run `connect` (it runs automatically). Ships with v0.1.10.
+- **Unreleased on `main`** ([SES-004](sessions/SES-004-docs-rehydration.md)) — docs: OVERVIEW
+  (`bb46dcb`), the session log (`7439bec` … `db47945`), the docs system (`sessions/`, `plan/`,
+  `analysis/`, `decisions/` ADR-001…018, `archive/`, `<TYPE>-<NNN>` naming), run skills (28 with
+  real drivers), nested `CLAUDE.md` files + path rules (ADR-018), `CONTEXT.md`, the rewritten root
+  files. Code: `doctor` reports Drifted as its own note and counts "satisfied"; picker, summary and
+  outcome prose say "applied"; the deferred message no longer tells the user to run `connect`;
+  `install.sh` downloads to a fresh file. Ships with v0.1.10.
 - **Parked, not on `main`:** the visual-grouping patch ([PLAN-001](plan/PLAN-001-visual-grouping.md))
   as a WIP commit on local branch `wip/visual-grouping` (unverified, never run under a PTY).
 
@@ -124,7 +123,7 @@ small separate commands, merge commits). The facts below are the ones a rule can
 1. **Visual grouping of the config flow + progress tracker** — [PLAN-001](plan/PLAN-001-visual-grouping.md)
    (Peter, 2026-08-30). Start from `wip/visual-grouping`, verify under a PTY, PR, release v0.1.10.
 2. First real end-to-end **connect phase** on Peter's machine (web apps, grants, licenses) — expect
-   bugs; ceremonies were never exercised in one pass. Write `PLAN-002` first if it grows.
+   bugs; ceremonies were never exercised in one pass. Write `PLAN-003` first if it grows.
 3. Persist the binary to `~/.local/bin/envsetup` so re-runs don't re-download (PRD open question).
 4. Upstream investigation of the compiled idle-CPU spin.
 5. **Findings from the run-skill drivers** (SES-004, `ba38081`): `src/items/finder/assets/set-favorites.swift`
@@ -145,7 +144,5 @@ small separate commands, merge commits). The facts below are the ones a rule can
    verify both assets). Peter approves outward-facing steps (push/PR/merge/release) — ask once,
    then proceed with small separate commands (large compound commands get denied by the
    permission prompt).
-3. Continuously: after every commit `bun run session`, fill every placeholder (Summary, Why, a
-   phrase per file), write the Narrative as it happens, `bun run session -- --check`; a new
-   decision → new ADR; a changed requirement → PRD; a finding → ANA; and this file's "Status" /
-   "Next up". Never deferred.
+3. Continuously: CLAUDE.md "Recording" — the session entry after every commit, and this file's
+   "Status" / "Next up" in the same step as the change. Never deferred.

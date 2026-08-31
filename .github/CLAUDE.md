@@ -1,9 +1,10 @@
 # .github — CI and release workflows (ADR-002, ADR-016)
 
-- `release.yml` runs only on a pushed `v*` tag and uploads assets: cut a release per
-  CONTRIBUTING.md; never trigger it to test. Uploads have flaked ("other side closed") — re-run the
-  job and verify both darwin assets.
-- `ci.yml`'s checks job stays on macOS (`macos-14`): detection and tests assume it; gitleaks runs on
-  ubuntu.
-- `gh pr checks <n> --watch` says "no checks reported" for ~20 s after `gh pr create` — wait and
-  retry rather than reading it as green.
+`ci.yml` runs the check gate and tests on macOS plus a gitleaks scan on ubuntu; `release.yml` builds
+and attaches the darwin binaries. Drive them with `/run-github` (`gh` to inspect runs, the same
+commands locally to reproduce).
+
+- `release.yml` runs only on a pushed `v*` tag: a release is cut per CONTRIBUTING.md "Cutting a
+  release", never by triggering the workflow to test it.
+- The checks job stays on `macos-14`: item detection and the tests assume macOS.
+- PR mechanics (checks lag after creation, merge commits) are in CONTRIBUTING.md step 8.

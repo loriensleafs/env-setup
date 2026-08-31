@@ -18,30 +18,29 @@ bun docs/.claude/skills/run-docs/link-check.ts            # docs/** + CLAUDE.md,
 Expected:
 
 ```text
-41 files, 135 relative links, 0 broken
+50 files, 136 relative links, 0 broken
 ```
 
 Exit 1 lists each `broken: <file> → <target>`. Limit to one directory with an argument:
 
 ```bash
-bun docs/.claude/skills/run-docs/link-check.ts docs/decisions   # → 18 files, 25 relative links, 0 broken
+bun docs/.claude/skills/run-docs/link-check.ts docs/decisions   # → 20 files, 26 relative links, 0 broken
 ```
 
-## Lint
+## Run (agent path) — lint
 
 ```bash
-bunx markdownlint-cli2 "docs/**/*.md"      # → Linting: 43 files … Summary: 0 issues in 0 files
+bunx markdownlint-cli2 "docs/**/*.md"      # the config's own **/*.md glob is added → Linting: 91 files … Summary: 0 issues in 0 files
 bun run check                              # the full gate (Biome + tsc + markdownlint), CI/pre-push
 ```
 
-## Session log
+## Run (agent path) — session log
 
 ```bash
 bun run session -- --check                 # → session: complete
 ```
 
-Each subdirectory has its own skill (`/run-docs-decisions`, `/run-docs-analysis`, `/run-docs-plan`,
-`/run-docs-sessions`, `/run-docs-archive`) that runs the same two checks scoped to it.
+Scope the link check to a subdirectory with the argument above.
 
 ## Gotchas
 

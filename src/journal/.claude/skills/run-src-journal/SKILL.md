@@ -9,12 +9,11 @@ finished marker) that drive "resume?" and "failed last run — retry". Drive it 
 `src/journal/.claude/skills/run-src-journal/driver.ts` — it writes to a **temp** journal,
 never `~/.local/state/envsetup/journal.jsonl`.
 
-All paths are relative to the repo root.
+All paths are relative to the repo root; every shell needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
 ## Run (agent path)
 
 ```bash
-export PATH="$HOME/.bun/bin:$PATH"
 bun src/journal/.claude/skills/run-src-journal/driver.ts
 ```
 

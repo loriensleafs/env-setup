@@ -1,7 +1,8 @@
 # Vendored @clack packages — temporary
 
 These tarballs are **built from clack's `main` branch** (bombshell-dev/clack,
-snapshot 2026-08-15), NOT the published npm releases.
+snapshot 2026-08-15), NOT the published npm releases. Decision: [ADR-003](../docs/decisions/ADR-003-vendored-clack.md).
+Verify the install still resolves to them: `/run-vendor`.
 
 ## Why they're here
 
@@ -28,7 +29,7 @@ When it ships:
 2. Edit `package.json`: delete the `overrides` block; add
    `"@clack/prompts": "^<new>"` and `"@clack/core": "^<new>"` under dependencies.
 3. `bun add @clack/prompts@latest @clack/core@latest`
-4. `rm -rf vendor` and delete this note.
+4. `rm -rf vendor` (this README goes with it) and supersede ADR-003.
 5. `bun test` + run the bootstrap path prompt to confirm Tab still completes.
 
 No runtime/env impact from vendoring: the tarballs install like any dependency
