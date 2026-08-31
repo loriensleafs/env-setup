@@ -59,3 +59,5 @@ bun test src/items/chrome/__tests__      # 4 pass, 0 fail (2 files)
   State/Preferences, and reopens it. `chromePwas` install is a ceremony (attended, AX-driven).
 - Import paths from inside the skill dir are five levels up for `src/exec` (`../../../../../exec/run.ts`)
   and three for the item files (`../../../chrome-config.ts`).
+
+`assets/install-web-app.swift` is covered here too: the driver byte-compares it with the embedded `INSTALL_SWIFT` and runs `xcrun swiftc -typecheck` on it — it is never executed (it installs a real Chrome app).

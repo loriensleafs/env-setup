@@ -53,3 +53,5 @@ bun test src/items/finder/__tests__    # 2 pass, 0 fail
   behaviour is correct — but edit the constant, not the file, until they are re-synced.
 - The helper must be **compiled** (`swiftc`); the `swift <file>` interpreter segfaults on it
   (docs/analysis/ANA-006).
+
+`assets/set-favorites.swift` is covered here too: the driver runs `xcrun swiftc -typecheck` on the file AND on the embedded `SET_FAVORITES_SWIFT` constant (what the item actually compiles) and reports drift between them — it never executes either (they rewrite the Finder sidebar).

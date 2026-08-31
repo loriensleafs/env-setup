@@ -16,6 +16,7 @@ Two kinds of document live here:
 | --- | --- | --- |
 | [PRD-001-envsetup.md](PRD-001-envsetup.md) | Product requirements for envsetup | current (v0.1.9) |
 | [PLAN-001-visual-grouping.md](PLAN-001-visual-grouping.md) | Visual grouping of the config flow + overall progress tracker | planned; patch parked on `wip/visual-grouping` |
+| [PLAN-002-nested-claude-md.md](PLAN-002-nested-claude-md.md) | Nested CLAUDE.md placement + run-skill pruning | done — ADR-018 |
 
 ## Rules
 
