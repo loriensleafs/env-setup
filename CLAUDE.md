@@ -89,9 +89,10 @@ bun run fix                      # auto-fix Biome + markdown
 bun run test                     # bun:test suite
 bun run compile                  # standalone binary → dist/envsetup
 bun run changelog                # regenerate CHANGELOG.md (git-cliff)
-bun run session -- --new <slug>  # start a session file (session start)
-bun run session                  # append entry skeletons for new commits into the current session
-bun run session -- --check       # fail if entries are missing or placeholders unfilled
+bun run session -- --new <slug>            # /session start runs this: creates SES-<next>-<slug>.md
+bun run session -- --session SES-NNN       # append entry skeletons for new commits into YOUR file
+bun run session -- --current --session SES-NNN   # list your placeholders by line
+bun run session -- --check --session SES-NNN     # the gate: exit 1 on missing/unfilled; others' files only warn
 ```
 
 ## Safety when running it
