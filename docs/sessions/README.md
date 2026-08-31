@@ -35,6 +35,7 @@ right files or `git show <sha>` instead of re-deriving history from the code.
 - **Session start:** `bun run session -- --new <slug>` creates `SES-<next>-<slug>.md` from the
   template (H1 `# YYYY-MM-DD HH:MM · Title` records when it started; the number orders sessions)
   and makes it current. Set the title and `Goal` immediately.
+- **Your own file, by name.** Another conversation may share this checkout and own the newest file. `--session SES-NNN` (or just the number) makes `bun run session` append to *your* file and `--check` gate *your* file; placeholders in any other session are reported as warnings and left to that conversation — never edited to make your gate green.
 - **After every commit** (not at the end of the PR, never "later"): `bun run session` appends an
   entry skeleton per commit no session mentions — `Summary` / `Why` placeholders and one line per
   touched file with +/− counts — into the current session. Fill in every `_(fill in)_`: the

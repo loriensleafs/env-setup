@@ -1,0 +1,13 @@
+$ git status --short
+
+$ git log --oneline -5
+784b161 docs(session): record 91fd2a8 (set-favorites.swift re-sync); record ea51e09 retroactively in SES-005; OVERVIEW Next-up 5 narrowed
+ebd35f0 docs(session): start record-eval session
+91fd2a8 fix(finder): re-sync set-favorites.swift with the embedded SET_FAVORITES_SWIFT constant
+ea51e09 feat(skills): /session start | record | end replaces /rehydrate and /wrap-up (skill-creator loop: validated, reviewed)
+8ef6efc Merge pull request #27 from loriensleafs/docs/session-entry-b433789
+
+$ bun run session -- --check
+$ bun scripts/session.ts --check
+session: complete
+exit=0

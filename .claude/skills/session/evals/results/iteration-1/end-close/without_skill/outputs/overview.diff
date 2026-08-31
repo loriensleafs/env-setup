@@ -1,0 +1,45 @@
+diff --git a/docs/OVERVIEW.md b/docs/OVERVIEW.md
+index ad82dea..a64a212 100644
+--- a/docs/OVERVIEW.md
++++ b/docs/OVERVIEW.md
+@@ -23,7 +23,7 @@ Owner: Peter Kloss (github loriensleafs). Public repo. Released: v0.1.9 (2026-08
+ | Doc | Job | Produced by |
+ | --- | --- | --- |
+ | [CONTEXT.md](../CONTEXT.md) | **The glossary** — the canonical word for every concept (item states, picked vs wanted, applied, ceremony, …) and the words to avoid. Code labels, prompts and docs use these words; a new or changed term is settled with the `domain-modeling` skill and written here first. | `domain-modeling` skill |
+-| `.claude/skills/session/` | **`/session start · record · end`** — the session ritual as one procedure with checkable ends: read the docs system in full and brief; append/fill each commit's entry and update what it made stale; the closing check. | by hand (skill-creator) |
++| `.claude/skills/session/` | **`/session start · record · end`** — the session ritual as one procedure with checkable ends: read the docs system in full and brief; append/fill each commit's entry and update what it made stale; the closing check. **Not in the checkout on `feat/session-skill`: removed by `d4e14bd` ([SES-006](sessions/SES-006-closing-eval.md)) — see "Next up" 1.** | by hand (skill-creator) |
+ | [CLAUDE.md](../CLAUDE.md) (= `AGENTS.md`) | Always-loaded agent brief: how to rehydrate (reading order), how to work with Peter, how to record, hard rules, architecture essentials, safety. | by hand |
+ | [CONTRIBUTING.md](../CONTRIBUTING.md) | Setup, change workflow, conventional commits, **how to cut a release**. | by hand |
+ | [docs/sessions/](sessions/README.md) `SES-NNN` | **What was done, session by session**: Goal / Outcome / Open, a Narrative (asked, tried, abandoned, verified), per commit a Summary, Why and a note per touched file. **Read the newest right after "Status".** | `bun run session` (`-- --new <slug>` starts one; `-- --check` gates) + the author |
+@@ -118,16 +118,26 @@ small separate commands, merge commits). The facts below are the ones a rule can
+   `install.sh` downloads to a fresh file. Ships with v0.1.10.
+ - **Parked, not on `main`:** the visual-grouping patch ([PLAN-001](plan/PLAN-001-visual-grouping.md))
+   as a WIP commit on local branch `wip/visual-grouping` (unverified, never run under a PTY).
++- **On `feat/session-skill`** ([SES-006](sessions/SES-006-closing-eval.md)): `ea51e09` replaced
++  `/rehydrate` + `/wrap-up` with one `/session start · record · end` skill; `d4e14bd` then deleted
++  `.claude/skills/session/` again, so CLAUDE.md, CONTRIBUTING.md, README.md, the Documents row
++  above and the run-scripts skill point at a skill that is not in the checkout. The SES-006 close
++  was done by hand from `docs/sessions/README.md`.
+ 
+ ## Next up
+ 
+-1. **Visual grouping of the config flow + progress tracker** — [PLAN-001](plan/PLAN-001-visual-grouping.md)
++1. **Restore or repoint the `/session` skill** (SES-006, `d4e14bd`): either revert `d4e14bd`
++   (the skill as of `ea51e09`) or rewrite the five references (CLAUDE.md "Rehydrating" /
++   "Recording", CONTRIBUTING.md steps 1 and 7, README.md "Working on it", the Documents row above,
++   `scripts/.claude/skills/run-scripts/SKILL.md`). Until then the first instruction in CLAUDE.md
++   (`/session start`) cannot run. Blocks the next session's rehydration, hence first.
++2. **Visual grouping of the config flow + progress tracker** — [PLAN-001](plan/PLAN-001-visual-grouping.md)
+    (Peter, 2026-08-30). Start from `wip/visual-grouping`, verify under a PTY, PR, release v0.1.10.
+-2. First real end-to-end **connect phase** on Peter's machine (web apps, grants, licenses) — expect
++3. First real end-to-end **connect phase** on Peter's machine (web apps, grants, licenses) — expect
+    bugs; ceremonies were never exercised in one pass. Write `PLAN-003` first if it grows.
+-3. Persist the binary to `~/.local/bin/envsetup` so re-runs don't re-download (PRD open question).
+-4. Upstream investigation of the compiled idle-CPU spin.
+-5. **Findings from the run-skill drivers** (SES-004, `ba38081`): `src/items/finder/assets/set-favorites.swift`
++4. Persist the binary to `~/.local/bin/envsetup` so re-runs don't re-download (PRD open question).
++5. Upstream investigation of the compiled idle-CPU spin.
++6. **Findings from the run-skill drivers** (SES-004, `ba38081`): `src/items/finder/assets/set-favorites.swift`
+    is stale vs the embedded `SET_FAVORITES_SWIFT` constant (the constant has `--list`; runtime ships the
+    constant — re-sync the file or generate one from the other); `hooks-format.ts` exits 0 silently when
+    Biome's config errors (e.g. `vcs.useIgnoreFile` outside a git repo) — consider logging to stderr.

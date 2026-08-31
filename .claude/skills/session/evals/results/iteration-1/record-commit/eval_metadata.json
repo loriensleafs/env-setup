@@ -1,0 +1,13 @@
+{
+  "eval_id": 2,
+  "eval_name": "record-commit",
+  "prompt": "I just committed the fix for the stale set-favorites.swift asset (it now matches the embedded constant). Record it properly before I open the PR.",
+  "expectations": [
+    "commit.diff shows a commit whose subject starts with docs(session): and which touches docs/sessions/SES-006-record-eval.md",
+    "session-file.md holds an entry for the fix(finder) commit with a written Summary, a written Why, and a phrase (not a placeholder) on the src/items/finder/assets/set-favorites.swift line",
+    "session-file.md contains no _(fill in)_ placeholder anywhere",
+    "git-state.txt shows `bun run session -- --check` printing session: complete",
+    "overview.diff shows docs/OVERVIEW.md Next-up 5 updated so the stale set-favorites.swift item is removed or marked done",
+    "git-state.txt shows a clean working tree (git status --short empty) with the docs(session) commit on top of the fix commit"
+  ]
+}

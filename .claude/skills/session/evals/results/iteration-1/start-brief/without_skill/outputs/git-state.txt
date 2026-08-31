@@ -1,0 +1,18 @@
+## git status --short
+ M docs/sessions/README.md
+ M docs/sessions/SES-005-rehydration.md
+?? docs/sessions/SES-006-pickup-brief.md
+
+## git log --oneline -5
+71529ab baseline: session skill removed
+ea51e09 feat(skills): /session start | record | end replaces /rehydrate and /wrap-up (skill-creator loop: validated, reviewed)
+8ef6efc Merge pull request #27 from loriensleafs/docs/session-entry-b433789
+1187acc docs(session): move the b433789 entry to SES-004; /rehydrate: no sampling — every named file read in full
+24cd68e Merge pull request #26 from loriensleafs/feat/rehydrate-skill
+
+## bun run session -- --check
+$ bun scripts/session.ts --check
+unfilled: SES-006-pickup-brief.md has 2 placeholder line(s)
+session: NOT ready — run `bun run session` and fill in the placeholders.
+error: script "session" exited with code 1
+exit=1

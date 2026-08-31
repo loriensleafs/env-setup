@@ -23,7 +23,7 @@ Owner: Peter Kloss (github loriensleafs). Public repo. Released: v0.1.9 (2026-08
 | Doc | Job | Produced by |
 | --- | --- | --- |
 | [CONTEXT.md](../CONTEXT.md) | **The glossary** — the canonical word for every concept (item states, picked vs wanted, applied, ceremony, …) and the words to avoid. Code labels, prompts and docs use these words; a new or changed term is settled with the `domain-modeling` skill and written here first. | `domain-modeling` skill |
-| `.claude/skills/rehydrate/`, `.claude/skills/wrap-up/` | **`/rehydrate`** — the reading order as an executable procedure with a completion criterion (fires at session start); **`/wrap-up`** — the closing check (session log complete, Status current, tree clean). | by hand |
+| `.claude/skills/session/` | **`/session start · record · end`** — the session ritual as one procedure with checkable ends: read the docs system in full and brief; append/fill each commit's entry and update what it made stale; the closing check. | by hand (skill-creator) |
 | [CLAUDE.md](../CLAUDE.md) (= `AGENTS.md`) | Always-loaded agent brief: how to rehydrate (reading order), how to work with Peter, how to record, hard rules, architecture essentials, safety. | by hand |
 | [CONTRIBUTING.md](../CONTRIBUTING.md) | Setup, change workflow, conventional commits, **how to cut a release**. | by hand |
 | [docs/sessions/](sessions/README.md) `SES-NNN` | **What was done, session by session**: Goal / Outcome / Open, a Narrative (asked, tried, abandoned, verified), per commit a Summary, Why and a note per touched file. **Read the newest right after "Status".** | `bun run session` (`-- --new <slug>` starts one; `-- --check` gates) + the author |
@@ -116,6 +116,10 @@ small separate commands, merge commits). The facts below are the ones a rule can
   files. Code: `doctor` reports Drifted as its own note and counts "satisfied"; picker, summary and
   outcome prose say "applied"; the deferred message no longer tells the user to run `connect`;
   `install.sh` downloads to a fresh file. Ships with v0.1.10.
+- **`/session start · record · end`** (SES-004, `ea51e09`…`dacbdb8`): the session ritual as one model-invoked skill,
+  built with the skill-creator loop — ANA-009, ADR-019, two measured iterations (evidence under
+  `.claude/skills/session/evals/results/`); the session tool takes `--session SES-NNN` and `--current`.
+  Unverified: the `!` injection in a real conversation; the trigger sweep; the model-tier sweep.
 - **Parked, not on `main`:** the visual-grouping patch ([PLAN-001](plan/PLAN-001-visual-grouping.md))
   as a WIP commit on local branch `wip/visual-grouping` (unverified, never run under a PTY).
 

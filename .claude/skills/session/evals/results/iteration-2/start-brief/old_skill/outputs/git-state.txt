@@ -1,0 +1,29 @@
+$ git rev-parse --short HEAD
+7ac900f
+
+$ git status --short
+ M docs/sessions/README.md
+?? docs/sessions/SES-006-resume-session-skill-and-plan-001.md
+
+$ git log --oneline -5
+7ac900f docs(session): fixture — iteration-1 skill (baseline arm)
+c424315 docs(session): entries for the /session skill, ANA-009/ADR-019 and iteration 2 (recorded via --session SES-004)
+8ba5c97 feat(skills): /session iteration 2 — injected state, named mode argument, checklists and templates; session tool gains --session and warns on other sessions' placeholders
+4d3ad13 docs(analysis): ANA-009 — Anthropic's skill workflow best practices (arguments, conditional pattern, invocation, authoring); ADR-019 for /session; iteration-1 eval evidence
+ea51e09 feat(skills): /session start | record | end replaces /rehydrate and /wrap-up (skill-creator loop: validated, reviewed)
+
+$ bun run session -- --check
+$ bun scripts/session.ts --check
+warning: SES-005-rehydration.md has 2 placeholder line(s) — not the gated session; leave it to its own conversation (pass --session to gate a different file)
+unfilled: SES-006-resume-session-skill-and-plan-001.md has 2 placeholder line(s)
+session: NOT ready — run `bun run session` and fill in the placeholders.
+error: script "session" exited with code 1
+exit=1
+
+$ bun run session -- --check --session SES-006
+$ bun scripts/session.ts --check --session "SES-006"
+warning: SES-005-rehydration.md has 2 placeholder line(s) — not the gated session; leave it to its own conversation (pass --session to gate a different file)
+unfilled: SES-006-resume-session-skill-and-plan-001.md has 2 placeholder line(s)
+session: NOT ready — run `bun run session` and fill in the placeholders.
+error: script "session" exited with code 1
+exit=1

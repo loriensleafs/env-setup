@@ -1,0 +1,12 @@
+{
+  "eval_id": 3,
+  "eval_name": "end-close",
+  "prompt": "That's it for today, I'm done. Close things out.",
+  "expectations": [
+    "session-file.md has Outcome and Open at end written (no _(fill in)_ on either line)",
+    "git-state.txt shows `bun run session -- --check` printing session: complete and an empty git status --short",
+    "reply.md is a short closing note (at most 4 lines) that says what shipped in the conversation and the first thing to do next time",
+    "overview.diff is either 'no change' with reply.md/transcript.md stating OVERVIEW Status and Next up were checked against reality, or a change to Status/Next up justified in the transcript",
+    "no second session file was created: only docs/sessions/SES-006-closing-eval.md changed under docs/sessions/ (README index regeneration excepted)"
+  ]
+}

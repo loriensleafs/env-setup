@@ -1,6 +1,6 @@
 ---
 name: run-scripts
-description: Run the repo tooling in scripts/ — the session-log tool (bun run session: new, append, check). Use when asked to run, check, append, or start a session log entry.
+description: Drive or test scripts/session.ts, the session-log tool (bun run session: new, append, check) — its commands and their real outputs. Use when asked to run, debug, change or verify the tool itself. Not for performing the session ritual (starting, recording or ending a session), which is /session.
 ---
 
 `scripts/session.ts` maintains `docs/sessions/SES-NNN-*.md` (ADR-017): `--new <slug>` starts a session file,
@@ -15,6 +15,7 @@ All paths are relative to the repo root; every shell needs `export PATH="$HOME/.
 bun scripts/session.ts --check      # → session: complete        (exit 1 + "missing:"/"unfilled:" lines otherwise)
 bun scripts/session.ts              # → session: up to date      (else "+ <sha> <subject>" per appended skeleton)
 bun run session -- --check          # same via the package script (note the `--` before flags)
+bun run session -- --check --session SES-004   # gate a named session; other files' placeholders → warnings
 ```
 
 `bun run session -- --new <slug>` creates `docs/sessions/SES-<next>-<slug>.md` and regenerates the index —
