@@ -1,62 +1,22 @@
-# Ledger — what has been done, in order
+# 2026-08-26 04:41 · Foundation — spine, UI, items, orchestrator, first releases
 
-The append-only record of every change that reached `main`, oldest first, newest last. It is the
-**rehydration mechanism** for a new session: `docs/OVERVIEW.md` says where the project *is*
-("Status") and what is *next* ("Next up"); this file says exactly what was *done*, in what order,
-what each change did to **every file it touched** — code, docs, config, CI, scripts, assets — so an
-agent can open the right files or `git show <sha>` instead of re-deriving history from the code.
+- Goal: Stand up the pure-Bun CLI from scratch: item framework, manifest/journal, clack UI, orchestrator, first item groups, secrets, release pipeline; ship v0.0.1–v0.0.2.
+- Outcome: v0.0.1 + v0.0.2 released; `curl … | sh` bootstrap works on Peter's machine; ~40-item registry; dev tooling (Biome, markdownlint, lefthook, git-cliff, CI + gitleaks); config screens; reset-on-drift designed.
+- Open at end: Reset-on-drift (config-conflict consent) built but not released — blocks v0.1.0.
 
-## How to read it
+## Narrative
 
-1. Read OVERVIEW "Status" and "Next up" first — they are the summary; this is the detail.
-2. Then read the **last section** here ("Since v<latest>"): everything that happened after the
-   latest release — what is on `main` but not yet shipped. Each entry's `Summary` says what
-   changed, `Why` says the motive, the per-file lines say where and what in each file, `Notes`
-   carry the gotchas. Those entries are the evidence behind "Status".
-3. When taking a "Next up" item, search this file for the files or keywords it involves, read
-   those entries (their per-file lines and Notes), and `git show <sha>` only when the exact diff
-   matters.
-4. Headings are release boundaries: "## Since vX.Y.Z" holds the commits made **after** the vX.Y.Z
-   tag. The section under the newest heading is the unreleased work.
+The whole first day, in many conversations. The narrative for this period lives in
+[../PLAN.md](../PLAN.md): "Build log (chronological)", "UI iteration history", "Session log", and
+the dated decision sections (detect+lock killed → everything toggleable; vendored clack from
+main for `completeOnTab`; secrets age-encrypted in-repo; per-item `zsh()` contributions; the
+Claude Code auto-format hook installed by the CLI, not committed as project hooks; the
+reset-on-drift config model collapsed from a much larger conflict-consent design — see
+[../CONFIG-COMPAT-PLAN.md](../CONFIG-COMPAT-PLAN.md)). Peter's collaboration rules were set here
+(one question at a time, research first, best way not easiest, transitive prereqs installed
+automatically) and are in PLAN.md's banner and OVERVIEW.md.
 
-## How to keep it up to date
-
-- **Continuously, after every commit** — not at the end of the PR, never "later". Commit, then run
-  `bun run ledger` (`scripts/ledger.ts`): it appends an entry skeleton per commit not yet listed —
-  `Summary` / `Why` placeholders and one line per touched file with its +/− line counts. Fill in
-  every `_(fill in)_`: the Summary, the Why, and for each file a short phrase of what changed in
-  it. Add `Notes` when a future reader must know something (a gotcha, a follow-up, what was
-  verified and how, a decision made on the spot). `bun run ledger --check` fails while anything
-  is missing or unfilled. Commit as `docs(ledger): …` in the same PR — such commits are skipped by
-  the script, so they never need an entry of their own.
-- `Files` means **every** file the commit touched, whatever kind: source, tests, docs (this file,
-  OVERVIEW, PLAN…), config (`package.json`, `biome.json`, `lefthook.yml`), CI workflows, scripts,
-  assets. The script lists them all from git; never trim the list by hand.
-- A release (`chore(release): vX.Y.Z` commit + tag) gets a new "## Since vX.Y.Z" heading; the
-  script inserts it automatically after the tagged commit, so run it once more after tagging.
-- Never rewrite or reorder old entries; correct a mistake with a new entry. Merge PRs with merge
-  commits (not squash) so the shas here stay valid.
-- Update OVERVIEW "Status" / "Next up" (and the PLAN.md decision section, if a decision moved) in
-  the same step, citing the entry's sha, whenever the picture changed.
-
-## Entry template
-
-```markdown
-### YYYY-MM-DD · type(scope): subject · sha
-
-- Summary: one or two lines — what this change does as a whole
-- Why: one line — the problem or request that caused it (name who asked if it was Peter)
-- Files:
-  - `src/thing.ts` (+12/−3) — what changed in this file
-  - `docs/OVERVIEW.md` (+4/−1) — what changed in this file
-  - `.github/workflows/ci.yml` (+2/−0) — what changed in this file
-- Notes: optional — gotchas, follow-ups, what was verified and how
-```
-
-Entries up to 2026-08-30 were generated from `git log` and carry only the file list with line
-counts; their commit messages (`git show -s <sha>`) hold the summary and why.
-
-## Up to v0.0.1
+## Changes (one entry per commit, in order)
 
 ### 2026-08-26 · Scaffold envsetup: bun + clack + citty + zod foundation · 4d67d0a
 
@@ -395,7 +355,7 @@ counts; their commit messages (`git show -s <sha>`) hold the summary and why.
   - `src/ui/config-screens.ts` (+101/−0)
   - `test/spikes/bootstrap-dry.exp` (+1/−1)
 
-## Since v0.0.1 (tagged 2026-08-26)
+> **Released v0.0.1** — tag on this commit.
 
 ### 2026-08-26 · Record v0.0.1 release + verified curl bootstrap · ce333cb
 
@@ -414,7 +374,7 @@ counts; their commit messages (`git show -s <sha>`) hold the summary and why.
   - `src/auth/github-device-flow.ts` (+3/−1)
   - `src/commands/auth.ts` (+5/−2)
 
-## Since v0.0.2 (tagged 2026-08-26)
+> **Released v0.0.2** — tag on this commit.
 
 ### 2026-08-26 · Open-items sweep: Google Sans item, real CleanShot applier from captured defaults · ec73a78
 
@@ -627,262 +587,3 @@ counts; their commit messages (`git show -s <sha>`) hold the summary and why.
 - Files:
   - `.claude/skills/run-envsetup/SKILL.md` (+119/−0)
   - `.claude/skills/run-envsetup/smoke.mjs` (+71/−0)
-
-### 2026-08-27 · feat: reset-on-drift — drifted config re-enters the list as an opt-in reset · 8df81bd
-
-- Files:
-  - `src/commands/__tests__/bootstrap-presentation.test.ts` (+24/−0)
-  - `src/commands/bootstrap.ts` (+20/−4)
-  - `src/commands/doctor.ts` (+10/−4)
-  - `src/items/chrome/chrome-pwas.ts` (+19/−6)
-  - `src/items/claude-code/claude-settings.ts` (+48/−15)
-  - `src/items/defs/better-display.ts` (+55/−12)
-  - `src/items/defs/delta-config.ts` (+18/−13)
-  - `src/items/defs/podman-machine.ts` (+18/−2)
-  - `src/items/defs/superwhisper-config.ts` (+14/−7)
-  - `src/items/ghostty/ghostty-config.ts` (+7/−3)
-  - `src/items/item.ts` (+9/−0)
-  - `src/items/repos/acmelabs-marketplace.ts` (+17/−3)
-  - `src/items/typora/typora-config.ts` (+4/−2)
-
-### 2026-08-27 · fix: four defects found by the doc-verified compatibility research · 6488ea5
-
-- Files:
-  - `src/ceremonies/handlers.ts` (+1/−1)
-  - `src/items/defs/cleanshot-config.ts` (+79/−4)
-  - `src/items/defs/git-identity.ts` (+19/−4)
-  - `src/items/defs/ssh-keys.ts` (+4/−0)
-  - `src/items/editors/__tests__/editor-config.test.ts` (+7/−2)
-  - `src/items/editors/editor-config.ts` (+23/−6)
-
-### 2026-08-27 · docs: reset-on-drift plan + verified compatibility research appendix · e940f8a
-
-- Files:
-  - `docs/CONFIG-COMPAT-PLAN.md` (+112/−0)
-  - `docs/PLAN.md` (+62/−0)
-
-### 2026-08-27 · chore(release): v0.1.0 · 582e7bb
-
-- Files:
-  - `CHANGELOG.md` (+20/−1)
-  - `package.json` (+1/−1)
-  - `src/index.ts` (+1/−1)
-
-## Since v0.1.0 (tagged 2026-08-27)
-
-### 2026-08-27 · docs: reset-on-drift in CLAUDE/README/CONTRIBUTING, post-v0.1.0 release example · 5248192
-
-- Files:
-  - `CLAUDE.md` (+8/−1)
-  - `CONTRIBUTING.md` (+15/−8)
-  - `README.md` (+6/−0)
-
-### 2026-08-27 · fix: curl|sh left stdin at the exhausted pipe — prompts EOF-cancelled instantly · c9d133b
-
-- Files:
-  - `install.sh` (+6/−0)
-  - `src/commands/bootstrap.ts` (+12/−0)
-
-### 2026-08-27 · chore(release): v0.1.1 · 73c2992
-
-- Files:
-  - `CHANGELOG.md` (+12/−0)
-  - `package.json` (+1/−1)
-  - `src/index.ts` (+1/−1)
-
-## Since v0.1.1 (tagged 2026-08-27)
-
-### 2026-08-27 · fix: piped-install prompts froze (dead /dev/tty reads) + 0-width-terminal OOM · 0a7257a
-
-- Files:
-  - `install.sh` (+3/−6)
-  - `src/commands/bootstrap.ts` (+7/−7)
-  - `src/index.ts` (+51/−1)
-
-### 2026-08-27 · chore(release): v0.1.2 · ce54038
-
-- Files:
-  - `CHANGELOG.md` (+8/−0)
-  - `package.json` (+1/−1)
-  - `src/index.ts` (+1/−1)
-
-## Since v0.1.2 (tagged 2026-08-27)
-
-### 2026-08-27 · fix: thread an explicitly-opened /dev/tty into every prompt (curl|sh input) · 8c9a1e7
-
-- Files:
-  - `docs/PLAN.md` (+14/−0)
-  - `src/ceremonies/handlers.ts` (+2/−1)
-  - `src/commands/bootstrap.ts` (+15/−3)
-  - `src/commands/secrets.ts` (+4/−3)
-  - `src/index.ts` (+10/−29)
-  - `src/ui/config-screens.ts` (+5/−0)
-  - `src/ui/group-multi-select.ts` (+3/−0)
-  - `src/ui/radio-group.ts` (+3/−0)
-  - `src/ui/terminal.ts` (+41/−0)
-
-### 2026-08-27 · chore(release): v0.1.3 · 6529cdc
-
-- Files:
-  - `CHANGELOG.md` (+8/−0)
-  - `package.json` (+1/−1)
-  - `src/index.ts` (+1/−1)
-
-## Since v0.1.3 (tagged 2026-08-27)
-
-### 2026-08-27 · fix: four defects from the first real end-to-end bootstrap run · 03fe76b
-
-- Files:
-  - `src/commands/bootstrap.ts` (+26/−13)
-  - `src/items/claude-code/assets-embed.ts` (+25/−0)
-  - `src/items/claude-code/claude-settings.ts` (+10/−11)
-  - `src/items/defs/github-auth.ts` (+19/−5)
-  - `src/items/defs/ssh-keys.ts` (+25/−2)
-  - `src/items/typora/typora-config.ts` (+20/−2)
-
-### 2026-08-27 · chore(release): v0.1.4 · 27e0023
-
-- Files:
-  - `CHANGELOG.md` (+8/−0)
-  - `package.json` (+1/−1)
-  - `src/index.ts` (+1/−1)
-
-## Since v0.1.4 (tagged 2026-08-27)
-
-### 2026-08-30 · feat: chrome-config asks to quit Chrome, then edits and reopens it · 1eb01fd
-
-- Files:
-  - `src/commands/bootstrap.ts` (+20/−1)
-  - `src/items/chrome/chrome-config.ts` (+25/−2)
-  - `src/items/item.ts` (+6/−0)
-  - `src/orchestrator/orchestrator.ts` (+8/−1)
-
-### 2026-08-30 · chore(release): v0.1.5 · 1bdb147
-
-- Files:
-  - `CHANGELOG.md` (+8/−0)
-  - `package.json` (+1/−1)
-  - `src/index.ts` (+1/−1)
-
-## Since v0.1.5 (tagged 2026-08-30)
-
-### 2026-08-30 · fix: label ceremony-only items as attended steps, not 'installed' · 04ea640
-
-- Files:
-  - `src/commands/bootstrap.ts` (+10/−1)
-  - `src/orchestrator/orchestrator.ts` (+13/−0)
-
-### 2026-08-30 · chore(release): v0.1.6 · eab7d36
-
-- Files:
-  - `CHANGELOG.md` (+8/−0)
-  - `package.json` (+1/−1)
-  - `src/index.ts` (+1/−1)
-
-## Since v0.1.6 (tagged 2026-08-30)
-
-### 2026-08-30 · feat: the one command finishes the job — auto connect phase, journal-driven retry · 2f79bb9
-
-- Files:
-  - `README.md` (+3/−3)
-  - `src/ceremonies/connect-phase.ts` (+67/−0)
-  - `src/commands/__tests__/bootstrap-presentation.test.ts` (+6/−0)
-  - `src/commands/bootstrap.ts` (+35/−16)
-  - `src/commands/connect.ts` (+9/−35)
-
-### 2026-08-30 · chore(release): v0.1.7 · 7e100c5
-
-- Files:
-  - `CHANGELOG.md` (+8/−0)
-  - `package.json` (+1/−1)
-  - `src/index.ts` (+1/−1)
-
-## Since v0.1.7 (tagged 2026-08-30)
-
-### 2026-08-30 · feat: render each item's config screen as one clack group · 361771b
-
-- Files:
-  - `src/ui/config-screens.ts` (+51/−38)
-
-### 2026-08-30 · chore(release): v0.1.8 · 8f923db
-
-- Files:
-  - `CHANGELOG.md` (+8/−0)
-  - `package.json` (+1/−1)
-  - `src/index.ts` (+1/−1)
-
-## Since v0.1.8 (tagged 2026-08-30)
-
-### 2026-08-30 · fix: radio prompt flows inside a clack group (state-aware frame) · 9c6446e
-
-- Files:
-  - `src/ui/radio-group.ts` (+24/−8)
-
-### 2026-08-30 · chore(release): v0.1.9 · 2384b88
-
-- Files:
-  - `CHANGELOG.md` (+8/−0)
-  - `package.json` (+1/−1)
-  - `src/index.ts` (+1/−1)
-
-## Since v0.1.9 (tagged 2026-08-30)
-
-### 2026-08-30 · docs: OVERVIEW.md — project map, status, and handoff for new sessions · bb46dcb
-
-- Summary: First handoff doc: project map, doc table, hard rules, architecture, hard-won empirical facts, status, next-up designs.
-- Why: Peter asked (2026-08-30, at 99% context) for an overview/PRD-style doc pointing to the other docs so a fresh session can resume without re-deriving the project.
-- Files:
-  - `CLAUDE.md` (+2/−1) — "Start here: docs/OVERVIEW.md" pointer
-  - `docs/OVERVIEW.md` (+130/−0) — new — the whole handoff, incl. the visual-grouping design and curl|sh / PTY facts
-
-### 2026-08-30 · docs: add LEDGER.md and the update discipline; record docs-restructure plan · 7439bec
-
-- Summary: First ledger (one line per commit from git log) plus the discipline to keep it; the PRD/DECISIONS/LEDGER/research restructure recorded as a plan.
-- Why: Peter asked for a continuously updated ledger of everything done, and whether PLAN.md / CONFIG-COMPAT-PLAN.md should be reworked into a PRD.
-- Files:
-  - `CLAUDE.md` (+2/−1) — pointer to the ledger
-  - `CONTRIBUTING.md` (+9/−1) — "Record it" step with a git-log regeneration command
-  - `docs/LEDGER.md` (+115/−0) — new — seeded from git history under "Since vX" headings
-  - `docs/OVERVIEW.md` (+13/−3) — doc-map row; Next-up 2 = docs restructure that retires PLAN.md
-
-### 2026-08-30 · docs: ledger with files touched + bun run ledger; startup pointers for agents · ee5e336
-
-- Summary: Ledger becomes a rehydration mechanism: generated entries with files touched, read/maintain instructions, entry template; agents pointed at OVERVIEW → LEDGER on startup.
-- Why: Peter: the one-line ledger was not complete enough to rehydrate a session — needs a template, maintenance rules, how to read it against OVERVIEW, files per change, and startup pointers in CLAUDE.md/README.
-- Files:
-  - `CLAUDE.md` (+14/−4) — "Session start / session end" checklist replaces the start-here paragraph; `bun run ledger` in commands
-  - `CONTRIBUTING.md` (+8/−9) — intro points at OVERVIEW/LEDGER; step 5 uses `bun run ledger`
-  - `README.md` (+5/−3) — "Working on it" pointer to OVERVIEW → LEDGER
-  - `docs/LEDGER.md` (+335/−79) — header rewritten (read / maintain / template); body regenerated with files per commit
-  - `docs/OVERVIEW.md` (+14/−2) — Status references the unreleased ledger section; Next-up 1 points at `wip/visual-grouping`; resume checklist
-  - `package.json` (+1/−0) — `ledger` script
-  - `scripts/ledger.ts` (+92/−0) — new — append-only generator, skips docs(ledger) commits, escapes `_` in subjects
-- Notes: The visual-grouping patch found uncommitted in the working tree was parked on local branch `wip/visual-grouping`, unverified.
-
-### 2026-08-30 · docs: granular ledger — Summary, Why, and a note per touched file; rehydration procedure in CLAUDE.md · f772638
-
-- Summary: Ledger entries become granular — Summary, Why, and a note per touched file — and CLAUDE.md gains the reading order for digesting the docs at session start.
-- Why: Peter: CLAUDE.md should tell agents how to digest the docs (incl. the ledger) to rehydrate; the template must make clear Files means any file (docs, config, …); each file should get its own line with a note.
-- Files:
-  - `CLAUDE.md` (+40/−21) — "Rehydrating — how to digest the docs" (ordered reading procedure, what to extract from each doc, PLAN vs ledger precedence) and "Recording" with the full template inline; `--check` in commands
-  - `docs/LEDGER.md` (+575/−96) — template + rules for granular entries; "Files means every file"; body regenerated with +/− per file; the three earlier unreleased entries filled in fully
-  - `scripts/ledger.ts` (+75/−28) — numstat-based per-file lines with placeholders, Summary/Why placeholders, `--check` mode (missing entries or unfilled entry lines fail)
-- Notes: History (up to 2026-08-30) keeps only file lists with counts — no Summary/Why/notes; they can't be backfilled honestly. `--check` counts placeholders only on entry lines because the header prose names the placeholder.
-
-### 2026-08-30 · docs: CONTRIBUTING step and OVERVIEW doc-map match the granular ledger · f29ec58
-
-- Summary: CONTRIBUTING step 5 and the OVERVIEW doc-map row describe the granular ledger and `--check`.
-- Why: Same request as f772638; these two patches missed in that commit because the formatter had rewrapped the anchor text.
-- Files:
-  - `CONTRIBUTING.md` (+6/−4) — step 5 "Record it": skeleton per commit, every file kind, `bun run ledger -- --check`
-  - `docs/OVERVIEW.md` (+4/−3) — doc-map row for LEDGER.md (Summary/Why/per-file, `--check`); resume step 3 mentions the placeholders and `--check`
-
-### 2026-08-30 · docs: continuous upkeep is a hard rule; PLAN status current; OVERVIEW/PLAN cite ledger entries · 62dbf83
-
-- Summary: Continuous doc upkeep becomes a hard rule; PLAN.md's status block is current again and cites ledger entries; OVERVIEW Status cites entries by sha.
-- Why: Peter: OVERVIEW, PLAN and the ledger must be kept up to date constantly — the agent must never defer it — and OVERVIEW/PLAN should reference specific ledger entries.
-- Files:
-  - `CLAUDE.md` (+9/−4) — hard rule "Docs are kept current continuously — never deferred"; Recording section is "continuously, as you go" (after every commit) and asks for sha citations
-  - `docs/LEDGER.md` (+3/−2) — "Continuously, after every commit" replaces "before merge"; OVERVIEW/PLAN updated in the same step with the sha
-  - `docs/OVERVIEW.md` (+6/−2) — Status block carries the never-defer note and cites unreleased entries by sha
-  - `docs/PLAN.md` (+20/−2) — new CURRENT STATUS (2026-08-31) with ledger refs and the decisions settled since; the 2026-08-26 block demoted to a snapshot; purpose banner says update in the same commit

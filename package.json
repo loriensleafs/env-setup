@@ -16,7 +16,7 @@
     "fix": "biome check --write . && markdownlint-cli2 --fix",
     "check": "biome check . && bun tsc --noEmit && markdownlint-cli2",
     "changelog": "git-cliff -o CHANGELOG.md",
-    "ledger": "bun scripts/ledger.ts",
+    "session": "bun scripts/session.ts",
     "compile": "bun build --compile src/index.ts --outfile dist/envsetup",
     "prepare": "lefthook install"
   },

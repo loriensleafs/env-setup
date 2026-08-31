@@ -2,7 +2,7 @@
 
 > **Purpose of this doc**: comprehensive enough that a brand-new conversation can pick up
 > exactly where we left off. **Update constantly — in the same commit as the change, never
-> deferred; cite LEDGER.md entries (sha) where a decision or status came from.** Owner: Peter (github.com/loriensleafs) +
+> deferred; cite session-log entries (docs/sessions/, sha) where a decision or status came from.** Owner: Peter (github.com/loriensleafs) +
 > Claude, collaborating. Peter drives decisions; Claude researches/builds after agreement.
 > **This is a collaboration — do NOT unilaterally build ahead of agreed decisions.**
 > **Collaboration protocol (Peter, 2026-08-26): ask questions ONE at a time via AskUserQuestion
@@ -24,12 +24,12 @@
 
 **Kept current continuously — never deferred.** The live status and what's next are in
 [OVERVIEW.md](OVERVIEW.md) ("Status", "Next up"); every change is recorded, with a note per
-touched file, in [LEDGER.md](LEDGER.md). This doc holds the **decisions and their rationale**;
-when a decision changes, change it here *in the same commit* and cite the ledger entry (sha).
+touched file and the session narrative, in [sessions/](sessions/README.md). This doc holds the **decisions and their rationale**;
+when a decision changes, change it here *in the same commit* and cite the session-log entry (sha).
 
 - Released through **v0.1.9** (2026-08-30). Peter's machine converges via the one-liner, 0 failed.
-- Unreleased on `main`: docs only — OVERVIEW (LEDGER `bb46dcb`), ledger + `bun run ledger`
-  (`7439bec`, `ee5e336`, `f772638`, `f29ec58`, `62dbf83`).
+- Unreleased on `main`: docs only — OVERVIEW (`bb46dcb`), the change record that became
+  `docs/sessions/` + `bun run session` (`7439bec`, `ee5e336`, `f772638`, `f29ec58`, `62dbf83`, `db47945`).
 - Parked: visual grouping of the config flow — local branch `wip/visual-grouping`, unverified
   (OVERVIEW Next-up 1).
 - Decisions since the snapshot below that are settled here: reset-on-drift config model
@@ -37,7 +37,7 @@ when a decision changes, change it here *in the same commit* and cite the ledger
   missing pieces (`v0.1.7`), config screens as one clack group per item (`v0.1.8`/`v0.1.9`),
   curl|sh interactivity via in-process `/dev/tty` (§ "curl|sh interactivity", `v0.1.3`).
 
-# ─── Status snapshot (2026-08-26; superseded by OVERVIEW + LEDGER, kept for context) ───
+# ─── Status snapshot (2026-08-26; superseded by OVERVIEW + docs/sessions, kept for context) ───
 
 **Repo**: github.com/loriensleafs/env-setup (public) · 71 tests green · registry: 40 items
 **Phases**: A ✅ · C ✅ · B ✅ · BUILD: feature-complete for v0.0.1
