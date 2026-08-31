@@ -4,7 +4,7 @@
 - Status: open
 - Plan: —
 - Outcome: _(fill in)_
-- Open at end: plugin-kit branch `fix/eval-tooling` @ b0d4411 is local — the push is refused until acmelabs-15 grants the GitHub CLI OAuth app (`gh api user/orgs` must list the org); then push, `gh pr create`, merge. The tightened join wording is unmeasured (iteration 5 when the next skill change lands). SES-005 belongs to the rehydration conversation of 19:25; close it by hand if that conversation is over.
+- Open at end: plugin-kit PR #1 (github.com/acmelabs-15/plugin-kit/pull/1, branch `fix/eval-tooling` @ b0d4411) is open — Peter merges. The tightened join wording and the ADR-021 entry step are unmeasured (iteration 5 with the next skill change). SES-005 belongs to the rehydration conversation of 19:25; close it by hand if that conversation is over.
 
 ## Narrative
 
@@ -16,6 +16,10 @@ gotcha now says so. Iteration 4 runs the four evals with the transcript-evidence
 clones of main @ 2a815ac; baseline = the 66b083d skill text). plugin-kit: the org has OAuth-app
 restrictions and the GitHub CLI app is not granted for acmelabs-15 (`gh api user/orgs` → []), so the push
 is refused; branch `fix/eval-tooling` @ b0d4411 stays local.
+
+The plugin-kit push unblocked once the GitHub CLI app showed `acmelabs-15 ✓` under its Organization
+access (Peter granted it; `gh api user/orgs` then listed the org); pushed and PR #1 opened. Entry grain
+settled as ADR-021 (`77aa614`): value only, `Also:` lines, the `Session-entry: none` trailer.
 
 ## Changes (one entry per commit, in order)
 
