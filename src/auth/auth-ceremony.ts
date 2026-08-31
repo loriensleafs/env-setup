@@ -23,7 +23,7 @@ export async function storedToken(run: Runner): Promise<string | null> {
 }
 
 /**
- * The one auth ceremony (docs/PLAN.md: right after summary confirm).
+ * The one auth ceremony (docs/decisions/ADR-009-github-auth-and-signing.md: right after summary confirm).
  * Device flow under envsetup's app id → token into macOS Keychain → handed to
  * gh (so clones/API work) → gh becomes git's credential helper.
  */

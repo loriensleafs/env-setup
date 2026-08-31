@@ -3,7 +3,7 @@ import { storedToken } from "../../auth/auth-ceremony.ts";
 import { fetchUser, noreplyEmail } from "../../auth/github-device-flow.ts";
 import { saveManifest } from "../../manifest/store.ts";
 
-/** Resolves the GitHub noreply address and sets git user.email (docs/PLAN.md). */
+/** Resolves the GitHub noreply address and sets git user.email (docs/decisions/ADR-009-github-auth-and-signing.md). */
 export const gitEmail = defineItem({
   id: "git-email",
   title: "Git commit email (GitHub noreply)",

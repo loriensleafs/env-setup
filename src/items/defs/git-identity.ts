@@ -4,7 +4,7 @@ import { defineItem } from "../item.ts";
 /**
  * Git identity + SSH-signing prep. user.name and signing config are settable
  * now; user.email (GitHub noreply) and the actual keys arrive with the Stage C
- * auth flow, which updates this configuration (docs/PLAN.md git auth section).
+ * auth flow, which updates this configuration (docs/decisions/ADR-009-github-auth-and-signing.md).
  */
 export const gitIdentity = defineItem({
   id: "git-identity",

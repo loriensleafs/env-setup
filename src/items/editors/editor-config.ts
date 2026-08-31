@@ -23,7 +23,7 @@ export const EXTENSIONS: string[] = [
 ];
 
 /**
- * Decided settings (docs/PLAN.md Cursor pass); project configs win for lint/format.
+ * Decided settings (docs/plan/PRD-001-envsetup.md Cursor pass); project configs win for lint/format.
  * Theme note: with `window.autoDetectColorScheme`, VS Code REWRITES
  * `workbench.colorTheme` from the preferred*ColorTheme keys on every OS scheme
  * flip (vscode #196119) — so we pin the `preferred*` keys and deliberately do

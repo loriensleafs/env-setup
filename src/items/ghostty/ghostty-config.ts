@@ -39,7 +39,7 @@ macos-option-as-alt = true
 ${config.quickTerminal ? "\n# Quick terminal over any app.\nkeybind = global:cmd+grave_accent=toggle_quick_terminal\n" : ""}`;
 }
 
-/** Writes Ghostty's config (decided defaults; docs/PLAN.md Phase A). */
+/** Writes Ghostty's config (decided defaults; docs/plan/PRD-001-envsetup.md Phase A). */
 export const ghosttyConfig = defineItem<GhosttyConfig>({
   id: "ghostty-config",
   title: "Ghostty configuration",

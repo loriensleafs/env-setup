@@ -57,8 +57,8 @@ append-only spinner per step.
 ### 2026-08-27 · docs: reset-on-drift plan + verified compatibility research appendix · e940f8a
 
 - Files:
-  - `docs/CONFIG-COMPAT-PLAN.md` (+112/−0)
-  - `docs/PLAN.md` (+62/−0)
+  - `docs/decisions/ADR-010-reset-on-drift-config-model.md` (+112/−0)
+  - `docs/archive/ARC-001-living-plan.md` (+62/−0)
 
 ### 2026-08-27 · chore(release): v0.1.0 · 582e7bb
 
@@ -110,7 +110,7 @@ append-only spinner per step.
 ### 2026-08-27 · fix: thread an explicitly-opened /dev/tty into every prompt (curl|sh input) · 8c9a1e7
 
 - Files:
-  - `docs/PLAN.md` (+14/−0)
+  - `docs/archive/ARC-001-living-plan.md` (+14/−0)
   - `src/ceremonies/handlers.ts` (+2/−1)
   - `src/commands/bootstrap.ts` (+15/−3)
   - `src/commands/secrets.ts` (+4/−3)

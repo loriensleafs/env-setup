@@ -3,7 +3,7 @@ import { join } from "node:path";
 
 // Dev-CLI convention on macOS (git, gh, ghostty, claude): XDG-style dirs under $HOME,
 // honoring XDG_* overrides. Deliberate deviation from env-paths' Library/* mapping —
-// see docs/PLAN.md "Repo structure" addendum.
+// see docs/decisions/ADR-007-manifest-journal-item-architecture.md (paths).
 function xdg(envVar: string, fallback: string): string {
   const v = process.env[envVar];
   return v && v.trim() !== "" ? v : join(homedir(), fallback);

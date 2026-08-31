@@ -10,39 +10,49 @@ it in shape with `doctor`/`sync`.
 ## Rehydrating — how to digest the docs at session start
 
 Read in this order, extract what each is for, then stop reading and work. Do **not** rebuild
-history from the code or from `git log` yourself — the session log exists so you never have to.
+history from the code or from `git log` yourself — the docs system exists so you never have to.
+Every doc is `<TYPE>-<NNN>-<kebab-title>.md` in its directory, each directory's README holds its
+rules and template.
 
 1. [docs/OVERVIEW.md](docs/OVERVIEW.md): skim the map; read **"Status"**, **"Next up"** and
    **"Key empirical facts"** in full. Output: where the project is, what is next, what not to
    relearn.
-2. [docs/sessions/](docs/sessions/README.md): the index, then the **newest session file in full**
+2. [docs/sessions/](docs/sessions/README.md): the index, then the **newest `SES-NNN` in full**
    (Goal / Outcome / Open at end, Narrative, Changes), then earlier sessions back to the last
    `> **Released vX.Y.Z**` marker. Per entry: `Summary` = what changed, `Why` = the motive, the
    per-file lines = where and what in each file, `Notes` = gotchas. Output: what is on `main` but
    unreleased, what is parked, what was tried and abandoned, what was verified and how.
-3. For the "Next up" item you take: `grep -rn <file-or-keyword> docs/sessions/`, read those
-   entries' per-file lines and Notes; `git show <sha>` only when the exact diff matters.
-4. [docs/PLAN.md](docs/PLAN.md) / [docs/CONFIG-COMPAT-PLAN.md](docs/CONFIG-COMPAT-PLAN.md): consult
-   the section for the decision you are about to touch — not front to back. Decisions there are
-   settled; don't re-litigate them. Where PLAN's text disagrees with the session log, the session
-   log is right — and fix PLAN in the same step.
+3. For the "Next up" item you take: its `PLAN-NNN` in [docs/plan/](docs/plan/README.md) if one
+   exists; the `ADR-NNN` in [docs/decisions/](docs/decisions/README.md) for every area you will
+   touch (decisions are settled — do not re-litigate; a change needs a superseding ADR); the
+   `ANA-NNN` in [docs/analysis/](docs/analysis/README.md) for facts you would otherwise re-research;
+   `grep -rn <file-or-keyword> docs/sessions/` for prior changes; `git show <sha>` only when the
+   exact diff matters.
+4. [docs/plan/PRD-001-envsetup.md](docs/plan/PRD-001-envsetup.md) for what envsetup must do (the
+   promise, UX requirements, item catalog with chosen defaults, boundaries) whenever the work
+   touches behaviour. `docs/archive/` is history only — never cite it as current.
 
 ## Recording — continuously, as you go
 
-- **Session start:** `bun run session -- --new <slug>` — creates today's session file and makes it
+- **Session start:** `bun run session -- --new <slug>` — creates `SES-<next>-<slug>.md` and makes it
   current; set its title and `Goal` right away.
 - **After every commit** (not at the end of the PR, never "later"): `bun run session` appends an
   entry skeleton per new commit — `Summary` / `Why` placeholders and one line per touched file,
   **every** file, whatever kind (source, tests, docs, config, CI, scripts, assets), with its +/−
   counts. Fill in every placeholder (a short phrase per file of what changed in it), add `Notes`
   when a future reader must know something, run `bun run session -- --check`, commit as
-  `docs(session): …`, and update OVERVIEW "Status" / "Next up" — and the PLAN.md decision section
-  if a decision moved — citing the entry's sha.
+  `docs(session): …`.
+- **In the same step as the change that makes them stale**, citing the session entry (sha):
+  OVERVIEW "Status" / "Next up"; a new or changed decision → a new `ADR-NNN`
+  (`documentation-and-adrs` skill; `grill-with-docs` to interrogate a design first); a changed
+  requirement or default → `PRD-001`; a feature bigger than a small fix → its `PLAN-NNN`
+  (`planning-and-task-breakdown`); a fact established against primary sources or empirically →
+  `ANA-NNN` (`research` skill, told to save there). Update each directory's README index.
 - **Narrative as it happens:** requests, decisions, dead ends, false leads, verifications go into
   the session's Narrative when they happen; `Outcome` / `Open at end` before the session ends.
 
-Never put any of this off; the next session depends on it. A filled entry (full template in
-[docs/sessions/README.md](docs/sessions/README.md)):
+Never put any of this off; the next session depends on it. A filled session entry (full template
+in [docs/sessions/README.md](docs/sessions/README.md)):
 
 ```markdown
 ### YYYY-MM-DD · type(scope): subject · sha
@@ -56,10 +66,7 @@ Never put any of this off; the next session depends on it. A filled entry (full 
 - Notes: optional — gotchas, follow-ups, what was verified and how
 ```
 
-Other docs: Config model + verified compatibility research:
-[docs/CONFIG-COMPAT-PLAN.md](docs/CONFIG-COMPAT-PLAN.md). Research foundation:
-[docs/RESEARCH-clack-citty-bun.md](docs/RESEARCH-clack-citty-bun.md). Contribution & release
-workflow: [CONTRIBUTING.md](CONTRIBUTING.md).
+Other: contribution & release workflow in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Hard rules (do not violate)
 
@@ -72,10 +79,11 @@ workflow: [CONTRIBUTING.md](CONTRIBUTING.md).
   `secrets.json.age` (+ the user's password manager). Never put a key — even a partial/truncated
   one — in source, docs, tests, or a commit message.
 - **Tests:** `<name>.test.ts` in a `__tests__/` dir beside the file under test (`bun:test`).
-- **Docs are kept current continuously — never deferred.** OVERVIEW "Status"/"Next up",
-  PLAN.md decisions, and the session log are updated *as part of the change that makes them stale*
-  (same commit or the very next `docs(session)` commit), not "later", not "at the end of the PR",
-  not "in the next session". Where OVERVIEW or PLAN refer to work, cite the session entry (sha).
+- **Docs are kept current continuously — never deferred.** OVERVIEW "Status"/"Next up", the
+  ADRs, the PRD, the plans, the analyses and the session log are updated *as part of the change
+  that makes them stale* (same commit or the very next `docs(session)` commit), not "later", not
+  "at the end of the PR", not "in the next session". Where a doc refers to work, cite the session
+  entry (sha).
 - **Before finishing code:** `bun run check` (Biome + tsc + markdownlint) must pass; `bun run
   fix` auto-fixes. Lefthook enforces this at commit/push, but don't rely on it.
 
@@ -90,7 +98,7 @@ workflow: [CONTRIBUTING.md](CONTRIBUTING.md).
   config is present but mismatched (vs plain `installed: false` for never-configured). Drifted
   items re-enter the bootstrap list as "installed — settings differ (select to reset)", default
   UNCHECKED — selection is the user's consent to re-apply; we never silently overwrite. No
-  conflict checking, by decision (docs/CONFIG-COMPAT-PLAN.md).
+  conflict checking, by decision (docs/decisions/ADR-010-reset-on-drift-config-model.md).
 - **`zsh()` contributions** are co-located per item and assembled into the managed `~/.zshrc`
   block by `src/items/defs/shell-block.ts` (env → FPATH → compinit → init → aliases). Add shell
   needs to the item, not to a central block.

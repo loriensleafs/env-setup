@@ -2,7 +2,7 @@ import { Decrypter, Encrypter } from "age-encryption";
 
 /**
  * Passphrase-encrypted secrets blob (scrypt, age format) — the chezmoi-style
- * pattern decided in docs/PLAN.md Secrets. The .age file is committed to the
+ * pattern decided in docs/decisions/ADR-008-secrets-age-encrypted-in-repo.md. The .age file is committed to the
  * (public) repo; the passphrase lives in Peter's password manager.
  */
 export async function encryptSecrets(

@@ -1,5 +1,7 @@
 # Research: clack + citty + Bun CLI foundation
 
+> **Analysis** · 2026-08-26 · status: current (foundation research; the stack it recommends shipped). Moved from `docs/RESEARCH-ANA-001-clack-citty-bun.md` on 2026-08-30. See [README](README.md) for how analysis docs are kept.
+
 _Compiled 2026-08-26 for envsetup. Method: full source read of cloned repos (bombshell-dev/clack
 @ prompts 1.7.0 / core 1.4.3, unjs/citty @ 0.2.2), web research, and empirical spikes run on
 this machine under Bun 1.4.0 (runtime AND `bun build --compile` binary)._

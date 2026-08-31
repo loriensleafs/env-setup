@@ -1,7 +1,7 @@
 /**
  * Session log tooling — docs/sessions/*.md, one file per work session.
  *
- *   bun run session -- --new <slug>   start a session file for today (becomes current)
+ *   bun run session -- --new <slug>   start SES-<next>-<slug>.md (becomes current)
  *   bun run session                   append entry skeletons for commits no session mentions
  *   bun run session -- --check        fail if commits are missing or placeholders unfilled
  *
@@ -38,6 +38,7 @@ interface Commit {
 interface Session {
   file: string;
   name: string;
+  seq: number;
   started: string;
   title: string;
   goal: string;
@@ -124,15 +125,16 @@ function render(c: Commit, tag: string | undefined): string {
 async function sessions(): Promise<Session[]> {
   const list: Session[] = [];
   for (const name of readdirSync(DIR)) {
-    if (!/^\d{4}-\d{2}-\d{2}-.+\.md$/.test(name)) continue;
+    const num = name.match(/^SES-(\d{3})-.+\.md$/);
+    if (!num) continue;
     const file = join(DIR, name);
     const text = await Bun.file(file).text();
     const h1 = text.match(/^# (\d{4}-\d{2}-\d{2} \d{2}:\d{2}) · (.+)$/m);
     if (!h1) throw new Error(`${name}: first heading must be "# YYYY-MM-DD HH:MM · Title"`);
     const goal = text.match(/^- Goal: (.+)$/m)?.[1] ?? "";
-    list.push({ file, name, started: h1[1], title: h1[2], goal, text });
+    list.push({ file, name, seq: Number(num[1]), started: h1[1], title: h1[2], goal, text });
   }
-  return list.sort((a, b) => a.started.localeCompare(b.started));
+  return list.sort((a, b) => a.seq - b.seq);
 }
 
 function template(started: string, title: string): string {
@@ -153,7 +155,10 @@ ${FILL} — what was asked, decided, tried and abandoned, verified (and how); ci
 async function writeIndex(all: Session[]): Promise<void> {
   const rows = [...all]
     .reverse()
-    .map((s) => `- [${s.started} · ${s.title}](${s.name}) — ${s.goal}`)
+    .map(
+      (s) =>
+        `- [SES-${String(s.seq).padStart(3, "0")} · ${s.started} · ${s.title}](${s.name}) — ${s.goal}`,
+    )
     .join("\n");
   const text = await Bun.file(INDEX).text();
   const START = "<!-- sessions:start -->";
@@ -178,12 +183,13 @@ if (argv[0] === "--new") {
   const pad = (n: number) => String(n).padStart(2, "0");
   const date = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
   const started = `${date} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
-  const name = `${date}-${slug}.md`;
+  const seq = (all.at(-1)?.seq ?? 0) + 1;
+  const name = `SES-${String(seq).padStart(3, "0")}-${slug}.md`;
   const file = join(DIR, name);
   if (await Bun.file(file).exists()) throw new Error(`${name} already exists`);
   const title = slug.replace(/-/g, " ");
   await Bun.write(file, template(started, title));
-  await writeIndex([...all, { file, name, started, title, goal: FILL, text: "" }]);
+  await writeIndex([...all, { file, name, seq, started, title, goal: FILL, text: "" }]);
   console.log(`session: started ${name} — set the Goal line and the title.`);
   process.exit(0);
 }

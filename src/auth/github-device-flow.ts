@@ -88,7 +88,7 @@ export async function fetchUser(token: string, fetchFn: FetchLike = fetch): Prom
   return { login: u.login, id: u.id };
 }
 
-/** GitHub's commit-privacy address (docs/PLAN.md: noreply email decision). */
+/** GitHub's commit-privacy address (docs/decisions/ADR-009-github-auth-and-signing.md: noreply email). */
 export function noreplyEmail(user: GithubUser): string {
   return `${user.id}+${user.login}@users.noreply.github.com`;
 }

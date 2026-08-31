@@ -1,4 +1,11 @@
-# Mac Setup CLI — Living Plan
+# ARC-001: Mac Setup CLI — Living Plan (ARCHIVED 2026-08-30)
+
+> **Retired, read-only.** This was the single source of truth from 2026-08-25 to 2026-08-30. Its
+> content now lives in [../decisions/](../decisions/README.md) (ADRs), [../plan/PRD-001-envsetup.md](../plan/PRD-001-envsetup.md)
+> (requirements), [../analysis/](../analysis/README.md) (research) and [../sessions/](../sessions/README.md)
+> (history). Do not edit; do not cite as current. Original text follows unchanged.
+
+---
 
 > **Purpose of this doc**: comprehensive enough that a brand-new conversation can pick up
 > exactly where we left off. **Update constantly — in the same commit as the change, never
@@ -893,14 +900,14 @@ PHASES:
     Discord, Podman, Typora  (Claude Code + Chrome already specced)
  B. Create the env-setup GitHub repo + scaffold (needs VISIBILITY decision — Typora license
     key security depends on it)
- C. COMPLETE 2026-08-26 (see RESEARCH-clack-citty-bun.md §§1-12): stack adopted (clack +
+ C. COMPLETE 2026-08-26 (see RESEARCH-ANA-001-clack-citty-bun.md §§1-12): stack adopted (clack +
     @clack/core custom prompts + citty + Zod 4 + age-encryption + env-paths); manifest/journal/
     item architecture approved; secrets = age-encrypted in repo; auth = own-app device flow
     right after summary confirm; release pipeline approved; mechanics researched (Chrome
     managed-policy routes, WebAppInstallForceList for PWAs, Automator Services for Quick
     Actions; toolbar.pinned_actions protection = empirical test at build).
     NEXT: Phase B — create the env-setup repo + scaffold.
- C. (was) IN PROGRESS. **clack/citty/bun spike DONE 2026-08-26 — see RESEARCH-clack-citty-bun.md**
+ C. (was) IN PROGRESS. **clack/citty/bun spike DONE 2026-08-26 — see RESEARCH-ANA-001-clack-citty-bun.md**
     (all assumptions validated on Bun 1.4.0 runtime + compiled binary; custom core prompt
     proven; citty recommended pending Peter's confirm; Zod 4 + Standard Schema pattern for
     evolvable configs). Remaining C spikes below:
@@ -927,9 +934,9 @@ Known from this machine so far:
 
 ## Research queue (comprehensive dives Claude will do; results get recorded here)
 >
-> ⚠️ SUPERSEDED — all items researched or absorbed into RESEARCH-clack-citty-bun.md / build-time notes.
+> ⚠️ SUPERSEDED — all items researched or absorbed into RESEARCH-ANA-001-clack-citty-bun.md / build-time notes.
 
-- [x] clack v1.7 full API — DONE, see RESEARCH-clack-citty-bun.md
+- [x] clack v1.7 full API — DONE, see RESEARCH-ANA-001-clack-citty-bun.md
 - [ ] (superseded line) clack v1.7 full API: group/groupMultiselect/tasks/taskLog/progress/spinner/stream;
       what task+progress compatibility actually looks like; custom prompts via @clack/core
 - [ ] Resumable-workflow state design (journal format, where it lives, idempotency per step)
@@ -1042,7 +1049,7 @@ Zod-driven COMPATIBILITY model. Key principles:
   config schemas for internal rules; map Zod issues → ■ error UI. The written config is whatever
   survives validation — we never inject values the user didn't choose.
 
-### STATUS: SUPERSEDED then BUILT — see docs/CONFIG-COMPAT-PLAN.md
+### STATUS: SUPERSEDED then BUILT — see docs/decisions/ADR-010-reset-on-drift-config-model.md
 
 FINAL DIRECTION (Peter, 2026-08-27): the conflict-consent design above was dropped as
 over-complicated. The shipped model is **reset-on-drift**: an item leaves the install list only
@@ -1067,7 +1074,7 @@ buildSettings' PLUGIN_REPO_MAP plugin filtering), and several live foot-guns not
 (BetterDisplay menuBarIcon=false + dockVisibility=never → no UI entry point; claude-settings
 defaultMode:auto requires its env flag; git commit.gpgsign=true requires the ssh-keys item's key;
 Ghostty global ⌘` shadows macOS next-window). The full findings table + the settled reactive
-group-select design live in docs/CONFIG-COMPAT-PLAN.md. The feature is NOT speculative — it
+group-select design live in docs/decisions/ADR-010-reset-on-drift-config-model.md. The feature is NOT speculative — it
 replaces existing ad-hoc welds with declared schema rules. Blocks v0.1.0 per Peter.
 
 ## Dev tooling & commit pipeline — 2026-08-26

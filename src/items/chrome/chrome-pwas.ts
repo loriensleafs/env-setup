@@ -11,7 +11,7 @@ export interface PwaSpec {
   host: string;
 }
 
-/** Decided Google web apps (docs/PLAN.md). */
+/** Decided Google web apps (docs/plan/PRD-001-envsetup.md). */
 export const PWAS: PwaSpec[] = [
   { url: "https://mail.google.com/mail/", name: "Mail", host: "mail.google.com" },
   { url: "https://calendar.google.com/calendar/", name: "Calendar", host: "calendar.google.com" },

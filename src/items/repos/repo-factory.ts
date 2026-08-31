@@ -48,7 +48,7 @@ export function repoItem(spec: RepoSpec): Item {
   });
 }
 
-/** The 5 decided ACMElabs plugin repos (docs/PLAN.md Group 3). */
+/** The 5 decided ACMElabs plugin repos (docs/plan/PRD-001-envsetup.md Group 3). */
 export const ACMELABS_REPOS: RepoSpec[] = [
   {
     id: "repo-skills",
@@ -84,7 +84,7 @@ export const ACMELABS_REPOS: RepoSpec[] = [
   },
 ];
 
-/** The 4 decided reference clones, owner-prefixed dirs (docs/PLAN.md Group 3). */
+/** The 4 decided reference clones, owner-prefixed dirs (docs/plan/PRD-001-envsetup.md Group 3). */
 export const REFERENCE_REPOS: RepoSpec[] = [
   {
     id: "repo-basic-memory",

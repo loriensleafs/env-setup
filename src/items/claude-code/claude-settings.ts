@@ -30,7 +30,7 @@ export interface BuildSettingsInput {
  * template: marketplace path templated onto this machine's devDir, ACMElabs
  * plugins filtered to the repos actually selected, statusline command pointed
  * at the pure-bun port. Everything else passes through verbatim
- * (docs/PLAN.md: Desktop file is authoritative; hooks INCLUDED).
+ * (docs/plan/PRD-001-envsetup.md Claude Code + docs/decisions/ADR-013-claude-code-format-hook-installed-by-cli.md: template is authoritative; hooks INCLUDED).
  */
 export function buildSettings(input: BuildSettingsInput): Record<string, unknown> {
   const settings = structuredClone(input.template);

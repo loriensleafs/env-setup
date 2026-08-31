@@ -98,7 +98,7 @@ function workflowInfoPlist(name: string): string {
 }
 
 // Payload sources, written to ~/.config/envsetup/scripts/ at configure time.
-// Pure bun per the script-language rule (docs/PLAN.md).
+// Pure bun per the script-language rule (docs/decisions/ADR-001-pure-bun-no-node.md).
 const PAYLOADS: Record<string, string> = {
   "copy-path.ts": `#!/usr/bin/env bun
 // Quick Action payload: copy the absolute path(s) of the selected items.

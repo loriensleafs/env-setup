@@ -6,7 +6,7 @@ const TERMINAL_ICNS =
 
 /**
  * Swap Ghostty's Dock icon for the native Terminal icon, read from the target
- * machine at runtime (docs/PLAN.md Dock spec). Uses NSWorkspace.setIcon via a
+ * machine at runtime (docs/plan/PRD-001-envsetup.md Dock spec). Uses NSWorkspace.setIcon via a
  * transient Swift script (the technique validated in-session 2026-08-25);
  * writes the Icon\r resource outside the code-signature scope. Cask upgrades
  * wipe it — detect() notices and sync reapplies.
