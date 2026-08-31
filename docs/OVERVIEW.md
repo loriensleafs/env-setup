@@ -22,7 +22,7 @@ Owner: Peter Kloss (github loriensleafs). Public repo. Released: v0.1.9 (2026-08
 | Doc | Job | Produced by |
 | --- | --- | --- |
 | [CONTEXT.md](../CONTEXT.md) | **The glossary** — the canonical word for every concept (item states, picked vs wanted, applied, ceremony, …) and the words to avoid. Code labels, prompts and docs use these words; a new or changed term is settled with the `domain-modeling` skill and written here first. | `domain-modeling` skill |
-| [CLAUDE.md](../CLAUDE.md) (= `AGENTS.md`) | Always-loaded agent brief: how to rehydrate, how to record, hard rules, architecture essentials. | by hand |
+| [CLAUDE.md](../CLAUDE.md) (= `AGENTS.md`) | Always-loaded agent brief: how to rehydrate (reading order), how to work with Peter, how to record, hard rules, architecture essentials, safety. | by hand |
 | [CONTRIBUTING.md](../CONTRIBUTING.md) | Setup, change workflow, conventional commits, **how to cut a release**. | by hand |
 | [docs/sessions/](sessions/README.md) `SES-NNN` | **What was done, session by session**: Goal / Outcome / Open, a Narrative (asked, tried, abandoned, verified), per commit a Summary, Why and a note per touched file. **Read the newest right after "Status".** | `bun run session` (`-- --new <slug>` starts one; `-- --check` gates) + the author |
 | [docs/plan/](plan/README.md) `PRD-NNN` / `PLAN-NNN` | **What we build and why** ([PRD-001](plan/PRD-001-envsetup.md): promise, UX requirements, item catalog with chosen defaults, boundaries, success criteria) and **how** (one plan per feature). | `spec-driven-development`, `planning-and-task-breakdown` skills |
@@ -36,21 +36,12 @@ Owner: Peter Kloss (github loriensleafs). Public repo. Released: v0.1.9 (2026-08
 **All of it is kept current continuously, never deferred** ([ADR-017](decisions/ADR-017-docs-system.md)):
 the change that makes a doc stale updates it in the same step, citing the session entry (sha).
 
-## Hard rules (never violate)
+## Hard rules and how to work with Peter
 
-- Pure Bun. No Node runtime, no Python we ship. `node:` builtins are fine (Bun implements them). ([ADR-001](decisions/ADR-001-pure-bun-no-node.md))
-- `@clack/*` is vendored from `main` (`vendor/*.tgz`) for `completeOnTab`; never swap to npm. ([ADR-003](decisions/ADR-003-vendored-clack.md))
-- Secrets only in `secrets.json.age` (+ password manager). Never a key — even partial — in any
-  tracked file or commit message. ([ADR-008](decisions/ADR-008-secrets-age-encrypted-in-repo.md))
-- Tests: `<name>.test.ts` in a sibling `__tests__/`. `bun run check` (Biome + tsc + markdownlint)
-  must pass; lefthook enforces on commit/push. ([ADR-004](decisions/ADR-004-repo-structure-and-tests.md), [ADR-016](decisions/ADR-016-dev-tooling.md))
-- Best way, not easiest: research official docs before choosing an install method; identify and
-  install transitive prerequisites automatically. ([ADR-011](decisions/ADR-011-install-method-per-tool.md))
-- Peter's collaboration style: one question at a time (AskUserQuestion), researched options with a
-  recommendation, no batched lists; pushback welcome. Real research, not assumptions — an
-  unverified claim ("no incompatibilities exist") burned trust once; verify or say unverified.
-  Never declare an approach impossible from one failed attempt ([ANA-006](analysis/ANA-006-finder-favorites-sharedfilelist.md)).
-- Docs are never deferred (above).
+Both live in [CLAUDE.md](../CLAUDE.md) (always loaded): pure Bun, vendored clack, secrets never in
+tracked files, sibling tests, docs never deferred, the check gate — and the collaboration style
+(one question at a time with a recommendation inside it, research first, verify or say unverified,
+small separate commands, merge commits). The facts below are the ones a rule cannot capture.
 
 ## Architecture
 
