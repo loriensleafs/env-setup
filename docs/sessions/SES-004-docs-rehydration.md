@@ -1,10 +1,10 @@
 # 2026-08-30 18:00 · Docs for rehydration — OVERVIEW, ledger → granular entries → sessions, continuous upkeep
 
 - Goal: Make a fresh session able to pick up exactly where the last one stopped: a handoff overview, a complete record of what was done (with files), and a discipline that keeps it all current.
-- Status: open
+- Status: closed
 - Plan: —
-- Outcome: OVERVIEW.md; a git-derived change record that evolved (one line per commit → files touched → Summary/Why + a note per file → per-session files); `bun run session` tooling with `--check`; CLAUDE.md rehydration reading order; continuous-upkeep hard rule; then the whole docs system — `plan/` (PRD-001, PLAN-001), `analysis/` (ANA-001…008), `decisions/` (ADR-001…017), `archive/` — with one naming convention `<TYPE>-<NNN>-<kebab-title>.md`, the living plan retired; and a `/run-*` skill with a verified driver in every directory (56), the root one walking the real bootstrap TUI under `expect` up to the confirm; then the `/session start | record | end` skill built with the skill-creator loop (validated, reviewed, two measured iterations: 95% vs 84% on the stricter set), ANA-009 (Anthropic's workflow-skill guidance, verified at source), ADR-019, and the session tool's `--session` / `--current`.
-- Open at end: Next-up 1 (visual grouping, PLAN-001) from `wip/visual-grouping`; first real connect-phase run. From the /session work: the `!` injection is verified only by the next real conversation; both sweeps are run (`280d906`, ANA-009 addendum) — the description under-routes on Haiku (2/10) and Sonnet (6/10) and Haiku's outcome runs fail 6/20, which the next eval iteration can take up; three graders flagged that Outcome/Narrative/Shipped lines are tied to no transcript evidence; SES-005 belongs to another conversation and stays as it is. Session model (ADR-020, `66b083d`, `4e7f673`): the skill, tool and docs shipped and re-measured (24/24 vs 22/24); still open — the `!` injection and the `/session-*` aliases in a real conversation, an expectation tying Outcome/Narrative claims to transcript evidence, and closing this session once the docs stream ends.
+- Outcome: OVERVIEW.md; a git-derived change record that evolved (one line per commit → files touched → Summary/Why + a note per file → per-session files); `bun run session` tooling with `--check`; CLAUDE.md rehydration reading order; continuous-upkeep hard rule; then the whole docs system — `plan/` (PRD-001, PLAN-001), `analysis/` (ANA-001…008), `decisions/` (ADR-001…017), `archive/` — with one naming convention `<TYPE>-<NNN>-<kebab-title>.md`, the living plan retired; and a `/run-*` skill with a verified driver in every directory (56), the root one walking the real bootstrap TUI under `expect` up to the confirm; then the `/session start | record | end` skill built with the skill-creator loop (validated, reviewed, two measured iterations: 95% vs 84% on the stricter set), ANA-009 (Anthropic's workflow-skill guidance, verified at source), ADR-019, and the session tool's `--session` / `--current`. Then ADR-020 (`66b083d`): sessions as streams of work with status, the tool inside the skill as a subcommand CLI, `close` added; measured 24/24 vs 22/24 (`4e7f673`); the trigger/tier sweeps (`280d906`); the literal-injection gotcha and transcript-evidence expectations (`a8f44b2`). Closed by `/session close` — the first real run of it.
+- Open at end: Next-up 1 (visual grouping, PLAN-001) from `wip/visual-grouping` — open its own session with `--plan "PLAN-001 · Phase 1"`; first real connect-phase run. From the /session work: rendering of the `!` injection in an interactive conversation (verified only under `claude -p`, where it arrives literal and the gotcha covers it); the transcript-evidence expectations are unmeasured until an iteration 4; SES-005 belongs to another conversation and stays as it is. plugin-kit: branch `fix/eval-tooling` (`f19281a`) holds the viewer, report-path and neighbour-sweep fixes, unpushed.
 
 ## Narrative
 
@@ -73,6 +73,11 @@ into the skill and chose a subcommand CLI over flags or six scripts. The skill-r
 majors were applied before the evals (the gate had counted Outcome/Open at end; now only `close`
 does). Iteration 3 (`4e7f673`): 24/24 vs 22/24, both baseline misses on the behaviours ADR-020
 changed. The viewer's done-dialog erased an all-empty submit twice; the review was written by hand.
+
+Closing: Peter asked for the open items fixed — the plugin-kit defects (viewer erasing an all-empty
+review, the report import path, the neighbour sweep quoting the target) landed on its `fix/eval-tooling`
+branch with tests, and the `!` injection was probed under `claude -p` (`a8f44b2`). With the docs system,
+the session model and its evidence all on `main`, this stream's Goal is met; closed with `/session close`.
 
 ## Changes (one entry per commit, in order)
 
