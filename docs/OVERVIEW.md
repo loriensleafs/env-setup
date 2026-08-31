@@ -141,7 +141,7 @@ small separate commands, merge commits). The facts below are the ones a rule can
   refuses a word the glossary marks `former name` in the live prose (session files, ADRs and analyses
   are records); `CONTEXT.md` gained `## Relationships` and `## Flagged ambiguities`; the success test
   (the glossary changes during the conversation, shrinks as often as it grows) is in CLAUDE.md Recording.
-- **Rehydration belongs to the plan skill** (ADR-024, ANA-011; `1ae9a7e`, [SES-008](sessions/SES-008-brain-toolset-on-env-setup.md)):
+- **Rehydration belongs to the plan skill** (ADR-024, ANA-011; `1ae9a7e`, [SES-008](sessions/SES-008-brain-toolset-on-env-setup.md), done):
   `/plan [PLAN-NNN]` will own the walk; the session skill keeps the record with three acts
   (`start · log · close`) and one status (`in progress | done`); join / open / leave and `Open at
   end` go. Decided in acmelabs-15/sessions, carried out in acmelabs-15/brain (its PLAN-001), whose
@@ -152,7 +152,8 @@ small separate commands, merge commits). The facts below are the ones a rule can
   session log say `/brain:session start · log · close`. Its docs(session) commit restores the
   `CONTEXT.md` tail the hand regeneration cut (§ Secrets, § Relationships, § Flagged ambiguities,
   § Open, `ledger`'s former-name marker) and sweeps CONTRIBUTING, `CLAUDE.md` § Commands, the run
-  skills and `docs/sessions/CLAUDE.md`.
+  skills and `docs/sessions/CLAUDE.md` (`83d0881`). SES-008 closed with `/brain:session-close` — the
+  first session recorded end to end on the installed plugin (brain PLAN-001 Part 3's Checkpoint).
 - **Parked, not on `main`:** the visual-grouping patch ([PLAN-001](plan/PLAN-001-visual-grouping.md))
   as a WIP commit on local branch `wip/visual-grouping` (unverified, never run under a PTY).
 

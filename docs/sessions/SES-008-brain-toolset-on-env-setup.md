@@ -1,9 +1,9 @@
 # 2026-08-31 08:35 · env-setup on the brain plugin — acmelabs-15/brain PLAN-001 Part 3 Task 4
 
 - Goal: env-setup on the installed `brain` 0.4.0 plugin: ADR-024 and ANA-011 committed with their index rows; the `repo-brain` spec in and `repo-sessions` out of `ACMELABS_REPOS`, the marketplace regenerated; the docs naming `/brain:session start | log | close` with § Rehydrating reduced to the read order until `/brain:plan` exists. Recorded here with the installed plugin's own `/brain:session-log`.
-- Status: in progress
+- Status: done
 - Plan: —
-- Outcome: _(fill in)_
+- Outcome: ADR-024 and ANA-011 are in this repo with their index rows (`1ae9a7e`); `repo-brain` replaces `repo-sessions` in `ACMELABS_REPOS`, verified with the read-only repos driver and the real marketplace file, which lists `brain` 0.4.0 (`d9398d7`); the docs say the installed forms — `/brain:session start · log · close`, `CLAUDE.md` § Rehydrating the read order alone — and the `CONTEXT.md` tail the hand regeneration cut is restored with `ledger`'s former-name marker (`260a510`, `83d0881`; avoid-check 10 files, 1 former name, 0 hits; `bun run check` green). The whole session was recorded with the installed `brain` 0.4.0 plugin's `/brain:session-log` and closed with `/brain:session-close` — acmelabs-15/brain PLAN-001 Part 3's Checkpoint. No release. Unverified: acmelabs-15/sessions archived on GitHub (the commit message says so). Follow-ups: for brain, refreshing a template-generated section without losing the file's tail, and `(former name, …)` on the template's `ledger` Avoid item; for this repo, `link-check.ts` treats `~/` paths as relative (11 false reports on ANA-011).
 
 ## Narrative
 
