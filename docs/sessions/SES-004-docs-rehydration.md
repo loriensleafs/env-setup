@@ -578,3 +578,13 @@ A blanket replace briefly rewrote Peter's quoted words in ADR-010 — restored; 
   - `scripts/CLAUDE.md` (+2/−1) — documents --session and the warning semantics
   - `scripts/session.ts` (+39/−4) — `--session SES-NNN` selects the append target and the gated file; other files' placeholders print warnings; `--new` prints the flag to use
 - Notes: Verified: `bun run session -- --check --session SES-004` gates this file and warns about SES-005; `--session 5` gates SES-005. Injected `!` commands are not executed when a subagent merely reads SKILL.md, so the evals exercise the prose, not the injection — the injection is verified by the next real conversation.
+
+### 2026-08-30 · feat(session-tool): --current lists the selected session's placeholders by line; skill makes the gate loop explicit; ANA-009 implications reconciled with what shipped · d347c9f
+
+- Summary: The session tool gains `--current` (selected file, Goal, every placeholder with its line number); the skill's record step makes the gate loop explicit (`NOT ready` → fill what it names → gate again); ANA-009's implications list now says what actually shipped, including why `allowed-tools` stayed in.
+- Why: Peter: "did we do everything suggested in ANA-009?" — two items were partial (scripts-solve-don't-defer; the validation loop) and one had silently deviated (allowed-tools).
+- Files:
+  - `.claude/skills/session/SKILL.md` (+5/−1) — record step names `--current`; after the gate block: NOT ready → fill → gate again → then stage
+  - `docs/analysis/ANA-009-skill-workflow-best-practices.md` (+12/−7) — implication 5 reversed with the D1 reason; 9 marked done (--session/--current, validation loop); 10 stays unverified
+  - `scripts/session.ts` (+22/−0) — `--current`: prints session, started/title, goal, placeholder lines with numbers
+- Notes: Committed after the iteration-2 fixtures were cloned, so those runs exercised the skill without the `--current` mention and the loop line — a one-line difference from what ships; recorded in the iteration's metadata. Models tier sweep (ANA-009 P3) remains not done.
