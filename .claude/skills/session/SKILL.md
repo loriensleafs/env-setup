@@ -1,17 +1,18 @@
 ---
 name: session
-argument-hint: "start | record | end"
+argument-hint: "start | entry | end"
 arguments: [mode]
 allowed-tools: Bash(git status:*) Bash(git branch:*) Bash(git log:*) Bash(bun run session:*)
-description: "Runs the envsetup session ritual and produces its artifacts: `/session start` reads the docs system in full (OVERVIEW, the newest SES, CONTEXT.md, the area's ADRs/analyses/plan), checks the tree against the session log, creates this conversation's docs/sessions/SES-NNN file and posts a brief; `/session record` after every commit appends and fills the commit's entry, updates OVERVIEW/ADR/PRD/CONTEXT.md where the change made them stale, and commits it as docs(session); `/session end` verifies the log is complete, Status is current and the tree is clean. Use at the start of a conversation in this repo, right after each commit, and before finishing. Not for authoring the docs themselves (an ADR, the PRD, an analysis, the glossary — those have their own skills), not for driving the CLI (the run skills), and not for running, changing or testing the session tool itself (`scripts/session.ts`: the run-scripts skill; questions about it: docs/sessions/README.md)."
+description: "Runs the envsetup session ritual and produces its artifacts: `/session start` reads the docs system in full (OVERVIEW, the newest SES, CONTEXT.md, the area's ADRs/analyses/plan), checks the tree against the session log, creates this conversation's docs/sessions/SES-NNN file and posts a brief; `/session entry` after every commit appends and fills the commit's entry, updates OVERVIEW/ADR/PRD/CONTEXT.md where the change made them stale, and commits it as docs(session); `/session end` verifies the log is complete, Status is current and the tree is clean. Use at the start of a conversation in this repo, right after each commit, and before finishing. Not for authoring the docs themselves (an ADR, the PRD, an analysis, the glossary — those have their own skills), not for driving the CLI (the run skills), and not for running, changing or testing the session tool itself (`scripts/session.ts`: the run-scripts skill; questions about it: docs/sessions/README.md)."
 ---
 
-# Session — start, record, end
+# Session — start, entry, end
 
 Every conversation here starts from nothing but the repo; the docs system (ADR-017) is the
 continuity, and only if each conversation reads it at the start and writes to it as it goes.
-Mode: **$mode** (`start`, `record` or `end`; when empty, infer: no session file created in this
-conversation → `start`; a commit just landed → `record`; the user is wrapping up → `end`).
+Mode: **$mode** (`start`, `entry` or `end`; when empty, infer: no session file created in this
+conversation → `start`; a commit just landed → `entry`; the user is wrapping up → `end`). The
+user-only aliases `/session-start`, `/session-entry`, `/session-end` invoke the same modes.
 
 Live state at invocation (injected; do not re-run these to "confirm"):
 
@@ -86,13 +87,13 @@ Start progress:
 the user asked a question rather than for work, answer it from what you read, and still create the
 session file before any change.
 
-## record
+## entry
 
 Right after every commit — the entry is cheapest while the change is in front of you, and the next
 conversation's `start` depends on it.
 
 ```text
-Record progress:
+Entry progress:
 - [ ] 1 bun run session (--session yours) appended the skeleton(s)
 - [ ] 2 every placeholder filled; Notes say what was verified and how
 - [ ] 3 everything the change made stale updated, citing the sha

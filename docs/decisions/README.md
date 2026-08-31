@@ -28,7 +28,7 @@ away) and cite the session entry (sha).
 | [016](ADR-016-dev-tooling.md) | Biome + markdownlint-cli2 + lefthook + git-cliff + CI with gitleaks, all no-Node | accepted |
 | [017](ADR-017-docs-system.md) | Docs system: OVERVIEW · sessions · plan · analysis · decisions; kept current continuously | accepted |
 | [018](ADR-018-nested-claude-md-placement.md) | Nested CLAUDE.md only where a directory has unwritten conventions; path rules for file types; run skills only with a real driver | accepted |
-| [019](ADR-019-session-skill-invocation-and-name.md) | One model-invoked `/session` skill (start · record · end) named for its leading word; the check gate guards its side effects | accepted |
+| [019](ADR-019-session-skill-invocation-and-name.md) | One model-invoked `/session` skill (start · entry · end; typed-only `/session-*` aliases) named for its leading word; the check gate guards its side effects | accepted |
 
 ## Rules
 

@@ -9,7 +9,7 @@ pointers below.
 runs the attended ceremonies, and **converges** on re-run; `doctor` is the read-only diff; `sync`
 applies the manifest without the picker. Owner: Peter Kloss (github `loriensleafs`).
 
-## Rehydrating — at session start, run `/session start`
+## Rehydrating — at session start, run `/session start` (alias `/session-start`)
 
 The `/session` skill (`.claude/skills/session/`) is the one home of the session ritual: `start`
 reads the docs system in the right order — OVERVIEW (Status, Next up, Key facts) → the newest
@@ -35,12 +35,13 @@ history only.
   Merge PRs with **merge commits** (session entries cite shas).
 - Proceed on reversible work without asking; finish the whole task; report faithfully.
 
-## Recording — after every commit, run `/session record`; at the end, `/session end`
+## Recording — after every commit, run `/session entry`; at the end, `/session end`
 
-`record` appends and fills the commit's entry and updates everything the change made stale in the
+`entry` appends and fills the commit's entry and updates everything the change made stale in the
 same step (OVERVIEW, ADR, PRD, plan, analysis, `CONTEXT.md`, a directory's `CLAUDE.md`), then
 commits it as `docs(session): …`; `end` checks the log, Status and the tree. The procedure lives
-in the skill, the template in `docs/sessions/README.md`. Never put it off; the next conversation's
+in the skill, the template in `docs/sessions/README.md`; `/session-start`, `/session-entry` and
+`/session-end` are typed-only aliases. Never put it off; the next conversation's
 `start` depends on it.
 
 ## Hard rules (do not violate)
