@@ -21,6 +21,11 @@ The plugin-kit push unblocked once the GitHub CLI app showed `acmelabs-15 ✓` u
 access (Peter granted it; `gh api user/orgs` then listed the org); pushed, PR #1 opened and merged (`e4b1a53`). Entry grain
 settled as ADR-021 (`77aa614`): value only, `Also:` lines, the `Session-entry: none` trailer.
 
+ANA-010 answered "why not automatic": nothing in the reference automates CONTEXT.md; its setup installs a
+reading rule, one skill owns the write. Peter had the installed copies under `~/.claude/skills` brought in
+line: ADR location follows the project, 16 skills read CONTEXT.md before exploring, 6 route to
+`domain-modeling` (recorded in `~/.claude/skills/LOCAL-CHANGES.md`; outside this repo, so no entry here).
+
 ## Changes (one entry per commit, in order)
 
 ### 2026-08-30 · docs(skill): the Skill-tool path never renders the injection — verified interactive; open SES-006 · 631b7f8
