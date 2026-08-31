@@ -123,6 +123,8 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
   // Single task-log group: each message announces the section about to be
   // evaluated (work runs right after, parallel within the section); no counts,
   // no group.success — taskLog.success collapses everything to one line.
+  const phase = (n: number, title: string) => p.log.step(color.bold(`Step ${n} of 5 · ${title}`));
+  phase(1, "Scan this machine");
   const scanLog = p.taskLog({ title: "Initializing", spacing: 0 });
   const scanGroup = scanLog.group("");
   for (const [section, items] of sections) {
@@ -140,6 +142,7 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
   scanLog.success(`Ready in ${elapsed}s`);
 
   // --- Identity + locations (Group 6) ------------------------------------
+  phase(2, "Who you are");
   // Zod schemas double as prompt validators (Standard Schema bridge).
   const nonEmpty = (what: string) => z.string().trim().min(1, `${what} is required`);
   const answers = await p.group(
@@ -219,6 +222,7 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
     if (items.length === 0) delete groups[section];
   }
 
+  phase(3, "Choose what to install");
   const picks = await groupMultiselect({
     message: "What should this machine get?",
     groups,
@@ -233,14 +237,19 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
     const configurable = registry
       .all()
       .filter((item) => selection.includes(item.id) && item.configSchema !== undefined);
-    for (const item of configurable) {
-      const config = await promptItemConfig(item, undefined);
+    if (configurable.length > 0) phase(4, `Configure ${configurable.length} items`);
+    for (const [i, item] of configurable.entries()) {
+      const config = await promptItemConfig(item, undefined, {
+        index: i + 1,
+        total: configurable.length,
+      });
       if (p.isCancel(config as never)) bail("cancelled");
       itemConfigs.set(item.id, config);
     }
   }
 
   // --- Summary + confirm --------------------------------------------------
+  phase(5, "Review and install");
   const toInstall = selection.filter((id) => !(detection.get(id)?.installed ?? false));
   const alreadyThere = [...detection.values()].filter((d) => d.installed).length;
   p.note(

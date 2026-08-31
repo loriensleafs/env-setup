@@ -30,6 +30,7 @@ interface JsonSchemaProp {
 export async function promptItemConfig(
   item: Item<unknown>,
   stored: unknown,
+  position?: { index: number; total: number },
 ): Promise<unknown | symbol> {
   const schema = item.configSchema as z.ZodType<unknown> | undefined;
   if (!schema) return stored;
@@ -42,7 +43,9 @@ export async function promptItemConfig(
   // Rendered as ONE clack group (Peter, 2026-08-31): the item's title, then
   // every field flowing under a single connected bar — instead of each field
   // as its own standalone prompt with its own header.
-  p.log.step(item.title);
+  // A boxed header makes the chunking unmistakable — the previous item's last
+  // field ran straight into the next item's first (Peter, 2026-08-31).
+  p.note(item.title, position ? `Configure ${position.index} of ${position.total}` : "Configure");
   const prompts: Record<string, () => Promise<unknown>> = {};
   for (const [key, prop] of Object.entries(props)) {
     const label = humanize(key);
