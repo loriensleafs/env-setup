@@ -398,3 +398,14 @@ A blanket replace briefly rewrote Peter's quoted words in ADR-010 — restored; 
   - `src/items/item.ts` (+2/−1) — DetectResult.installed documented as Applied; hint text in the differs doc
   - `src/orchestrator/orchestrator.ts` (+1/−1) — journal skip reason 'already applied'
 - Notes: The on-disk manifest field stays `selected` (renaming is a migration) and `DetectResult.installed` stays as the flag name (~65 items); both are spoken of as Wanted / Applied. Terms asserted without a conversation (Ceremony, Connect phase, Finishing pass, Converge, Section, Kind) are listed as open to challenge. No ADR: vocabulary is cheap to reverse. The doctor/label changes are code and ship with v0.1.10.
+
+### 2026-08-30 · docs: root files rewritten for the current way of working — CLAUDE.md reading order + working style, CONTRIBUTING workflow, README · edb9bba
+
+- Summary: The four root files rewritten coherently for how agents now work here: CLAUDE.md (reading order, working style, recording, rules, essentials, safety), CONTRIBUTING (the full workflow incl. session start, drivers, merge commits), README (product + reading order); OVERVIEW's rules become a pointer.
+- Why: Peter: "make sure all of the root project files … are as completely up to date as they need to be … make it clear how the agents should be working … including any references to other markdown documents that should be included in the initial reading".
+- Files:
+  - `CLAUDE.md` (+113/−106) — rewritten (148 lines): Rehydrating 1–5, Working with Peter, Recording, Hard rules (ADR refs), Architecture essentials, Commands, Safety
+  - `CONTRIBUTING.md` (+67/−60) — rewritten: reading pointer, ground rules, setup, 8-step workflow (session start first; merge commits), release with step 6
+  - `README.md` (+36/−27) — rewritten: commands in glossary words, drifted paragraph, Working on it reading order, development table with session + run skills
+  - `docs/OVERVIEW.md` (+7/−16) — Hard rules section → pointer to CLAUDE.md; CLAUDE.md doc-map row
+- Notes: Verified 0 duplicated sentences across the 23 root/README/OVERVIEW/CLAUDE files and 0 broken links; the blanket-replace lesson from the glossary commit applied (quotes are not labels).
