@@ -179,3 +179,11 @@ line: ADR location follows the project, 16 skills read CONTEXT.md before explori
   - `docs/analysis/ANA-010-context-md-maintenance-in-the-reference-skills.md` (+14/−0) — dated Acted-on section naming every edit made under ~/.claude/skills and the validator result
   - `docs/sessions/SES-006-session-followups.md` (+5/−0) — Narrative: the ANA-010 answer and the global skill edits (outside this repo, no entry of their own)
 - Notes: The global edits themselves are verified by plugin-kit's validator on all 22 touched skills (valid; idea-refine's 4 warnings pre-exist) and by grep tallies (16 read rules, 5 routing sections + the grill-me pointer, no bare `docs/adr/` rule left). Not measured: whether the added lines change how those skills behave — no evals exist for them.
+
+### 2026-08-30 · docs(claude): talk plain — a line of context, then Simplified Technical English in CONTEXT.md's words · e73676b
+
+- Summary: The root CLAUDE.md's Working-with-Peter list gains "Talk plain": a line of context, then Simplified Technical English in CONTEXT.md's words, /wait-what as the repair — mirroring the standing rule added to ~/CLAUDE.md §1.
+- Why: Peter: fold the /wait-what prompt (context, ASD-STE100, the ubiquitous language) into the global CLAUDE.md so the agent speaks that way by default; the repo section mirrors §1 for readers of AGENTS.md alone.
+- Files:
+  - `CLAUDE.md` (+2/−0) — one bullet under Working with Peter
+- Notes: The full rule (four STE rules that matter in chat, the CONTEXT.md/CONTEXT-MAP clause, structure over prose) is in ~/CLAUDE.md §1; the repo carries the one-line form. Not measured: effect on reply length or clarity.

@@ -36,6 +36,8 @@ never have to. Every doc is `<TYPE>-<NNN>-<kebab-title>.md` in its directory; ea
   small separate commands — large compound shell commands are denied by the permission prompt.
   Merge PRs with **merge commits** (session entries cite shas).
 - Proceed on reversible work without asking; finish the whole task; report faithfully.
+- Talk plain: a line of context, then Simplified Technical English in `CONTEXT.md`'s words
+  (`/wait-what` re-pitches what did not land).
 
 ## Recording — after every commit `/session entry`; leaving `/session end`; Goal done `/session close`
 
