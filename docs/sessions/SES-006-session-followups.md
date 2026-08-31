@@ -34,13 +34,13 @@ ever ran them. With the documented shape both paths render (transcripts of a typ
 
 2026-08-31 — the plugin. Peter challenged rehydration from a plan (plans should name the session serving each
 part; PRDs should name their plans; "as simple as telling the agent what plan you want to work on") → ADR-022; then
-moved the skill out of this repo → the `session` plugin (acmelabs-15/session, ADR-023), built after reading
+moved the skill out of this repo → the `sessions` plugin (acmelabs-15/sessions, ADR-023), built after reading
 plugin-kit's plugin-creator, command-creator, skill-creator and every shared reference in full at his request. What
 the reviewers caught: the injected lines were pipelines the permission checker evaluates segment by segment (fixed
 with `list --brief` and bare commands), a root CLAUDE.md fails `--strict` (moved under `.claude/`), the aliases
 named the skill unqualified, `.gitignore` anchored the fixture pattern at the wrong depth, and the README documented an
 install path with no marketplace behind it (the repo is now its own marketplace too). Dead end: `claude -p "/session
-start"` answers "isn't available" — headless resolves only `/session:session`; the bare form is an interactive-only
+start"` answers "isn't available" — headless resolves only `/sessions:session`; the bare form is an interactive-only
 claim, unverified. Render checks (`--plugin-dir`, scratch repo): skill path and alias path both rendered
 `Branch: main` / `Tree: …` / `Sessions: SES-001 …`; the alias forwarded `args: start PLAN-001`. The trigger sweep on
 record measured the pre-plugin description; the current one is unmeasured on Sonnet/Haiku (iteration 5, in the plugin).
@@ -226,7 +226,7 @@ record measured the pre-plugin description; the current one is unmeasured on Son
 
 ### 2026-08-31 · feat(session): the session skill moves to the session plugin; rehydrate by plan (ADR-022, ADR-023) · 2bb7e9f
 
-- Summary: The `/session` skill, its four aliases, the run skill, the tool and its eval evidence leave this repo for the `session` plugin (acmelabs-15/session `d194e3e`, installed from the regenerated ACMElabs marketplace; the `repo-session` item clones it). Plans now point at sessions (ADR-022): every plan part carries `> Status: planned | in progress (session SES-NNN) | done (session SES-NNN, sha)`, PRD-001 lists its plans, and `/session start PLAN-NNN` walks PRD → plan → part → session; the sessions and plan READMEs are rebuilt from the plugin's templates and point at the skill for the rules, which now have one home (ADR-023).
+- Summary: The `/session` skill, its four aliases, the run skill, the tool and its eval evidence leave this repo for the `sessions` plugin (acmelabs-15/sessions `d194e3e`, installed from the regenerated ACMElabs marketplace; the `repo-sessions` item clones it). Plans now point at sessions (ADR-022): every plan part carries `> Status: planned | in progress (session SES-NNN) | done (session SES-NNN, sha)`, PRD-001 lists its plans, and `/session start PLAN-NNN` walks PRD → plan → part → session; the sessions and plan READMEs are rebuilt from the plugin's templates and point at the skill for the rules, which now have one home (ADR-023).
 - Why: Peter, after reading a real `/session start` transcript: starting a conversation should be "as simple as telling the agent what plan you want to work on", plans should point at the session note serving each part and PRDs at plans; then "the session skill might need to be moved" out of this repo — "plugin name should just be session … a single skill with a commands folder", built with plugin-kit's creators, read in full.
 - Files:
   - `.claude/commands/session-close.md` (+0/−9) — deleted — the alias lives in the plugin's `commands/` (qualified `skill: session:session`; the start alias forwards a PLAN-NNN)
@@ -310,4 +310,4 @@ record measured the pre-plugin description; the current one is unmeasured on Son
   - `.claude/skills/session/evals/results/iteration-2/record-commit/eval_metadata.json` (+0/−16) — moved to the plugin unchanged (`skills/session/evals/`)
   - `.claude/skills/session/evals/results/iteration-2/record-commit/old_skill/grading.json` (+0/−143) — moved to the plugin unchanged (`skills/session/evals/`)
   - … +277 more (`git show --stat 2bb7e9f`)
-- Notes: verified — `bun run check`, `bun test` (111 pass), the docs link checker (0 broken); the installed plugin (`session@ACMElabs` 0.1.0) rendered its three injected state lines on both the skill path and the alias path under `claude -p --plugin-dir` in a scratch repo, its tool ran through the substituted plugin-root path, and in this checkout `session:session` is the only session command registered (no project copy left to shadow it). Unverified: the bare `/session` in an interactive session (headless resolves only the namespaced `/session:session`), and the `acmelabs-marketplace` item's `detect` against the regenerated file. The global plan/spec templates under `~/.claude/skills` carry the same status line (`LOCAL-CHANGES.md`, 2026-08-31).
+- Notes: verified — `bun run check`, `bun test` (111 pass), the docs link checker (0 broken); the installed plugin (`sessions@ACMElabs` 0.1.0) rendered its three injected state lines on both the skill path and the alias path under `claude -p --plugin-dir` in a scratch repo, its tool ran through the substituted plugin-root path, and in this checkout `session:session` is the only session command registered (no project copy left to shadow it). Unverified: the bare `/session` in an interactive session (headless resolves only the namespaced `/sessions:session`), and the `acmelabs-marketplace` item's `detect` against the regenerated file. The global plan/spec templates under `~/.claude/skills` carry the same status line (`LOCAL-CHANGES.md`, 2026-08-31).

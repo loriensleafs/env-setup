@@ -1,4 +1,4 @@
-# ADR-023: The session skill ships as the `session` plugin, and this repo consumes it
+# ADR-023: The session skill ships as the `sessions` plugin, and this repo consumes it
 
 ## Status
 
@@ -25,13 +25,13 @@ would prefer a single skill with a commands folder."
 ## Decision
 
 - **The skill, its four aliases, its tool, its tests and its eval evidence live in
-  [acmelabs-15/session](https://github.com/acmelabs-15/session)**, a plugin named `session`, built
+  [acmelabs-15/sessions](https://github.com/acmelabs-15/sessions)**, a plugin named `sessions`, built
   with plugin-kit (plugin-creator, skill-creator, command-creator): one skill (`skills/session/`)
   plus a `commands/` folder for the aliases — a legacy layout kept deliberately at Peter's
   preference — with `references/` for what the model reads (the record's shapes and rules, the
   tool's outputs and refusals), `assets/` for what `session init` copies into a repo, `scripts/`
   for the tool. The repo is its own marketplace (`.claude-plugin/marketplace.json`) and is listed
-  in the ACMElabs marketplace; the `repo-session` item clones it.
+  in the ACMElabs marketplace; the `repo-sessions` item clones it.
 - **This repo consumes it.** `.claude/skills/session`, `.claude/skills/run-session-tool`, the four
   `.claude/commands/session-*.md` and the `bun run session` script are gone; `docs/sessions/`,
   `docs/plan/` and `CONTEXT.md` keep the record and point at the skill for the rules, which now
@@ -62,9 +62,9 @@ Rejected — the reviewers flagged exactly this.
 ## Consequences
 
 - `/session` in this repo is the plugin's; a machine without the plugin has no `/session`. The
-  ACMElabs marketplace entry and `repo-session` item make `envsetup` install it.
+  ACMElabs marketplace entry and `repo-sessions` item make `envsetup` install it.
 - The eval evidence (four iterations, tier and trigger sweeps) moved with the skill; the next
   iteration is measured there. The `evals/` fixture is any git repo after `session init`.
 - Headless runs of the skill (`claude -p`) must pass `--allowedTools Skill`, and in headless mode
-  only the namespaced `/session:session …` form resolves; interactively the bare `/session` works
+  only the namespaced `/sessions:session …` form resolves; interactively the bare `/session` works
   when nothing else claims the name — which is why this repo's copy had to go.

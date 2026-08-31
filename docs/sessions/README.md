@@ -8,7 +8,7 @@ of its work. Together these files are the append-only record of every change tha
 commit log cannot hold: what was asked, tried, abandoned, verified. A new conversation reads them
 to pick up exactly where the last one stopped.
 
-The procedure that reads and writes them is the `/session` skill (the `session` plugin, ADR-023;
+The procedure that reads and writes them is the `/session` skill (the `sessions` plugin, ADR-023;
 the model in ADR-020, the entry grain in ADR-021, the plan pointers in ADR-022):
 `/session start [PLAN-NNN]` at the beginning of a conversation, `/session entry` right after
 every commit, `/session end` before leaving, `/session close` when the Goal is done. The rules —

@@ -31,12 +31,12 @@ bun test                             # bun:test suite
 ## Making a change
 
 1. **Rehydrate, then join or open a session.** `/session start [PLAN-NNN]` (alias `/session-start`; the
-   `session` plugin, ADR-023) reads the docs system in order, then — before the first commit — joins
+   `sessions` plugin, ADR-023) reads the docs system in order, then — before the first commit — joins
    the open session the plan part's status line names, or opens one: `session new <slug> --plan
    "PLAN-NNN · part N"` (creates `docs/sessions/SES-<next>-<slug>.md`) and sets the part to
    `in progress (session SES-NNN)` (ADR-022); set the file's title and `Goal`. `session` here is
    the plugin's tool — the skill runs it; by hand it is
-   `bun ~/Dev/ACMElabs/session/skills/session/scripts/session.ts`.
+   `bun ~/Dev/ACMElabs/sessions/skills/session/scripts/session.ts`.
    A session is a stream of work, open until closed, and may outlive this conversation (ADR-020);
    a conversation that changes nothing needs none. Keep its Narrative as things happen (requests,
    decisions, dead ends, what was verified and how).

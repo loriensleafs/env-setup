@@ -55,7 +55,7 @@ Pure-Bun toolchain (no Node runtime). `bun install` also wires the git hooks (vi
 | `bun run check` | Biome (format + lint) · `tsc` typecheck · markdownlint |
 | `bun run fix` | Auto-fix everything (Biome `--write` + markdownlint `--fix`) |
 | `bun run test` | Bun test suite |
-| `/session start · entry · end · close` | The `session` plugin (ACMElabs marketplace): the session ritual and the tool behind it (`list`, `new <slug>` opens, `append --session SES-NNN`, `current`, `check` gates, `close`) — ADR-022/023 |
+| `/session start · entry · end · close` | The `sessions` plugin (ACMElabs marketplace): the session ritual and the tool behind it (`list`, `new <slug>` opens, `append --session SES-NNN`, `current`, `check` gates, `close`) — ADR-022/023 |
 | `bun run changelog` | Regenerate `CHANGELOG.md` from conventional commits (git-cliff) |
 | `bun run compile` | Build the standalone binary |
 

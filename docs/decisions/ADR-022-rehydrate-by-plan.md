@@ -52,7 +52,7 @@ Two records of one fact drift. The plan points; the session records. Rejected.
 
 ## Consequences
 
-- The `session` plugin's tool gained `list --plan PLAN-NNN`; `start` takes the plan id as its
+- The `sessions` plugin's tool gained `list --plan PLAN-NNN`; `start` takes the plan id as its
   argument; the `/session-start` alias passes it through.
 - PLAN-001 and PLAN-002 were rewritten to parts with status lines; PRD-001 gained its Plans table.
   The sha in a `done` line is the entry that finished the part, so it is never self-referential —

@@ -10,7 +10,7 @@ carries a status line — `planned`, `in progress (session SES-NNN)` or
 `done (session SES-NNN, sha)` — so the plan says where the work stands and which session in
 `../sessions/` holds the story of each part, and the session's `Plan:` line points back. The PRD's
 `## Plans` table lists every plan implementing it, so PRD → plan → part → session is one walk.
-The `/session` skill (the `session` plugin, ADR-023) writes those status lines and ticks; progress is
+The `/session` skill (the `sessions` plugin, ADR-023) writes those status lines and ticks; progress is
 read from the session entries, never tracked twice (ADR-022).
 
 ## Index

@@ -11,7 +11,7 @@ applies the manifest without the picker. Owner: Peter Kloss (github `loriensleaf
 
 ## Rehydrating — at session start, run `/session start` (alias `/session-start`)
 
-The `/session` skill — the `session` plugin from the ACMElabs marketplace (ADR-023), not a file in
+The `/session` skill — the `sessions` plugin from the ACMElabs marketplace (ADR-023), not a file in
 this repo — is the one home of the session ritual: `start [PLAN-NNN]` reads the docs system in
 the right order — OVERVIEW (Status, Next up, Key facts) → the plan and the PRD it serves → every
 **open** `SES-NNN` serving it in full → [CONTEXT.md](CONTEXT.md) → the tree checked against the
@@ -103,7 +103,7 @@ bun run changelog                # regenerate CHANGELOG.md (git-cliff)
 
 The session tool (`list`, `new`, `append`, `current`, `check`, `close`) is the `session`
 plugin's, run by the `/session` skill as `bun "${CLAUDE_PLUGIN_ROOT}/skills/session/scripts/session.ts" …`; by hand,
-`bun ~/Dev/ACMElabs/session/skills/session/scripts/session.ts <command>` (ADR-023).
+`bun ~/Dev/ACMElabs/sessions/skills/session/scripts/session.ts <command>` (ADR-023).
 
 ## Safety when running it
 
