@@ -409,3 +409,63 @@ A blanket replace briefly rewrote Peter's quoted words in ADR-010 — restored; 
   - `README.md` (+36/−27) — rewritten: commands in glossary words, drifted paragraph, Working on it reading order, development table with session + run skills
   - `docs/OVERVIEW.md` (+7/−16) — Hard rules section → pointer to CLAUDE.md; CLAUDE.md doc-map row
 - Notes: Verified 0 duplicated sentences across the 23 root/README/OVERVIEW/CLAUDE files and 0 broken links; the blanket-replace lesson from the glossary commit applied (quotes are not labels).
+
+### 2026-08-30 · docs(agents): every nested agent doc reviewed for shape, flow and the glossary — 17 CLAUDE.md, 6 READMEs, 2 rules, 28 SKILL.md · 7ac99ab
+
+- Summary: Every nested agent-facing doc reviewed and reshaped in one pass — 17 nested CLAUDE.md, the 6 READMEs, the 2 path rules and all 28 SKILL.md — for a uniform shape, the glossary's words, no restatement of the root or a parent, and no stale facts from the day's earlier changes.
+- Why: Peter: "do the same thing for all of the same files and nested variations … a comprehensive evaluation making sure they're structured and flow in ways that make sense and would be most helpful to the agent".
+- Files:
+  - `.claude/rules/drivers.md` (+5/−5) — prohibition rephrased as the positive boundary
+  - `.claude/skills/run-envsetup/SKILL.md` (+13/−19) — picked/applied wording; tooling folded into Test; 'directories with a real driver'
+  - `.github/.claude/skills/run-github/SKILL.md` (+3/−1) — adds `gh pr merge --merge --delete-branch` with the merge-commit rule
+  - `.github/CLAUDE.md` (+8/−7) — framing + `/run-github` pointer; checks-lag and upload-flake now live in CONTRIBUTING (pointer)
+  - `docs/.claude/skills/run-docs/SKILL.md` (+6/−7) — link-check and markdownlint outputs re-run; removed-skills paragraph replaced by 'scope with the argument'
+  - `docs/CLAUDE.md` (+7/−9) — reframed: OVERVIEW is map + status, subdirectory READMEs are purpose/index/rules/template; `/run-docs` scopes by argument
+  - `docs/OVERVIEW.md` (+24/−27) — glossary words in What it is / Architecture; unreleased status merged into one bullet; Next-up plan number PLAN-003; resume step 3 → pointer
+  - `docs/analysis/CLAUDE.md` (+2/−4) — cut to the directory's one invariant + README pointer
+  - `docs/analysis/README.md` (+2/−2) — index sorted ANA-001…008
+  - `docs/archive/CLAUDE.md` (+3/−3) — cut to the directory's one invariant + README pointer
+  - `docs/archive/README.md` (+16/−6) — Index and Rules headings; how to retire a doc
+  - `docs/decisions/CLAUDE.md` (+3/−4) — cut to the directory's one invariant + README pointer
+  - `docs/decisions/README.md` (+1/−1) — ADR-010 row says 'picking is the consent'
+  - `docs/plan/CLAUDE.md` (+3/−4) — cut to the directory's one invariant + README pointer
+  - `docs/plan/README.md` (+6/−9) — purpose as one paragraph; PLAN-NNN naming
+  - `docs/sessions/CLAUDE.md` (+3/−4) — cut to the directory's one invariant + README pointer
+  - `docs/sessions/README.md` (+4/−2) — Rules → Reading / Writing so all READMEs run purpose → Index → Rules → Template
+  - `scripts/.claude/skills/run-scripts/SKILL.md` (+1/−1) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `scripts/CLAUDE.md` (+5/−4) — framing + `/run-scripts` pointer
+  - `src/.claude/skills/run-src/SKILL.md` (+5/−7) — doctor outro block re-run (61 satisfied · 2 missing · 1 drifted …); glossary gotchas
+  - `src/CLAUDE.md` (+24/−22) — reshaped: refs in the title, framing = invariant/blast radius + driver, bullets invariant → conventions → gotchas → pointers; glossary words; root/parent restatements removed
+  - `src/auth/.claude/skills/run-src-auth/SKILL.md` (+1/−2) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `src/ceremonies/.claude/skills/run-src-ceremonies/SKILL.md` (+7/−10) — connect-phase wording; removed the `bun test` block for the deleted **tests** dir
+  - `src/commands/.claude/skills/run-src-commands/SKILL.md` (+5/−5) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `src/commands/CLAUDE.md` (+12/−13) — reshaped: refs in the title, framing = invariant/blast radius + driver, bullets invariant → conventions → gotchas → pointers; glossary words; root/parent restatements removed
+  - `src/exec/.claude/skills/run-src-exec/SKILL.md` (+1/−2) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `src/items/.claude/skills/run-src-items/SKILL.md` (+1/−2) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `src/items/CLAUDE.md` (+19/−21) — reshaped: refs in the title, framing = invariant/blast radius + driver, bullets invariant → conventions → gotchas → pointers; glossary words; root/parent restatements removed
+  - `src/items/chrome/.claude/skills/run-src-items-chrome/SKILL.md` (+7/−14) — driver re-run; expected output includes the folded-in swiftc typecheck lines; trailing paragraphs merged into the intro
+  - `src/items/chrome/CLAUDE.md` (+8/−7) — reshaped: refs in the title, framing = invariant/blast radius + driver, bullets invariant → conventions → gotchas → pointers; glossary words; root/parent restatements removed
+  - `src/items/claude-code/.claude/skills/run-src-items-claude-code/SKILL.md` (+6/−13) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `src/items/claude-code/CLAUDE.md` (+16/−13) — reshaped: refs in the title, framing = invariant/blast radius + driver, bullets invariant → conventions → gotchas → pointers; glossary words; root/parent restatements removed
+  - `src/items/claude-code/assets/.claude/skills/run-src-items-claude-code-assets/SKILL.md` (+3/−9) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `src/items/defs/.claude/skills/run-src-items-defs/SKILL.md` (+4/−10) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `src/items/defs/CLAUDE.md` (+10/−9) — reshaped: refs in the title, framing = invariant/blast radius + driver, bullets invariant → conventions → gotchas → pointers; glossary words; root/parent restatements removed
+  - `src/items/editors/.claude/skills/run-src-items-editors/SKILL.md` (+3/−10) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `src/items/factories/.claude/skills/run-src-items-factories/SKILL.md` (+2/−9) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `src/items/finder/.claude/skills/run-src-items-finder/SKILL.md` (+6/−12) — driver re-run; expected output includes the folded-in swiftc typecheck lines; trailing paragraphs merged into the intro
+  - `src/items/finder/CLAUDE.md` (+7/−6) — reshaped: refs in the title, framing = invariant/blast radius + driver, bullets invariant → conventions → gotchas → pointers; glossary words; root/parent restatements removed
+  - `src/items/ghostty/.claude/skills/run-src-items-ghostty/SKILL.md` (+5/−11) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `src/items/quick-actions/.claude/skills/run-src-items-quick-actions/SKILL.md` (+2/−9) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `src/items/repos/.claude/skills/run-src-items-repos/SKILL.md` (+2/−9) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `src/items/typora/.claude/skills/run-src-items-typora/SKILL.md` (+4/−10) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `src/journal/.claude/skills/run-src-journal/SKILL.md` (+1/−2) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `src/manifest/.claude/skills/run-src-manifest/SKILL.md` (+1/−2) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `src/orchestrator/.claude/skills/run-src-orchestrator/SKILL.md` (+1/−2) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `src/orchestrator/CLAUDE.md` (+10/−11) — reshaped: refs in the title, framing = invariant/blast radius + driver, bullets invariant → conventions → gotchas → pointers; glossary words; root/parent restatements removed
+  - `src/paths/.claude/skills/run-src-paths/SKILL.md` (+1/−2) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `src/secrets/.claude/skills/run-src-secrets/SKILL.md` (+1/−2) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `src/ui/.claude/skills/run-src-ui/SKILL.md` (+1/−2) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `src/ui/CLAUDE.md` (+9/−9) — reshaped: refs in the title, framing = invariant/blast radius + driver, bullets invariant → conventions → gotchas → pointers; glossary words; root/parent restatements removed
+  - `vendor/.claude/skills/run-vendor/SKILL.md` (+1/−1) — uniform shape: one paths/PATH line, no per-block export, no generic Setup, section order Run (agent path) → Direct invocation → Build → Run (human) → Test → Gotchas → Troubleshooting; glossary words
+  - `vendor/README.md` (+3/−2) — ADR-003 link and `/run-vendor` pointer; conversion step names the ADR supersession
+- Notes: Three forks, disjoint file sets, one shape spec each; verified afterwards with a scanner (CONTEXT.md avoid-words in prose, duplicated sentences across all 55 agent-facing files, nested-CLAUDE.md shape) → 0 / 0 / clean, plus link check (0 broken), markdownlint, and the smoke driver. Commands whose output changed (doctor outro, link-check counts, chrome/finder drivers) were re-run before their blocks were edited.
