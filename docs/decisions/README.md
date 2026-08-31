@@ -31,6 +31,8 @@ away) and cite the session entry (sha).
 | [019](ADR-019-session-skill-invocation-and-name.md) | One model-invoked `/session` skill (start · entry · end · close; typed-only `/session-*` aliases) named for its leading word; the check gate guards its side effects | accepted |
 | [020](ADR-020-session-model.md) | A session is a bounded stream of work with `Status: open \| closed` and a `Plan:` line, not a conversation; a conversation joins or opens one before its first commit | accepted |
 | [021](ADR-021-entry-grain.md) | The session log holds value only: an entry per change worth reading about; a fix-up is vouched for by its parent's `Also:` line, a valueless commit carries `Session-entry: none`; every commit still accounted for | accepted |
+| [022](ADR-022-rehydrate-by-plan.md) | Rehydrate by plan: each plan part carries `> Status: planned \| in progress (session SES-NNN) \| done (session SES-NNN, sha)`, the PRD lists its plans, and `/session start PLAN-NNN` walks PRD → plan → part → session | accepted |
+| [023](ADR-023-session-plugin.md) | The session skill, its aliases and its tool ship as the `session` plugin (acmelabs-15/session, ACMElabs marketplace); this repo consumes it and keeps only its docs | accepted |
 
 ## Rules
 

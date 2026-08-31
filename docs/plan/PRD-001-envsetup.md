@@ -197,6 +197,13 @@ interactive changes; `envsetup doctor` on Peter's machine as the live read-only 
 Windows/Linux; managed/MDM deployment; cloud sync of app settings (Raycast `.rayconfig` etc.);
 notarization (until needed); a plugin system for third-party catalogs.
 
+## Plans
+
+| Plan | Implements | Status |
+| --- | --- | --- |
+| [PLAN-001-visual-grouping.md](PLAN-001-visual-grouping.md) | UX requirement 4 | planned — patch parked on `wip/visual-grouping` |
+| [PLAN-002-nested-claude-md.md](PLAN-002-nested-claude-md.md) | agent guidance placement (ADR-018) | done — merged 2026-08-30 (session SES-004) |
+
 ## Open questions
 
 - Persist the binary to `~/.local/bin/envsetup` so re-runs don't re-download (OVERVIEW Next up).

@@ -123,7 +123,7 @@ Also mutating/attended, never for drivers: `sync`, `connect`, `auth`, `secrets` 
 ```bash
 bun test                        # 111 pass, 0 fail (31 files)
 bun run check                   # Biome + tsc + markdownlint — the CI / pre-push gate
-bun run session check --session SES-NNN   # session log complete? (see /run-session-tool)
+bun ~/Dev/ACMElabs/session/skills/session/scripts/session.ts check --session SES-NNN   # session log complete? (the session plugin's tool)
 bun docs/.claude/skills/run-docs/link-check.ts   # every relative link in docs/ resolves (see /run-docs)
 ```
 

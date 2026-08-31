@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "dev": "bun src/index.ts",
-    "test": "bun test && bun test ./.claude/skills/session/scripts/__tests__/session-lib.test.ts",
+    "test": "bun test",
     "typecheck": "bun tsc --noEmit",
     "format": "biome format --write .",
     "lint": "biome check .",
@@ -16,7 +16,6 @@
     "fix": "biome check --write . && markdownlint-cli2 --fix",
     "check": "biome check . && bun tsc --noEmit && markdownlint-cli2",
     "changelog": "git-cliff -o CHANGELOG.md",
-    "session": "bun .claude/skills/session/scripts/session.ts",
     "compile": "bun build --compile src/index.ts --outfile dist/envsetup",
     "prepare": "lefthook install"
   },

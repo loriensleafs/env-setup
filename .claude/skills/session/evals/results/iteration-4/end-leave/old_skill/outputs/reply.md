@@ -1,2 +1,0 @@
-Shipped: `1d3d3d4` docs(session): handoff SES-006 — Open at end + Narrative written, OVERVIEW Status names SES-006 in flight, ADR pass now top of Next up; gate `session: complete (SES-006, open)`; tree clean on `main`, 2 commits unpushed; `gh pr list` skipped (origin is a local path).
-Next time: read `docs/decisions/README.md` + ADR-001…020 in full, fix what is stale, entry per commit, then `/session close`.  (SES-006 stays open)

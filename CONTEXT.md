@@ -210,13 +210,19 @@ stop for now with the log complete and a handoff written; the session stays open
 Goal is done: Outcome written, status flipped to closed.
 _Avoid_: end (for close), finish, resume (for join), create (for open)
 
+**Plan part**:
+One `### Part N` of a plan in `docs/plan/`, with its own status line — `planned`, `in progress
+(session SES-NNN)` or `done (session SES-NNN, sha)` — the pointer a new conversation follows from
+the plan to the session that holds its story (ADR-022). One session per part.
+_Avoid_: phase (as the heading word), step, milestone, ticket
+
 **Handoff**:
 The `Open at end` line of an open session: what the next conversation picks up first and what is
 unverified, written when a conversation leaves.
 _Avoid_: notes, todo, next steps (as the field name)
 
 **Gate**:
-`bun run session check`: exit 0 only when every commit on the branch is accounted for and your
+`session check` (the plugin's tool): exit 0 only when every commit on the branch is accounted for and your
 session has no placeholder the gate counts. Its exit status is the verdict; nothing is piped after
 it.
 _Avoid_: check (as the noun), lint, validation

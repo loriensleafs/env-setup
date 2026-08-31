@@ -11,11 +11,13 @@ applies the manifest without the picker. Owner: Peter Kloss (github `loriensleaf
 
 ## Rehydrating — at session start, run `/session start` (alias `/session-start`)
 
-The `/session` skill (`.claude/skills/session/`) is the one home of the session ritual: `start`
-reads the docs system in the right order — OVERVIEW (Status, Next up, Key facts) → every **open**
-`SES-NNN` in full → [CONTEXT.md](CONTEXT.md) → the tree checked against the log → the area's PLAN /
-ADRs / ANAs and its nested `CLAUDE.md` — then joins the open session whose Goal is this work, opens
-one for it, or states that nothing will change, and ends in a brief. A session is a stream of work
+The `/session` skill — the `session` plugin from the ACMElabs marketplace (ADR-023), not a file in
+this repo — is the one home of the session ritual: `start [PLAN-NNN]` reads the docs system in
+the right order — OVERVIEW (Status, Next up, Key facts) → the plan and the PRD it serves → every
+**open** `SES-NNN` serving it in full → [CONTEXT.md](CONTEXT.md) → the tree checked against the
+log → the ADRs / ANAs the plan cites and the nested `CLAUDE.md` — then joins the open session the
+plan part names, opens one for it and marks the part in progress, or states that nothing will
+change, and ends in a brief (ADR-022). A session is a stream of work
 toward one Goal, open until closed, and may span many conversations (ADR-020); a conversation
 needs one before its first commit, not before its first answer. **Every file it names is read in
 full, to the end, with no sampling**; a truncated read is continued with `offset`, never
@@ -46,8 +48,8 @@ same step (OVERVIEW, ADR, PRD, plan, analysis, `CONTEXT.md`, a directory's `CLAU
 commits it as `docs(session): …`. The session log holds value only (ADR-021): a fix-up gets no entry
 (its parent's `Also:` line vouches for it) and a commit with nothing to record carries the trailer
 `Session-entry: none`; `end` checks the log, Status and the tree and leaves the
-session open with a handoff; `close` writes the Outcome, runs `bun run session close`, and
-updates the plan the session served. The procedure lives in the skill, the template in
+session open with a handoff; `close` writes the Outcome, runs `session close`, and
+marks the plan part `done (session SES-NNN, sha)`. The procedure lives in the skill, the template in
 `docs/sessions/README.md`; `/session-start`, `/session-entry`, `/session-end` and
 `/session-close` are typed-only aliases. Never put it off; the next conversation's `start`
 depends on it.
@@ -97,13 +99,11 @@ bun run fix                      # auto-fix Biome + markdown
 bun run test                     # bun:test suite
 bun run compile                  # standalone binary → dist/envsetup
 bun run changelog                # regenerate CHANGELOG.md (git-cliff)
-bun run session list                  # every session with its status (open | closed), plan and Goal
-bun run session new <slug> [--plan "PLAN-NNN · part"]   # open SES-<next>-<slug>.md (/session start, when the work is new)
-bun run session append --session SES-NNN       # append entry skeletons for new commits into YOUR session
-bun run session current --session SES-NNN   # list your placeholders by line
-bun run session check --session SES-NNN     # the gate: exit 1 on missing/unfilled; others' files only warn
-bun run session close --session SES-NNN     # Goal done: gate, then Status: closed
 ```
+
+The session tool (`list`, `new`, `append`, `current`, `check`, `close`) is the `session`
+plugin's, run by the `/session` skill as `bun "${CLAUDE_PLUGIN_ROOT}/skills/session/scripts/session.ts" …`; by hand,
+`bun ~/Dev/ACMElabs/session/skills/session/scripts/session.ts <command>` (ADR-023).
 
 ## Safety when running it
 

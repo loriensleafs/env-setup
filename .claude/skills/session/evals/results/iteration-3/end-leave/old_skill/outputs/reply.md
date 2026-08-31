@@ -1,2 +1,0 @@
-Shipped: `1f4aa0f` docs(session) — SES-006 left open, Narrative and Open at end written; no other doc changed (OVERVIEW untouched). Branch `feat/session-model` is clean, 3 commits ahead of `origin/main`, no PR (origin is a local path, so `gh` cannot see one).
-Next time: the ADR pass — `docs/decisions/` ADR-001…020 plus its README, in full, fix anything stale, then `/session close`. Also respell the skill's injected gate line: `bun run session -- --check` crashes the current tool; the gate by hand (`check --session SES-006`) is green.
