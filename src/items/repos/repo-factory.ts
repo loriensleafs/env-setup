@@ -69,10 +69,10 @@ export const ACMELABS_REPOS: RepoSpec[] = [
     dest: "ACMElabs/plugin-kit",
   },
   {
-    id: "repo-sessions",
-    title: "ACMElabs/sessions",
-    repo: "acmelabs-15/sessions",
-    dest: "ACMElabs/sessions",
+    id: "repo-brain",
+    title: "ACMElabs/brain",
+    repo: "acmelabs-15/brain",
+    dest: "ACMElabs/brain",
   },
   {
     id: "repo-code-review",
