@@ -15,9 +15,18 @@ it in shape with `doctor`/`sync`.
    re-derive history from the code.
 2. **Decisions:** [docs/PLAN.md](docs/PLAN.md) is the source of truth for every design decision and
    its rationale — read the relevant part before non-trivial work.
-3. **End (part of every PR, before merge):** `bun run ledger`, fill in the `Why` line of the new
-   entries (template in LEDGER.md), and update OVERVIEW "Status" / "Next up" if the picture
-   changed. Docs discipline is not optional — the next session depends on it.
+3. **End (part of every PR, before merge):** `bun run ledger` appends one entry per new commit
+   (with the files touched); fill in each entry's `Why` (and `Notes` when a future reader must know
+   something), commit as `docs(ledger): …`, and update OVERVIEW "Status" / "Next up" if the
+   picture changed. Docs discipline is not optional — the next session depends on it. An entry:
+
+   ```markdown
+   ### YYYY-MM-DD · type(scope): subject · sha
+
+   - Files: `path/a.ts`, `path/b.ts`
+   - Why: one line — the problem or request that caused the change (name who asked if Peter did)
+   - Notes: optional — gotchas, follow-ups, what was verified and how
+   ```
 
 Other docs: Config model + verified compatibility research:
 [docs/CONFIG-COMPAT-PLAN.md](docs/CONFIG-COMPAT-PLAN.md). Research foundation:
