@@ -16,7 +16,7 @@ console.log("src driver — bun src/index.ts\n");
 check("--help lists the subcommands", ["--help"], "auth|connect|doctor|sync|secrets");
 check("--version", ["--version"], "0.");
 check("doctor --help", ["doctor", "--help"], "Diff this machine");
-const out = check("doctor (read-only diff of this machine)", ["doctor"], "in sync");
+const out = check("doctor (read-only diff of this machine)", ["doctor"], "satisfied");
 console.log(
   `    ${out
     .trim()

@@ -21,6 +21,7 @@ Owner: Peter Kloss (github loriensleafs). Public repo. Released: v0.1.9 (2026-08
 
 | Doc | Job | Produced by |
 | --- | --- | --- |
+| [CONTEXT.md](../CONTEXT.md) | **The glossary** — the canonical word for every concept (item states, picked vs wanted, applied, ceremony, …) and the words to avoid. Code labels, prompts and docs use these words; a new or changed term is settled with the `domain-modeling` skill and written here first. | `domain-modeling` skill |
 | [CLAUDE.md](../CLAUDE.md) (= `AGENTS.md`) | Always-loaded agent brief: how to rehydrate, how to record, hard rules, architecture essentials. | by hand |
 | [CONTRIBUTING.md](../CONTRIBUTING.md) | Setup, change workflow, conventional commits, **how to cut a release**. | by hand |
 | [docs/sessions/](sessions/README.md) `SES-NNN` | **What was done, session by session**: Goal / Outcome / Open, a Narrative (asked, tried, abandoned, verified), per commit a Summary, Why and a note per touched file. **Read the newest right after "Status".** | `bun run session` (`-- --new <slug>` starts one; `-- --check` gates) + the author |
@@ -60,7 +61,7 @@ the change that makes a doc stale updates it in the same step, citing the sessio
   matching our effective defaults). Drift-aware `detect()` on every item with defaults.
 - **Reset-on-drift model** ([ADR-010](decisions/ADR-010-reset-on-drift-config-model.md)): an item is
   off the install list only if installed at the wanted version AND config exactly matches; drifted
-  items show as "installed — settings differ (select to reset)", **unchecked** — selection is the
+  items show as "applied — settings differ (select to reset)", **unchecked** — selection is the
   consent. No conflict checking.
 - **Manifest** (`src/manifest/`): Zod-versioned, auto-migrated on load (`migrations.ts` has the
   recipe). **Journal** (JSONL): resumable runs, `failedSteps` drive "failed last run — retry".
@@ -121,6 +122,9 @@ the change that makes a doc stale updates it in the same step, citing the sessio
   v0.1.9 (source comments repointed only).
 - **Unreleased on `main`** (SES-004, after `855bfd6`): nested `CLAUDE.md` files + path rules per
   ADR-018; run skills pruned to the 28 with real drivers (PLAN-002).
+- **Unreleased code on `main`** (SES-004): `doctor` reports Drifted as its own note and counts
+  "satisfied"; picker/summary/outcome prose says "applied"; the deferred message no longer tells
+  the user to run `connect` (it runs automatically). Ships with v0.1.10.
 - **Parked, not on `main`:** the visual-grouping patch ([PLAN-001](plan/PLAN-001-visual-grouping.md))
   as a WIP commit on local branch `wip/visual-grouping` (unverified, never run under a PTY).
 

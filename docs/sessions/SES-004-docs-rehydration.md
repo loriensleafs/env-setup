@@ -37,6 +37,18 @@ the files in docs use similar naming conventions — decisions does a good job" 
 everywhere, sessions renumbered `SES-NNN` (the script now numbers and orders by it; the H1 keeps
 the start timestamp), source comments repointed from `docs/PLAN.md` to the ADR/PRD they meant.
 
+Then `/domain-modeling`: the vocabulary was pulled from the code (item kinds, DetectResult fields,
+orchestrator outcomes, doctor/bootstrap labels, ceremony ids) and `CONTEXT.md` seeded with the terms
+the ADRs already settle. Three collisions went to Peter one at a time, each with a scenario: the
+same config-mismatch idea had four names (`differs`, "settings differ", doctor's `drift` array filed
+under "missing", the docs' "drift") → **Satisfied / Missing / Drifted / Untracked**; "selected" meant
+both the picker's choice and the manifest's "this machine should have it" → **Picked / Wanted**
+(unchecking a present item stays a no-op, and the summary now says so); `installed` was stretched
+over configuration → **Applied** (with **Present** for the raw fact). Cross-reference findings fixed
+along the way: `doctor` filed drifted items under "missing" (Peter's machine shows `1 drifted` now),
+and the `deferred` outcome still told the user to run `envsetup connect`, automatic since v0.1.7.
+A blanket replace briefly rewrote Peter's quoted words in ADR-010 — restored; quotes are not labels.
+
 ## Changes (one entry per commit, in order)
 
 ### 2026-08-30 · docs: OVERVIEW.md — project map, status, and handoff for new sessions · bb46dcb

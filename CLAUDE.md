@@ -28,7 +28,11 @@ rules and template.
    `ANA-NNN` in [docs/analysis/](docs/analysis/README.md) for facts you would otherwise re-research;
    `grep -rn <file-or-keyword> docs/sessions/` for prior changes; `git show <sha>` only when the
    exact diff matters.
-4. [docs/plan/PRD-001-envsetup.md](docs/plan/PRD-001-envsetup.md) for what envsetup must do (the
+4. [CONTEXT.md](CONTEXT.md) is the glossary: use its words in code labels, prompts, commit
+   messages and docs (item states Applied / Satisfied / Missing / Drifted / Untracked; Picked vs
+   Wanted; Ceremony; Converge). A term that is missing, fuzzy or contested is settled with the
+   `domain-modeling` skill and written there before the code uses it.
+5. [docs/plan/PRD-001-envsetup.md](docs/plan/PRD-001-envsetup.md) for what envsetup must do (the
    promise, UX requirements, item catalog with chosen defaults, boundaries) whenever the work
    touches behaviour. `docs/archive/` is history only — never cite it as current.
 
@@ -100,7 +104,7 @@ workflow: [CONTRIBUTING.md](CONTRIBUTING.md).
 - **Reset-on-drift** (the config model): `detect()` must be drift-aware — compare the ACTUAL
   current values to the effective config, and return `{ installed: false, differs: true }` when
   config is present but mismatched (vs plain `installed: false` for never-configured). Drifted
-  items re-enter the bootstrap list as "installed — settings differ (select to reset)", default
+  items re-enter the bootstrap list as "applied — settings differ (select to reset)", default
   UNCHECKED — selection is the user's consent to re-apply; we never silently overwrite. No
   conflict checking, by decision (docs/decisions/ADR-010-reset-on-drift-config-model.md).
 - **`zsh()` contributions** are co-located per item and assembled into the managed `~/.zshrc`

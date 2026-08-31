@@ -26,7 +26,7 @@ Peter judged the machinery over-complicated relative to the value.
    install **and**, if we define defaults for it, its current values **exactly match** the
    effective config (manifest config, else schema defaults).
 2. Anything installed whose configuration drifted **stays listed**, marked
-   **"installed — settings differ (select to reset)"**, default **unchecked**. Selecting it is the
+   **"applied — settings differ (select to reset)"**, default **unchecked**. Selecting it is the
    user's opt-in to reset (or vary via the config screen). Unselected = untouched. `doctor` shows
    drift as `≠`, not "missing".
 3. **No conflict checking.** No `superRefine` compatibility rules, no `deriveDisabled`, no

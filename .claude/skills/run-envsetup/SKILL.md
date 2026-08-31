@@ -59,7 +59,7 @@ t=re.sub(r'\x1b\[[0-9;?]*[A-Za-z]','',t);print('\n'.join(l for l in t.replace('\
 What the stripped transcript shows, in order: the scan task log collapsing to `◆ Ready in
 Ns`; `Your name (git commits)` / `GitHub username` / `Dev directory` prefilled from the prior
 manifest and accepted; the picker (`What should this machine get?`) with missing items checked
-and drifted ones shown as `installed — settings differ` unchecked; any config screens for
+and drifted ones shown as `applied — settings differ` unchecked; any config screens for
 selected items with a schema; the `plan` note (`N items will be installed · M already
 installed`); `Proceed? (nothing has touched the system yet)` → `No` → `nothing was changed`.
 
@@ -89,7 +89,7 @@ Expected tail:
 ```text
 read-only machine diff:
   ✓ doctor runs and reports a diff
-  ✓ doctor outro shape (in sync · missing · untracked · shell-gap)
+  ✓ doctor outro shape (satisfied · missing · drifted · untracked · shell-gap)
 
 PASS — 8 passed, 0 failed
 ```

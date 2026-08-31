@@ -29,7 +29,7 @@ commands. Every installable/configurable thing is an **item** (`detect`/`install
 
 **Your settings are respected.** Something already installed with settings that differ from
 envsetup's defaults is never silently overwritten — it shows in the picker as
-*"installed — settings differ (select to reset)"*, unchecked. Selecting it is the opt-in to
+*"applied — settings differ (select to reset)"*, unchecked. Selecting it is the opt-in to
 reset; leave it unchecked and your configuration is untouched. `doctor` reports such drift
 as `≠` rather than "missing".
 
