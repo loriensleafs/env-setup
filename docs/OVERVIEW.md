@@ -111,7 +111,7 @@ small separate commands, merge commits). The facts below are the ones a rule can
   end-to-end on a fresh machine (first full connect run pending).
 - **Unreleased on `main`** ([SES-004](sessions/SES-004-docs-rehydration.md)) — docs: OVERVIEW
   (`bb46dcb`), the session log (`7439bec` … `db47945`), the docs system (`sessions/`, `plan/`,
-  `analysis/`, `decisions/` ADR-001…020, `archive/`, `<TYPE>-<NNN>` naming), run skills (28 with
+  `analysis/`, `decisions/` ADR-001…021, `archive/`, `<TYPE>-<NNN>` naming), run skills (28 with
   real drivers), nested `CLAUDE.md` files + path rules (ADR-018), `CONTEXT.md`, the rewritten root
   files. Code: `doctor` reports Drifted as its own note and counts "satisfied"; picker, summary and
   outcome prose say "applied"; the deferred message no longer tells the user to run `connect`;

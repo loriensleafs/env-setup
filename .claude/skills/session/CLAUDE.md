@@ -4,7 +4,7 @@
 `bun run session` (`package.json` points here), driven and tested by `/run-session-tool`; its pure
 half — header parsing, session selection, the status edit — is `scripts/session-lib.ts`, tested in
 `scripts/__tests__/session-lib.test.ts`. Tool invariants: it skips `docs(session)` and
-`docs(ledger)` commits; uses `--no-renames` (a rename is a delete + an add); orders sessions by
+`docs(ledger)` commits and commits whose message carries `Session-entry: none`, and reads a parent entry's `- Also: <sha>` lines as accounting for fix-ups (ADR-021); uses `--no-renames` (a rename is a delete + an add); orders sessions by
 `SES-NNN`; requires the H1 timestamp line; reads `Status: open | closed` (absent = open) and
 `Plan:`; the target of an append, `check` or `close` is the session named with `--session`,
 else the single open one — none or several open is an error, never a guess; `close` runs the

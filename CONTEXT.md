@@ -199,9 +199,11 @@ Goal is done or abandoned, the Outcome says which; nothing is appended to it aga
 _Avoid_: current (as the status word), active, done (for the status), finished
 
 **Entry**:
-One commit's block in a session file — Summary, Why, one line per touched file, Notes — written by
-`/session entry` right after the commit.
-_Avoid_: log entry, note, update, record (as the noun)
+The block a change worth reading about gets in a session file — Summary, Why, one line per
+touched file, Notes — written by `/session entry` right after the commit. The ledger holds value
+only: a fix-up commit gets no entry and is vouched for by its parent's `Also:` line; a commit with
+nothing to record says so itself (`Session-entry: none`) and gets none.
+_Avoid_: log entry, note, update, record (as the noun), commit (as the unit — a commit is git's)
 
 **Record** (verb):
 To write the entry and update everything the commit made stale, in the same step; the practice

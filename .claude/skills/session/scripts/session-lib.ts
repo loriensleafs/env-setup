@@ -129,3 +129,25 @@ export function selectSession(all: readonly Session[], arg: string | undefined):
   const list = open.map((s) => `${id(s.seq)} (${s.title})`).join(", ");
   throw new Error(`${open.length} open sessions — say which with --session: ${list}`);
 }
+
+/**
+ * The shas a session accounts for: every entry heading, plus every sha a parent
+ * entry names on an `- Also:` line -- a fix-up commit whose value belongs to that
+ * parent gets no entry of its own (ADR-021), so the parent vouches for it.
+ */
+export function knownShas(text: string): string[] {
+  const heads = [...text.matchAll(/^### .* · ([0-9a-f]{7,40})$/gm)].map((m) => m[1]);
+  const also = [...text.matchAll(/^\s*- Also: ([0-9a-f]{7,40})\b/gm)].map((m) => m[1]);
+  return [...heads, ...also];
+}
+
+/**
+ * A commit that says, in its own message, that the ledger has nothing to gain
+ * from it: the trailer `Session-entry: none`. The tool skips it like it skips
+ * `docs(session)` commits. Only the commit's author can make that call, and
+ * only at commit time -- which is the point: the ledger holds value, and the
+ * decision that a commit has none is recorded where it cannot be forgotten.
+ */
+export function declinesEntry(body: string): boolean {
+  return /^Session-entry:\s*none\s*$/im.test(body);
+}
