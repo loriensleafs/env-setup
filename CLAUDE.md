@@ -9,34 +9,16 @@ pointers below.
 runs the attended ceremonies, and **converges** on re-run; `doctor` is the read-only diff; `sync`
 applies the manifest without the picker. Owner: Peter Kloss (github `loriensleafs`).
 
-## Rehydrating — read in this order at session start, then work
+## Rehydrating — at session start, run `/rehydrate`
 
-Do **not** rebuild history from the code or `git log`; the docs system exists so you never have to.
-Every doc is `<TYPE>-<NNN>-<kebab-title>.md` in its directory; each directory's `README.md` holds
-its rules, index and template.
-
-1. [docs/OVERVIEW.md](docs/OVERVIEW.md) — the map. Read **"Status"**, **"Next up"** and **"Key
-   empirical facts"** in full: where the project is, what is next, what not to relearn.
-2. [docs/sessions/](docs/sessions/README.md) — the newest `SES-NNN` **in full** (Goal / Outcome /
-   Open at end, Narrative, Changes), then earlier ones back to the last `> **Released vX.Y.Z**`
-   marker: what is on `main` but unreleased, what is parked, what was tried and abandoned, what was
-   verified and how.
-3. [CONTEXT.md](CONTEXT.md) — the glossary. Its words are the words for code labels, prompts,
-   commit messages and docs (Applied / Satisfied / Missing / Drifted / Untracked; Picked vs Wanted;
-   Ceremony; Converge). A missing, fuzzy or contested term is settled with the `domain-modeling`
-   skill and written there before code uses it.
-4. For the area you will touch: its `PLAN-NNN` in [docs/plan/](docs/plan/README.md) if the work has
-   one; every relevant `ADR-NNN` in [docs/decisions/](docs/decisions/README.md) (decisions are
-   settled — a change needs a superseding ADR, never a re-litigation); the `ANA-NNN` in
-   [docs/analysis/](docs/analysis/README.md) for facts you would otherwise re-research;
-   `grep -rn <file-or-keyword> docs/sessions/` for prior changes; `git show <sha>` only when the
-   exact diff matters. The directory's own `CLAUDE.md` loads when you read files there and carries
-   that area's conventions and gotchas (`src/`, `src/{commands,items,orchestrator,ui}/`,
-   `src/items/{chrome,claude-code,defs,finder}/`, `docs/` + subdirectories, `.github/`, `scripts/`);
-   `.claude/rules/` adds file-type rules for run-skill drivers and `__tests__` (ADR-018).
-5. [docs/plan/PRD-001-envsetup.md](docs/plan/PRD-001-envsetup.md) whenever the work touches
-   behaviour: the promise, UX requirements, the item catalog with its chosen defaults, boundaries.
-   `docs/archive/` is history only — never cite it as current.
+The `/rehydrate` skill (`.claude/skills/rehydrate/`) is the one home of the reading order and its
+completion criterion: OVERVIEW (Status, Next up, Key facts) → the newest `SES-NNN` in full →
+[CONTEXT.md](CONTEXT.md) → the tree checked against the log → the area's PLAN / ADRs / ANAs and its
+nested `CLAUDE.md` → this conversation's session file → a brief to the user. Do **not** rebuild
+history from the code or `git log`; the docs system exists so you never have to. Every doc is
+`<TYPE>-<NNN>-<kebab-title>.md` in its directory; each directory's `README.md` holds its rules,
+index and template; `docs/archive/` is history only. At the end of a conversation `/wrap-up` checks
+that everything the next `/rehydrate` relies on has been written.
 
 ## Working with Peter
 
