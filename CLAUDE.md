@@ -126,5 +126,8 @@ bun run session -- --check # fail if entries are missing or placeholders unfille
 
 `envsetup` mutates the real macOS system. Bare `envsetup` (bootstrap) and `sync` **install
 software and change settings** — never run them to "test." `doctor` is read-only (diffs the
-machine against its manifest). To drive/smoke the CLI safely, use the run skill:
-`.claude/skills/run-envsetup/` (`bun .claude/skills/run-envsetup/smoke.mjs`).
+machine against its manifest). To drive/smoke the CLI safely, use the run skills: the root one
+(`/run-envsetup`: `expect .claude/skills/run-envsetup/bootstrap-walk.exp` walks the real TUI up to
+"Proceed?" and answers No; `bun .claude/skills/run-envsetup/smoke.mjs` covers the read-only
+surfaces) and one per directory (`<dir>/.claude/skills/run-*/driver.ts` — direct invocation of that
+module's safe functions). Never bypass them to "test" with a real run.

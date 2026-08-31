@@ -47,7 +47,12 @@ If `bun` isn't found, add it to PATH: `export PATH="$HOME/.bun/bin:$PATH"`.
    prompt passes `input: promptInput()` ([ADR-014](docs/decisions/ADR-014-terminal-input-in-process-dev-tty.md)).
    A new decision with alternatives gets an ADR; a new default or item updates the PRD's catalog.
 
-3. **Keep it green.**
+3. **Drive it, don't guess.** Every directory has a `/run-…` skill (`<dir>/.claude/skills/run-*/`)
+   with a driver that exercises its module safely; the root `/run-envsetup` walks the real bootstrap
+   TUI under `expect` up to the confirm. Run the driver for the directory you changed (and extend it
+   when you add a surface) — bare `envsetup`/`sync` mutate the machine and are never a test.
+
+4. **Keep it green.**
 
    ```bash
    bun run fix        # auto-fix Biome + markdown
@@ -55,7 +60,7 @@ If `bun` isn't found, add it to PATH: `export PATH="$HOME/.bun/bin:$PATH"`.
    bun test           # must pass
    ```
 
-4. **Commit with Conventional Commits** — the changelog is generated from them, so the type
+5. **Commit with Conventional Commits** — the changelog is generated from them, so the type
    prefix matters:
 
    | Prefix | Use for | Changelog group |
@@ -70,7 +75,7 @@ If `bun` isn't found, add it to PATH: `export PATH="$HOME/.bun/bin:$PATH"`.
    blocking only on un-auto-fixable lint or type errors. The **pre-push** hook runs the full
    check + tests.
 
-5. **Record it — continuously, not after.** At session start `bun run session -- --new <slug>`
+6. **Record it — continuously, not after.** At session start `bun run session -- --new <slug>`
    creates the session file. After every commit `bun run session` appends an entry skeleton to it
    (`Summary` / `Why` placeholders and one line per touched file — every file: code, docs, config,
    CI, scripts). Fill in every placeholder (template in [docs/sessions/README.md](docs/sessions/README.md)),
@@ -79,7 +84,7 @@ If `bun` isn't found, add it to PATH: `export PATH="$HOME/.bun/bin:$PATH"`.
    (the script skips those commits). After a release tag, run `bun run session` once more so the
    release marker lands.
 
-6. **Open a PR** (`gh pr create`). CI (`.github/workflows/ci.yml`) runs the same checks plus a
+7. **Open a PR** (`gh pr create`). CI (`.github/workflows/ci.yml`) runs the same checks plus a
    gitleaks secret scan. Merge once green.
 
 ## Cutting a release

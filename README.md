@@ -36,7 +36,7 @@ as `≠` rather than "missing".
 **Working on it (humans and agents): start at [docs/OVERVIEW.md](docs/OVERVIEW.md)** (map,
 status, next up), then the newest file in [docs/sessions/](docs/sessions/README.md) (what was done, session
 by session, with a note per touched file). Design + all decisions: [docs/archive/ARC-001-living-plan.md](docs/archive/ARC-001-living-plan.md) · research:
-[docs/RESEARCH-ANA-001-clack-citty-bun.md](docs/RESEARCH-ANA-001-clack-citty-bun.md) · agent conventions:
+[docs/analysis/ANA-001-clack-citty-bun.md](docs/analysis/ANA-001-clack-citty-bun.md) · agent conventions:
 [CLAUDE.md](CLAUDE.md) (also `AGENTS.md`).
 
 ## Development

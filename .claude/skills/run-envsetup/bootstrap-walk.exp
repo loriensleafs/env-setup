@@ -1,0 +1,70 @@
+#!/usr/bin/expect -f
+# bootstrap-walk.exp — drive the REAL interactive bootstrap under a PTY, all
+# the way through scan → identity → dev dir → picker → config screens →
+# summary, and answer NO at "Proceed?". Nothing is written before that
+# confirm (src/commands/bootstrap.ts saves the manifest only after it), so
+# this is a read-only walk of the whole Stage A UI.
+#
+# Usage (repo root):  expect .claude/skills/run-envsetup/bootstrap-walk.exp [transcript]
+# Exit 0 = reached "Proceed?" and cancelled ("nothing was changed").
+# Transcript (raw ANSI) → $transcript (default /tmp/envsetup-bootstrap-walk.txt).
+#
+# Safety rules baked in:
+#  - "Resume it?" is always answered n (resuming would INSTALL).
+#  - "Proceed?" is matched FIRST and answered n; plain Enter is never sent to it.
+#  - Enter is sent to a prompt only once its message is new, and the driver
+#    waits for that prompt's submitted (◇) line before moving on — a duplicate
+#    Enter can't leak into the next prompt.
+set timeout 60
+set transcript [lindex $argv 0]
+if {$transcript eq ""} { set transcript "/tmp/envsetup-bootstrap-walk.txt" }
+log_file -noappend $transcript
+set env(TERM) xterm-256color
+encoding system utf-8
+spawn bun src/index.ts
+fconfigure $spawn_id -encoding utf-8
+stty rows 50 columns 120 < $spawn_out(slave,name)
+
+set last ""
+set answered 0
+while {1} {
+  expect {
+    -re {Resume it\?} {
+      send "n"
+      puts "\n\[walk\] refused to resume an unfinished run"
+    }
+    -re {Proceed\? \(nothing has touched the system yet\)} {
+      sleep 0.3
+      send "n"
+      break
+    }
+    -re {◆[^ \r\n]* +([^\r\n]+?)\s*\r?\n} {
+      # the symbol is colour-wrapped (ESC[36m◆ESC[39m); strip ANSI from the message
+      set msg [string trim $expect_out(1,string)]
+      regsub -all {\x1b\[[0-9;?]*[A-Za-z]} $msg "" msg
+      set msg [string trim $msg]
+      # taskLog's collapsed "Ready in Xs" line also uses ◆ — not a prompt
+      if {[string match "Ready in *" $msg]} { exp_continue }
+      if {$msg eq $last} { exp_continue }
+      set last $msg
+      incr answered
+      sleep 0.2
+      send "\r"
+      # Wait for this prompt to submit (◇ + same message). The stock path
+      # prompt sometimes eats the first Enter → one retry.
+      set re "◇\[^ \r\n\]* +[string map {( \\( ) \\) [ \\[ ] \\] ? \\? . \\. * \\* + \\+ | \\|} $msg]"
+      expect {
+        -re $re {}
+        timeout { send "\r"; expect -re $re }
+      }
+    }
+    timeout { puts "\n\[walk\] TIMEOUT waiting for a prompt (last: $last)"; exit 2 }
+    eof { puts "\n\[walk\] EOF before Proceed? (last: $last)"; exit 3 }
+  }
+}
+expect {
+  -re {nothing was changed} { puts "\n\[walk\] OK — reached Proceed? after $answered prompts, answered No, nothing written" }
+  timeout { puts "\n\[walk\] no cancel message after answering No"; exit 4 }
+}
+expect eof
+exit 0

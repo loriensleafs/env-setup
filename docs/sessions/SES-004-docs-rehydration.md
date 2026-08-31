@@ -194,3 +194,91 @@ the start timestamp), source comments repointed from `docs/PLAN.md` to the ADR/P
   - `src/secrets/age-store.ts` (+1/−1) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
   - `src/secrets/secrets.ts` (+1/−1) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
 - Notes: `AGENTS.md` is a symlink to CLAUDE.md (edits go through it). `docs/archive/` is read-only history; ADR-017 records the alternatives Peter rejected on the way (single ledger, ledger + session notes). Source files changed only in comments.
+
+### 2026-08-30 · feat(skills): a /run-* skill with a verified driver in every directory · ba38081
+
+- Summary: A `/run-*` skill in every directory (56): the root one drives the real bootstrap TUI under `expect` up to (never past) the confirm; every source dir gets a `driver.ts` that directly invokes its safe functions; tests/docs/CI/scripts/vendor dirs get theirs. Every command was run.
+- Why: Peter ran `/run-skill-generator` with "do this recursively for every directory" and, asked about scope, chose literally every directory over one-per-unit.
+- Files:
+  - `.claude/skills/run-envsetup/SKILL.md` (+95/−52) — rewritten around the PTY walk + smoke driver; build, install.sh, tooling, gotchas from the three attempts (encoding, colour-wrapped symbols, `Ready in` line)
+  - `.claude/skills/run-envsetup/bootstrap-walk.exp` (+70/−0) — new — expect driver: walks scan → identity → dev dir → picker → config screens → summary, answers No at Proceed?; UTF-8 + ANSI-tolerant prompt matching; refuses Resume it?
+  - `.github/.claude/skills/run-github/SKILL.md` (+51/−0) — new — inspect workflows/runs via gh, reproduce the checks job locally
+  - `.github/workflows/.claude/skills/run-github-workflows/SKILL.md` (+50/−0) — new — inspect ci.yml/release.yml via gh, reproduce locally, what cannot be run
+  - `CLAUDE.md` (+5/−2) — "Safety when running it" names the PTY walk, smoke driver and per-directory drivers
+  - `CONTRIBUTING.md` (+9/−4) — new step 3 "Drive it, don't guess"; later steps renumbered
+  - `README.md` (+1/−1) — broken link `docs/RESEARCH-ANA-001-…` → `docs/analysis/ANA-001-clack-citty-bun.md`
+  - `docs/.claude/skills/run-docs/SKILL.md` (+53/−0) — new — link checker + markdownlint + session check for the whole docs system
+  - `docs/.claude/skills/run-docs/link-check.ts` (+44/−0) — new — relative-link checker for docs/** + CLAUDE/README/CONTRIBUTING (found 3 broken links on first run)
+  - `docs/OVERVIEW.md` (+1/−1) — doc-map row for the run skills
+  - `docs/analysis/.claude/skills/run-docs-analysis/SKILL.md` (+18/−0) — new — scoped link check + markdownlint (sessions: the session tool; archive: the moved-links gotcha)
+  - `docs/archive/.claude/skills/run-docs-archive/SKILL.md` (+23/−0) — new — scoped link check + markdownlint (sessions: the session tool; archive: the moved-links gotcha)
+  - `docs/archive/ARC-001-living-plan.md` (+3/−3) — two relative links repointed (`../OVERVIEW.md`, `../sessions/README.md`) after the move; banner notes it
+  - `docs/decisions/.claude/skills/run-docs-decisions/SKILL.md` (+18/−0) — new — scoped link check + markdownlint (sessions: the session tool; archive: the moved-links gotcha)
+  - `docs/plan/.claude/skills/run-docs-plan/SKILL.md` (+18/−0) — new — scoped link check + markdownlint (sessions: the session tool; archive: the moved-links gotcha)
+  - `docs/sessions/.claude/skills/run-docs-sessions/SKILL.md` (+28/−0) — new — scoped link check + markdownlint (sessions: the session tool; archive: the moved-links gotcha)
+  - `scripts/.claude/skills/run-scripts/SKILL.md` (+35/−0) — new — session tool: --check, append, --new (not run), gotchas
+  - `src/.claude/skills/run-src/SKILL.md` (+58/−0) — new — the entry `src/index.ts`; points at the root skill for the TUI walk
+  - `src/.claude/skills/run-src/driver.ts` (+29/−0) — new — entry-point surfaces via Bun.spawnSync (--help, --version, doctor --help, doctor)
+  - `src/auth/.claude/skills/run-src-auth/SKILL.md` (+52/−0) — new — how to drive this module: driver command + real output, direct-invocation snippet, `bun test` count
+  - `src/auth/.claude/skills/run-src-auth/driver.ts` (+70/−0) — new — direct invocation of this module's safe functions (mocked Runner / temp dirs / fixtures; detect() read-only; never install/configure/network)
+  - `src/auth/__tests__/.claude/skills/run-src-auth-tests/SKILL.md` (+27/−0) — new — `bun test <dir>` with the real pass counts, per-file commands
+  - `src/ceremonies/.claude/skills/run-src-ceremonies/SKILL.md` (+51/−0) — new — how to drive this module: driver command + real output, direct-invocation snippet, `bun test` count
+  - `src/ceremonies/.claude/skills/run-src-ceremonies/driver.ts` (+55/−0) — new — direct invocation of this module's safe functions (mocked Runner / temp dirs / fixtures; detect() read-only; never install/configure/network)
+  - `src/ceremonies/__tests__/.claude/skills/run-src-ceremonies-tests/SKILL.md` (+16/−0) — new — `bun test <dir>` with the real pass counts, per-file commands
+  - `src/commands/.claude/skills/run-src-commands/SKILL.md` (+56/−0) — new — how to drive this module: driver command + real output, direct-invocation snippet, `bun test` count
+  - `src/commands/.claude/skills/run-src-commands/driver.ts` (+53/−0) — new — direct invocation of this module's safe functions (mocked Runner / temp dirs / fixtures; detect() read-only; never install/configure/network)
+  - `src/commands/__tests__/.claude/skills/run-src-commands-tests/SKILL.md` (+27/−0) — new — `bun test <dir>` with the real pass counts, per-file commands
+  - `src/exec/.claude/skills/run-src-exec/SKILL.md` (+49/−0) — new — how to drive this module: driver command + real output, direct-invocation snippet, `bun test` count
+  - `src/exec/.claude/skills/run-src-exec/driver.ts` (+29/−0) — new — direct invocation of this module's safe functions (mocked Runner / temp dirs / fixtures; detect() read-only; never install/configure/network)
+  - `src/exec/__tests__/.claude/skills/run-src-exec-tests/SKILL.md` (+27/−0) — new — `bun test <dir>` with the real pass counts, per-file commands
+  - `src/items/.claude/skills/run-src-items/SKILL.md` (+56/−0) — new — how to drive this module: driver command + real output, direct-invocation snippet, `bun test` count
+  - `src/items/.claude/skills/run-src-items/driver.ts` (+89/−0) — new — direct invocation of this module's safe functions (mocked Runner / temp dirs / fixtures; detect() read-only; never install/configure/network)
+  - `src/items/__tests__/.claude/skills/run-src-items-tests/SKILL.md` (+28/−0) — new — `bun test <dir>` with the real pass counts, per-file commands
+  - `src/items/chrome/.claude/skills/run-src-items-chrome/SKILL.md` (+61/−0) — new — how to drive this module: driver command + real output, direct-invocation snippet, `bun test` count
+  - `src/items/chrome/.claude/skills/run-src-items-chrome/driver.ts` (+27/−0) — new — direct invocation of this module's safe functions (mocked Runner / temp dirs / fixtures; detect() read-only; never install/configure/network)
+  - `src/items/chrome/__tests__/.claude/skills/run-src-items-chrome-tests/SKILL.md` (+28/−0) — new — `bun test <dir>` with the real pass counts, per-file commands
+  - `src/items/chrome/assets/.claude/skills/run-src-items-chrome-assets/SKILL.md` (+45/−0) — new — typecheck-only skill; finder: documents that set-favorites.swift is STALE vs the embedded constant
+  - `src/items/chrome/assets/.claude/skills/run-src-items-chrome-assets/driver.ts` (+15/−0) — new — `swiftc -typecheck` + byte-equality with the embedded TS constant; never executes the helper (it mutates Chrome/Finder)
+  - `src/items/claude-code/.claude/skills/run-src-items-claude-code/SKILL.md` (+59/−0) — new — how to drive this module: driver command + real output, direct-invocation snippet, `bun test` count
+  - `src/items/claude-code/.claude/skills/run-src-items-claude-code/driver.ts` (+41/−0) — new — direct invocation of this module's safe functions (mocked Runner / temp dirs / fixtures; detect() read-only; never install/configure/network)
+  - `src/items/claude-code/__tests__/.claude/skills/run-src-items-claude-code-tests/SKILL.md` (+27/−0) — new — `bun test <dir>` with the real pass counts, per-file commands
+  - `src/items/claude-code/assets/.claude/skills/run-src-items-claude-code-assets/SKILL.md` (+58/−0) — new — the shipped Claude Code scripts' stdin-JSON contracts; gotcha: format hook no-ops silently when Biome's config errors outside a git repo
+  - `src/items/claude-code/assets/.claude/skills/run-src-items-claude-code-assets/driver.ts` (+109/−0) — new — feeds fixture payloads to statusline / subagent-statusline / format hook (scratch project), checks settings.template.json; notify hook not run (fires a real notification)
+  - `src/items/defs/.claude/skills/run-src-items-defs/SKILL.md` (+73/−0) — new — how to drive this module: driver command + real output, direct-invocation snippet, `bun test` count
+  - `src/items/defs/.claude/skills/run-src-items-defs/driver.ts` (+90/−0) — new — direct invocation of this module's safe functions (mocked Runner / temp dirs / fixtures; detect() read-only; never install/configure/network)
+  - `src/items/defs/__tests__/.claude/skills/run-src-items-defs-tests/SKILL.md` (+32/−0) — new — `bun test <dir>` with the real pass counts, per-file commands
+  - `src/items/editors/.claude/skills/run-src-items-editors/SKILL.md` (+53/−0) — new — how to drive this module: driver command + real output, direct-invocation snippet, `bun test` count
+  - `src/items/editors/.claude/skills/run-src-items-editors/driver.ts` (+17/−0) — new — direct invocation of this module's safe functions (mocked Runner / temp dirs / fixtures; detect() read-only; never install/configure/network)
+  - `src/items/editors/__tests__/.claude/skills/run-src-items-editors-tests/SKILL.md` (+27/−0) — new — `bun test <dir>` with the real pass counts, per-file commands
+  - `src/items/factories/.claude/skills/run-src-items-factories/SKILL.md` (+50/−0) — new — how to drive this module: driver command + real output, direct-invocation snippet, `bun test` count
+  - `src/items/factories/.claude/skills/run-src-items-factories/driver.ts` (+42/−0) — new — direct invocation of this module's safe functions (mocked Runner / temp dirs / fixtures; detect() read-only; never install/configure/network)
+  - `src/items/factories/__tests__/.claude/skills/run-src-items-factories-tests/SKILL.md` (+27/−0) — new — `bun test <dir>` with the real pass counts, per-file commands
+  - `src/items/finder/.claude/skills/run-src-items-finder/SKILL.md` (+55/−0) — new — how to drive this module: driver command + real output, direct-invocation snippet, `bun test` count
+  - `src/items/finder/.claude/skills/run-src-items-finder/driver.ts` (+33/−0) — new — direct invocation of this module's safe functions (mocked Runner / temp dirs / fixtures; detect() read-only; never install/configure/network)
+  - `src/items/finder/__tests__/.claude/skills/run-src-items-finder-tests/SKILL.md` (+27/−0) — new — `bun test <dir>` with the real pass counts, per-file commands
+  - `src/items/finder/assets/.claude/skills/run-src-items-finder-assets/SKILL.md` (+46/−0) — new — typecheck-only skill; finder: documents that set-favorites.swift is STALE vs the embedded constant
+  - `src/items/finder/assets/.claude/skills/run-src-items-finder-assets/driver.ts` (+25/−0) — new — `swiftc -typecheck` + byte-equality with the embedded TS constant; never executes the helper (it mutates Chrome/Finder)
+  - `src/items/ghostty/.claude/skills/run-src-items-ghostty/SKILL.md` (+58/−0) — new — how to drive this module: driver command + real output, direct-invocation snippet, `bun test` count
+  - `src/items/ghostty/.claude/skills/run-src-items-ghostty/driver.ts` (+26/−0) — new — direct invocation of this module's safe functions (mocked Runner / temp dirs / fixtures; detect() read-only; never install/configure/network)
+  - `src/items/ghostty/__tests__/.claude/skills/run-src-items-ghostty-tests/SKILL.md` (+27/−0) — new — `bun test <dir>` with the real pass counts, per-file commands
+  - `src/items/quick-actions/.claude/skills/run-src-items-quick-actions/SKILL.md` (+52/−0) — new — how to drive this module: driver command + real output, direct-invocation snippet, `bun test` count
+  - `src/items/quick-actions/.claude/skills/run-src-items-quick-actions/driver.ts` (+20/−0) — new — direct invocation of this module's safe functions (mocked Runner / temp dirs / fixtures; detect() read-only; never install/configure/network)
+  - `src/items/quick-actions/__tests__/.claude/skills/run-src-items-quick-actions-tests/SKILL.md` (+27/−0) — new — `bun test <dir>` with the real pass counts, per-file commands
+  - `src/items/repos/.claude/skills/run-src-items-repos/SKILL.md` (+55/−0) — new — how to drive this module: driver command + real output, direct-invocation snippet, `bun test` count
+  - `src/items/repos/.claude/skills/run-src-items-repos/driver.ts` (+41/−0) — new — direct invocation of this module's safe functions (mocked Runner / temp dirs / fixtures; detect() read-only; never install/configure/network)
+  - `src/items/repos/__tests__/.claude/skills/run-src-items-repos-tests/SKILL.md` (+27/−0) — new — `bun test <dir>` with the real pass counts, per-file commands
+  - `src/items/typora/.claude/skills/run-src-items-typora/SKILL.md` (+46/−0) — new — how to drive this module: driver command + real output, direct-invocation snippet, `bun test` count
+  - `src/items/typora/.claude/skills/run-src-items-typora/driver.ts` (+11/−0) — new — direct invocation of this module's safe functions (mocked Runner / temp dirs / fixtures; detect() read-only; never install/configure/network)
+  - `src/journal/.claude/skills/run-src-journal/SKILL.md` (+52/−0) — new — how to drive this module: driver command + real output, direct-invocation snippet, `bun test` count
+  - `src/journal/.claude/skills/run-src-journal/driver.ts` (+43/−0) — new — direct invocation of this module's safe functions (mocked Runner / temp dirs / fixtures; detect() read-only; never install/configure/network)
+  - `src/journal/__tests__/.claude/skills/run-src-journal-tests/SKILL.md` (+27/−0) — new — `bun test <dir>` with the real pass counts, per-file commands
+  - `src/manifest/.claude/skills/run-src-manifest/SKILL.md` (+46/−0) — new — how to drive this module: driver command + real output, direct-invocation snippet, `bun test` count
+  - `src/manifest/.claude/skills/run-src-manifest/driver.ts` (+55/−0) — new — direct invocation of this module's safe functions (mocked Runner / temp dirs / fixtures; detect() read-only; never install/configure/network)
+  - `src/manifest/__tests__/.claude/skills/run-src-manifest-tests/SKILL.md` (+29/−0) — new — `bun test <dir>` with the real pass counts, per-file commands
+  - `src/orchestrator/.claude/skills/run-src-orchestrator/SKILL.md` (+50/−0) — new — how to drive this module: driver command + real output, direct-invocation snippet, `bun test` count
+  - `src/orchestrator/.claude/skills/run-src-orchestrator/driver.ts` (+98/−0) — new — direct invocation of this module's safe functions (mocked Runner / temp dirs / fixtures; detect() read-only; never install/configure/network)
+  - `src/orchestrator/__tests__/.claude/skills/run-src-orchestrator-tests/SKILL.md` (+27/−0) — new — `bun test <dir>` with the real pass counts, per-file commands
+  - `src/paths/.claude/skills/run-src-paths/SKILL.md` (+49/−0) — new — how to drive this module: driver command + real output, direct-invocation snippet, `bun test` count
+  - `src/paths/.claude/skills/run-src-paths/driver.ts` (+45/−0) — new — direct invocation of this module's safe functions (mocked Runner / temp dirs / fixtures; detect() read-only; never install/configure/network)
+  - … +9 more (`git show --stat ba38081`)
+- Notes: Two forked agents built the per-module drivers in parallel. Drivers under `.claude/` are Biome-checked and executed but NOT typechecked (tsconfig `include: ["src"]` skips dot-dirs). Findings for follow-up: `src/items/finder/assets/set-favorites.swift` is stale vs the embedded `SET_FAVORITES_SWIFT` (the constant has `--list`; the file does not — runtime ships the constant); `hooks-format.ts` exits 0 silently when Biome's config errors (e.g. `vcs.useIgnoreFile` outside a git repo); and `sh install.sh …` re-run on this machine died with SIGKILL (exit 137) because it overwrites a previously-executed signed binary in place — fixed in the next PR.

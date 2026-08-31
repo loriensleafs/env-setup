@@ -3,7 +3,7 @@
 > **Retired, read-only.** This was the single source of truth from 2026-08-25 to 2026-08-30. Its
 > content now lives in [../decisions/](../decisions/README.md) (ADRs), [../plan/PRD-001-envsetup.md](../plan/PRD-001-envsetup.md)
 > (requirements), [../analysis/](../analysis/README.md) (research) and [../sessions/](../sessions/README.md)
-> (history). Do not edit; do not cite as current. Original text follows unchanged.
+> (history). Do not edit; do not cite as current. Original text follows unchanged (only relative links were repointed when the file moved).
 
 ---
 
@@ -30,8 +30,8 @@
 # ═══════════════════ CURRENT STATUS (2026-08-31) ═══════════════════
 
 **Kept current continuously — never deferred.** The live status and what's next are in
-[OVERVIEW.md](OVERVIEW.md) ("Status", "Next up"); every change is recorded, with a note per
-touched file and the session narrative, in [sessions/](sessions/README.md). This doc holds the **decisions and their rationale**;
+[OVERVIEW.md](../OVERVIEW.md) ("Status", "Next up"); every change is recorded, with a note per
+touched file and the session narrative, in [sessions/](../sessions/README.md). This doc holds the **decisions and their rationale**;
 when a decision changes, change it here *in the same commit* and cite the session-log entry (sha).
 
 - Released through **v0.1.9** (2026-08-30). Peter's machine converges via the one-liner, 0 failed.
