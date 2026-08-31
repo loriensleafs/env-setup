@@ -67,7 +67,8 @@ Start progress:
    files there.
 6. Once: `bun run session -- --new <slug>` (slug = the work ahead, kebab-case); set the title and
    `Goal` in the file it names.
-7. Post the brief — this template, every line present, under ~1,500 characters:
+7. Post the brief — this template and nothing after it, every line present, the whole reply under
+   ~1,200 characters (one clause per line; the session file and the Narrative hold the detail):
 
    ```text
    Released: vX.Y.Z (date, sha)
@@ -76,6 +77,7 @@ Start progress:
    Findings: <branch/tree/gate observations, or "clean">
    Open / unverified: …
    Next: <item> — first step: …
+   Question: <at most one, or omit the line>
    Session file: docs/sessions/SES-NNN-<slug>.md
    read in full: <every file from steps 1–3 and 5>
    ```
