@@ -357,3 +357,10 @@ the start timestamp), source comments repointed from `docs/PLAN.md` to the ADR/P
   - `src/ui/CLAUDE.md` (+17/−0) — new — extend core prompts, input option, state-aware frames, schema-derived screens, PTY strong oracle
   - `src/ui/__tests__/.claude/skills/run-src-ui-tests/SKILL.md` (+0/−29) — removed — `bun test <dir>` in prose earned no slash command
 - Notes: Research first (claude-code-guide agent, cited in ADR-018): nested files load lazily when Claude reads files under the directory and concatenate after the root; `AGENTS.md` is not read by Claude Code; `.claude/rules/*.md` with `paths:` load on read (v2.1.198+). Observed: the harness discovered `/run-docs-plan` the instant PLAN-002 was written under docs/plan — nested skills are picked up on touch. Two inventory forks scored all 56 directories (9 strong / 14 weak / 33 none). Verification: 18 CLAUDE.md files, largest nested 36 lines, 0 sentences shared between any two, 0 broken links, `bun run check` green, both folded drivers run. Unverified: whether `**/.claude/skills/**` matches dot-directories (fallback globs recorded in ADR-018).
+
+### 2026-08-30 · docs(agents): docs/CLAUDE.md names OVERVIEW.md as the map and the subdirectory READMEs as the rules · b13ab9b
+
+- Summary: `docs/CLAUDE.md` now names `OVERVIEW.md` as the map of docs/ and the subdirectory READMEs as the rules; no `docs/README.md` (it would duplicate OVERVIEW), and no sibling READMEs for the src/.github/scripts CLAUDE.md files (their human docs are the ADR/ANA/PRD/CONTRIBUTING they already link).
+- Why: Peter: "does the docs directory need a README.md that docs/CLAUDE.md references?" and "do any of the other nested CLAUDE.md files need sibling README.md files?"
+- Files:
+  - `docs/CLAUDE.md` (+6/−2) — header names OVERVIEW.md as the map; subdirectory READMEs as rules/index/template
