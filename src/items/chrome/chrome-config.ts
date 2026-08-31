@@ -59,8 +59,28 @@ export const chromeConfig = defineItem({
     };
   },
   configure: async (ctx) => {
+    let reopen = false;
     if (await chromeRunning(ctx)) {
-      throw new Error("Chrome is running — quit it and retry (its files can't be edited live)");
+      // Chrome rewrites Local State / Preferences on exit, so live edits are
+      // clobbered. Ask, quit gracefully (tabs are restored by Chrome), wait for
+      // the process to exit, then reopen it after the edit.
+      const yes = ctx.ask
+        ? await ctx.ask(
+            "Chrome is running and its settings files can't be edited live. Quit Chrome now? (it reopens when done)",
+          )
+        : false;
+      if (!yes) {
+        throw new Error("Chrome is running — quit it and retry (its files can't be edited live)");
+      }
+      await ctx.run(["osascript", "-e", 'tell application "Google Chrome" to quit']);
+      const deadline = Date.now() + 20_000;
+      while ((await chromeRunning(ctx)) && Date.now() < deadline) {
+        await Bun.sleep(500);
+      }
+      if (await chromeRunning(ctx)) {
+        throw new Error("Chrome didn't quit within 20s — quit it manually and retry");
+      }
+      reopen = true;
     }
     // Local State: flags. File may not exist before first launch — create shell.
     const ls = (await readJson(LOCAL_STATE)) ?? {};
@@ -80,7 +100,10 @@ export const chromeConfig = defineItem({
     prefs.tab_search = { ...(prefs.tab_search as object | undefined), pinned_to_tabstrip: true };
     await mkdir(join(PREFERENCES, ".."), { recursive: true });
     await Bun.write(PREFERENCES, JSON.stringify(prefs));
-    ctx.log("flags + toolbar applied; sign-in and sync happen in the connect phase");
+    if (reopen) await ctx.run(["open", "-a", "Google Chrome"]);
+    ctx.log(
+      `flags + toolbar applied${reopen ? " (Chrome reopened)" : ""}; sign-in and sync happen in the connect phase`,
+    );
   },
   verify: async () => {
     const ls = await readJson(LOCAL_STATE);

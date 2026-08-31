@@ -32,6 +32,12 @@ export interface ItemContext {
   manifest: Manifest;
   log: (message: string) => void;
   run: Runner;
+  /**
+   * Ask the user a yes/no question mid-step (the run pauses its spinner,
+   * prompts, resumes). Absent in headless contexts — items must fall back to
+   * failing with a clear message when it's undefined.
+   */
+  ask?: (message: string) => Promise<boolean>;
 }
 
 /** A ceremony is an attended step (sign-in, permission dialog) surfaced in Stage C. */

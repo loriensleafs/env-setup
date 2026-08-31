@@ -316,7 +316,25 @@ export async function executePlan(
   const stepSpinner = p.spinner();
   let stepIndex = 0;
   let spinning = false;
+  let currentTitle = "";
+  // Items can ask a yes/no question mid-step (e.g. "quit Chrome?"): pause
+  // the spinner so the prompt renders cleanly, then resume it.
+  const ask = async (message: string): Promise<boolean> => {
+    const wasSpinning = spinning;
+    if (wasSpinning) {
+      stepSpinner.stop(currentTitle);
+      spinning = false;
+    }
+    const answer = await p.confirm({ message, input: promptInput() });
+    const yes = !p.isCancel(answer) && answer === true;
+    if (wasSpinning) {
+      stepSpinner.start(currentTitle);
+      spinning = true;
+    }
+    return yes;
+  };
   const report = await orchestrate({
+    ask,
     registry,
     manifest,
     selection,
@@ -326,7 +344,8 @@ export async function executePlan(
     events: {
       onStepStart: (_id, title) => {
         stepIndex++;
-        stepSpinner.start(`${title} (${stepIndex}/${order.length})`);
+        currentTitle = `${title} (${stepIndex}/${order.length})`;
+        stepSpinner.start(currentTitle);
         spinning = true;
       },
       onStepLog: (_id, message) => {
