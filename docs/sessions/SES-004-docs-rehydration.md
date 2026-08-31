@@ -793,3 +793,41 @@ regenerated (real deltas +3,453 / +3,309 tokens).
   - `.claude/skills/session/evals/results/tier-sweep/sonnet/start-brief/with_skill/grading.json` (+151/−0) — Sonnet 5 start-brief grader verdict: 7/7
   - … +25 more (`git show --stat 280d906`)
 - Notes: Verified: every tier grade was checked by a grader against the fixture clone, not the transcript (reflogs, `git status`, `wc -c`/`wc -w`, driver re-runs); the trigger figures are full-N (no early stop) except the description loop's own baseline. Not verified: one run per cell — the one-expectation gaps between Sonnet, Opus and Fable are inside run-to-run spread; Haiku's six are not. Decisions: description left as is (held-out 8/9 beats both candidates' 7/9); nothing in SKILL.md changed. Found on the way: three graders flagged that Outcome/Narrative/Shipped lines are tied to no transcript evidence (next eval iteration); Peter fixed the plugin-kit aggregator token bug the same day; `optimize-description.ts` imports its HTML report module from the wrong directory (report skipped, results unaffected); the routing measurement runs in a throwaway root with no repo present.
+
+### 2026-08-30 · feat(session): sessions are streams of work with status; tool moves into the skill as a subcommand CLI · 66b083d
+
+- Summary: ADR-020: a session is a stream of work with `Status: open | closed` and a `Plan:` line, spanning conversations; the tool moves into the skill (`.claude/skills/session/scripts/`, `scripts/` gone, `/run-scripts` → `/run-session-tool`) and becomes a subcommand CLI (list, new, append, check, close, current) with status-based selection and a pure, tested lib; the skill gains `close` and `end` becomes leave; every doc that stated the old model rewritten; SES-001–003 closed.
+- Why: Peter: a session should not be the length of a conversation; sessions want a status and a link to plans. Then, same turn: the tool should live in the skill, and as a subcommand CLI rather than flags or six scripts.
+- Files:
+  - `.claude/commands/session-close.md` (+9/−0) — new typed-only alias for `/session close`
+  - `.claude/commands/session-end.md` (+1/−1) — description says leave: handoff written, session stays open
+  - `.claude/commands/session-start.md` (+1/−1) — description: join the open session, open one, or state none (was: create this conversation's file)
+  - `.claude/skills/run-envsetup/SKILL.md` (+1/−1) — the session-log line names --session and /run-session-tool
+  - `.claude/skills/run-session-tool/SKILL.md` (+58/−0) — renamed from scripts/.claude/skills/run-scripts; new paths, subcommand blocks re-run, the bun-test dot-directory gotcha
+  - `.claude/skills/session/CLAUDE.md` (+15/−0) — new nested CLAUDE.md: the ritual, the tool, its invariants (replaces scripts/CLAUDE.md)
+  - `.claude/skills/session/SKILL.md` (+115/−61) — four modes (start joins/opens/none; entry; end = leave with a handoff commit; close); injected `list` line with PATH; gotchas for the gate's header rule, the release marker and `new`-per-stream; allowed-tools gains git show + gh pr list; the five skill-reviewer majors applied
+  - `.claude/skills/session/evals/evals.json` (+11/−10) — eval 1 expects Status: open and the two-open-sessions finding; eval 3's prompt states the Goal is met (close mode); fixture note for iteration 3; subcommand spelling
+  - `.claude/skills/session/scripts/__tests__/session-lib.test.ts` (+132/−0) — 13 tests over the lib: header parsing, selection (named / one open / none / several), status edit, template counts, index row, slugify
+  - `.claude/skills/session/scripts/session-lib.ts` (+131/−0) — new pure half: parseHeader (Status/Plan), template, placeholderCount(closing), withStatus, indexRow, selectSession (named > single open > error)
+  - `.claude/skills/session/scripts/session.ts` (+339/−0) — moved from scripts/; subcommand dispatcher (list, new, append, check, close, current; legacy --flags accepted); status-based selection; close runs the gate counting Outcome/Open at end; docs path ../../../../docs/sessions/
+  - `CLAUDE.md` (+22/−16) — Rehydrating: every open session, join/open/none before the first commit, ADR-020 pointer; Recording: end = leave, close added; Commands block in subcommand spelling (list, new, append, check, close)
+  - `CONTEXT.md` (+28/−9) — new section "The session log": Session, Conversation, Open/Closed, Entry and Record (the last two moved out of Configuration)
+  - `CONTRIBUTING.md` (+15/−9) — step 1 joins or opens a session (list / new --plan), step 7 names end = leave and close; subcommand spelling
+  - `README.md` (+3/−3) — Working-on-it line names end (leave) and close; the `bun run session` table row lists the subcommands
+  - `docs/OVERVIEW.md` (+15/−8) — doc map rows for the skill and sessions (four modes, status, ADR-020), nested CLAUDE.md list (scripts/ → .claude/skills/session/), Status bullet for the session model, resume step 2 joins or opens
+  - `docs/decisions/ADR-018-nested-claude-md-placement.md` (+3/−1) — dated note: scripts/ retired, its CLAUDE.md content moved into the skill
+  - `docs/decisions/ADR-019-session-skill-invocation-and-name.md` (+4/−1) — status note pointing at ADR-020 (end = leave, close added)
+  - `docs/decisions/ADR-020-session-model.md` (+81/−0) — new ADR: session = stream of work with status, conversation = participant, tool selection by status, end/close split, plan↔session links; the same-day move of the tool into the skill
+  - `docs/decisions/README.md` (+2/−1) — index row 020; row 019 names the four modes
+  - `docs/plan/README.md` (+3/−0) — rule: plans and sessions point at each other (Plan: line; ticks cite entry shas)
+  - `docs/sessions/CLAUDE.md` (+6/−4) — invariant covers the status line and never appending to a closed session
+  - `docs/sessions/README.md` (+44/−23) — definition of a session (ADR-020), reading rule = every open session, join/open/leave/close rules, template with Status/Plan, release-marker rule, history note
+  - `docs/sessions/SES-001-foundation.md` (+1/−0) — Status: closed (migration)
+  - `docs/sessions/SES-002-curl-sh-interactivity-and-first-bootstrap-fixes.md` (+1/−0) — Status: closed (migration)
+  - `docs/sessions/SES-003-real-bootstrap-runs-v0.1.5-to-v0.1.9.md` (+1/−0) — Status: closed (migration)
+  - `docs/sessions/SES-004-docs-rehydration.md` (+2/−0) — Status: open, Plan: — (this docs-system stream); index rows carry status
+  - `package.json` (+2/−2) — `session` script points at .claude/skills/session/scripts/session.ts; `test` also runs the skill's test file by path (bun test skips dot-directories)
+  - `scripts/.claude/skills/run-scripts/SKILL.md` (+0/−36) — removed — renamed to .claude/skills/run-session-tool
+  - `scripts/CLAUDE.md` (+0/−9) — removed — content moved to .claude/skills/session/CLAUDE.md
+  - `scripts/session.ts` (+0/−294) — removed — moved into the skill (see above)
+- Notes: Verified: 13 lib tests + the 111 src tests via `bun run test`; every subcommand run against the real log (list, check --session 4, legacy `-- --check`, close on a closed session, current, an unknown command, a bare check with two open sessions refusing); validators valid for both skills and four aliases; link-check 0 broken; skill-reviewer NEEDS WORK → its five majors applied (gate/header contradiction fixed in the tool, injected line hardened, release-marker gotcha, handoff commit in end, close step 1 = end 1–3). Not verified: the `!` injection in a real conversation; the evals on the changed skill (iteration 3 follows). Decisions on the spot: `Outcome`/`Open at end` are counted only by `close`; a file without a Status line reads as open; legacy `--flag` spellings still parse.
