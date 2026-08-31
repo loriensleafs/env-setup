@@ -140,3 +140,19 @@ settled as ADR-021 (`77aa614`): value only, `Also:` lines, the `Session-entry: n
   - `docs/decisions/ADR-017-docs-system.md` (+6/−0) — dated status note pointing at ADR-020 and ADR-021 (its quoted `-- --flag` commands are the old spelling; the decision stands)
   - `docs/sessions/CLAUDE.md` (+2/−1) — invariant carries the value-only rule (Also lines, the trailer)
 - Notes: Verified by re-running the sweep (old spellings, three-mode lists, scripts/ mentions, old ADR ranges: none left outside history and dated ADR notes), `bun run check`, link-check (138 links, 0 broken) and verify-agent-docs.py (0 avoid-words, 0 duplicate sentences).
+
+### 2026-08-30 · docs(context): Session log, Join/Open/Leave/Close, Handoff and Gate defined; 'ledger' retired again · 2dd1455
+
+- Summary: CONTEXT.md defines the four session-log words the docs used without definition (Gate, Join/Open/Leave/Close, Handoff, Session log) and retires 'ledger' again; eight live lines now say session log.
+- Why: Peter: does CONTEXT.md need updating? A usage count said yes — gate 30×, join 26×, leave 17×, handoff 15× undefined, ledger 15× against the retired name.
+- Files:
+  - `.claude/skills/session/SKILL.md` (+1/−1) — entry step 1 says session log
+  - `CLAUDE.md` (+1/−1) — Recording line says session log
+  - `CONTEXT.md` (+25/−2) — new terms Session log (Avoid: ledger), Join/Open/Leave/Close, Handoff, Gate; Entry says session log
+  - `CONTRIBUTING.md` (+1/−1) — step 7 says session log
+  - `README.md` (+1/−1) — working-on-it line says session log
+  - `docs/OVERVIEW.md` (+1/−1) — Status entry-grain line says session log
+  - `docs/decisions/README.md` (+1/−1) — ADR-021 index row says session log
+  - `docs/sessions/CLAUDE.md` (+1/−1) — invariant says session log
+  - `docs/sessions/README.md` (+1/−1) — the value-only rule says session log (the SES-004 title and the migration note keep the historical word)
+- Notes: Verified: verify-agent-docs.py with 'ledger' added to its avoid list reports only the two historical uses; check, link-check and the gate green. Decision on the spot: 'leave' is the canonical word for `/session end` (the mode name stays `end`; the glossary lists end under Avoid for close only).
