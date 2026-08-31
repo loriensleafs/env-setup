@@ -156,3 +156,12 @@ settled as ADR-021 (`77aa614`): value only, `Also:` lines, the `Session-entry: n
   - `docs/sessions/CLAUDE.md` (+1/−1) — invariant says session log
   - `docs/sessions/README.md` (+1/−1) — the value-only rule says session log (the SES-004 title and the migration note keep the historical word)
 - Notes: Verified: verify-agent-docs.py with 'ledger' added to its avoid list reports only the two historical uses; check, link-check and the gate green. Decision on the spot: 'leave' is the canonical word for `/session end` (the mode name stays `end`; the glossary lists end under Avoid for close only).
+
+### 2026-08-30 · docs(analysis): ANA-010 — how the reference skills keep CONTEXT.md current (no automation; a reading rule from setup; one skill owns the write) · 67f40d6
+
+- Summary: ANA-010: how the reference skills repo keeps CONTEXT.md current — no automation anywhere; the setup skill installs a reading rule (docs/agents/domain.md) that defers creation to /domain-modeling; one skill owns the write, reached by delegation from four others; the reference's own docs admit the discipline leaks; envsetup never received the setup hook and has the same discipline with the same leak.
+- Why: Peter: "Why didn't those things get automatically added to CONTEXT.md? … do a complete and comprehensive analysis of ~/Dev/reference/matt-pocock-skills … is it part of the install stack?"
+- Files:
+  - `docs/analysis/ANA-010-context-md-maintenance-in-the-reference-skills.md` (+122/−0) — the analysis: findings A–E with file:line citations to the reference at 6654f6b, refuted claim, unverifiable, four implications
+  - `docs/analysis/README.md` (+1/−0) — index row for ANA-010
+- Notes: Sources verified by reading the cited files at the cited lines (setup SKILL.md, domain.md, domain-modeling SKILL.md + CONTEXT-FORMAT.md, the four delegating skills, .agents/invocation.md, docs/engineering/domain-modeling.md, the glossary's git log) plus an Explore agent's full pass; the only unverifiable claim is how often the discipline fires in other users' repos. Decision left to Peter: which of the four implications to act on (avoid-word check, the two extra CONTEXT.md sections).
