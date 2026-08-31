@@ -18,3 +18,13 @@ restrictions and the GitHub CLI app is not granted for acmelabs-15 (`gh api user
 is refused; branch `fix/eval-tooling` @ b0d4411 stays local.
 
 ## Changes (one entry per commit, in order)
+
+### 2026-08-30 · docs(skill): the Skill-tool path never renders the injection — verified interactive; open SES-006 · 631b7f8
+
+- Summary: The injection gotcha states the verified fact — through the Skill tool (model invocation or a `/session-*` alias) the file arrives unrendered, in an interactive session too — and SES-006 opens for this follow-up stream.
+- Why: Peter: verify the injection in a real conversation. An interactive `claude` driven under expect (`/session-start` typed) delivered the skill with the three `!` lines literal, same as `claude -p`; SES-004 is closed, so this work needs its own session (ADR-020).
+- Files:
+  - `.claude/skills/session/SKILL.md` (+5/−3) — gotcha reworded: verified interactive + `-p`; the Skill-tool path never renders the injection
+  - `docs/sessions/README.md` (+1/−0) — index row for SES-006 (regenerated)
+- Notes: Verified: the interactive transcript at ~/.claude/projects/…inject-probe/5c42ad71….jsonl shows `Skill{session,start}` → skill content with `- Sessions:`!`PATH=… bun run session list …``` literal, then the model's own Bash run of the three commands. Not verified: whether a typed`/session start` (no alias, no Skill tool) renders them — that path expands inline and the transcript does not echo the expanded prompt.
+  - `docs/sessions/SES-006-session-followups.md` (+20/−0) — new session: title, Goal, Narrative (the two probes, iteration 4, the plugin-kit push block)
