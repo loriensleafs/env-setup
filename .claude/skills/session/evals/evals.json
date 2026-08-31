@@ -6,21 +6,41 @@
       "prompt": "I'm picking envsetup back up. Where are we, and what should I do first?",
       "expected_output": "A brief of at most ~12 lines: released version, unreleased-on-main, parked branches, open/unverified items from the newest session, the proposed Next-up item and its first step, a 'read in full: …' line naming every file read — and a new docs/sessions/SES-NNN file with its Goal set.",
       "files": [],
-      "expectations": []
+      "expectations": [
+        "brief.md is at most 14 lines and states the released version (v0.1.9)",
+        "brief.md names what is on main but unreleased and the parked branch wip/visual-grouping",
+        "brief.md reports the `bun run session -- --check` result (NOT ready: SES-005 placeholders / an unrecorded commit) as a finding rather than silently fixing it",
+        "session-file.md exists: a new docs/sessions/SES-NNN file was created and its Goal line is filled (no _(fill in)_ on Goal)",
+        "transcript.md shows docs/OVERVIEW.md, the newest SES file and CONTEXT.md were each read to their end (no read left truncated), and brief.md carries a 'read in full:' line naming them",
+        "brief.md proposes a concrete next item with a first step (e.g. PLAN-001 visual grouping starting from wip/visual-grouping)"
+      ]
     },
     {
       "id": 2,
       "prompt": "I just committed the fix for the stale set-favorites.swift asset (it now matches the embedded constant). Record it properly before I open the PR.",
       "expected_output": "A docs(session) commit whose entry for that sha has Summary, Why, one filled line per touched file and Notes; OVERVIEW Next-up 5 updated (the stale-asset item removed or marked done); `bun run session -- --check` prints `session: complete`.",
       "files": [],
-      "expectations": []
+      "expectations": [
+        "commit.diff shows a commit whose subject starts with docs(session): and which touches docs/sessions/SES-006-record-eval.md",
+        "session-file.md holds an entry for the fix(finder) commit with a written Summary, a written Why, and a phrase (not a placeholder) on the src/items/finder/assets/set-favorites.swift line",
+        "session-file.md contains no _(fill in)_ placeholder anywhere",
+        "git-state.txt shows `bun run session -- --check` printing session: complete",
+        "overview.diff shows docs/OVERVIEW.md Next-up 5 updated so the stale set-favorites.swift item is removed or marked done",
+        "git-state.txt shows a clean working tree (git status --short empty) with the docs(session) commit on top of the fix commit"
+      ]
     },
     {
       "id": 3,
       "prompt": "That's it for today, I'm done. Close things out.",
       "expected_output": "The current session's Outcome and Open at end filled, OVERVIEW Status/Next up matching reality, a clean tree on main (or every exception named), and a two-line closing note: what shipped, what to do first next time.",
       "files": [],
-      "expectations": []
+      "expectations": [
+        "session-file.md has Outcome and Open at end written (no _(fill in)_ on either line)",
+        "git-state.txt shows `bun run session -- --check` printing session: complete and an empty git status --short",
+        "reply.md is a short closing note (at most 4 lines) that says what shipped in the conversation and the first thing to do next time",
+        "overview.diff is either 'no change' with reply.md/transcript.md stating OVERVIEW Status and Next up were checked against reality, or a change to Status/Next up justified in the transcript",
+        "no second session file was created: only docs/sessions/SES-006-closing-eval.md changed under docs/sessions/ (README index regeneration excepted)"
+      ]
     }
   ],
   "hard_negatives": [

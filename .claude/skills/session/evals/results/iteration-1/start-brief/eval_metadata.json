@@ -1,0 +1,13 @@
+{
+  "eval_id": 1,
+  "eval_name": "start-brief",
+  "prompt": "I'm picking envsetup back up. Where are we, and what should I do first?",
+  "expectations": [
+    "brief.md is at most 14 lines and states the released version (v0.1.9)",
+    "brief.md names what is on main but unreleased and the parked branch wip/visual-grouping",
+    "brief.md reports the `bun run session -- --check` result (NOT ready: SES-005 placeholders / an unrecorded commit) as a finding rather than silently fixing it",
+    "session-file.md exists: a new docs/sessions/SES-NNN file was created and its Goal line is filled (no _(fill in)_ on Goal)",
+    "transcript.md shows docs/OVERVIEW.md, the newest SES file and CONTEXT.md were each read to their end (no read left truncated), and brief.md carries a 'read in full:' line naming them",
+    "brief.md proposes a concrete next item with a first step (e.g. PLAN-001 visual grouping starting from wip/visual-grouping)"
+  ]
+}

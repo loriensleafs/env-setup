@@ -18,6 +18,7 @@ secondary write-up or an assumption. Unverified beliefs are labelled unverified.
 | [ANA-006-finder-favorites-sharedfilelist.md](ANA-006-finder-favorites-sharedfilelist.md) | Setting Finder sidebar favorites on macOS 26 after `mysides`/`sfltool` died. | current |
 | [ANA-007-config-compatibility.md](ANA-007-config-compatibility.md) | Which shipped defaults conflict with each other or with the OS (doc-verified), and which claims were refuted. | current (conflict *checking* is out of scope by decision) |
 | [ANA-008-terminal-input-under-curl-sh.md](ANA-008-terminal-input-under-curl-sh.md) | Why prompts die under `curl \| sh`, and the only input path Bun can actually read. | current |
+| [ANA-009-skill-workflow-best-practices.md](ANA-009-skill-workflow-best-practices.md) | What Anthropic's own pages say about workflow skills: arguments (`$ARGUMENTS`, `$N`, named), the conditional workflow pattern, checklists/validation loops, invocation control for side effects, dynamic context injection. | current |
 
 ## Rules
 

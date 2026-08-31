@@ -1,0 +1,12 @@
+$ git status --short
+
+$ git log --oneline -5
+fa62da0 docs(session): record 7fa525f (set-favorites.swift re-sync), ea51e09, f35152f; OVERVIEW + finder docs updated
+f35152f baseline: session skill removed
+388a619 docs(session): start record-eval session
+7fa525f fix(finder): re-sync set-favorites.swift with the embedded SET_FAVORITES_SWIFT constant
+ea51e09 feat(skills): /session start | record | end replaces /rehydrate and /wrap-up (skill-creator loop: validated, reviewed)
+
+$ bun run session -- --check
+$ bun scripts/session.ts --check
+session: complete

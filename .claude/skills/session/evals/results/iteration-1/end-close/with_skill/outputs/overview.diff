@@ -1,0 +1,20 @@
+diff --git a/docs/OVERVIEW.md b/docs/OVERVIEW.md
+index ad82dea..e360f3a 100644
+--- a/docs/OVERVIEW.md
++++ b/docs/OVERVIEW.md
+@@ -118,9 +118,15 @@ small separate commands, merge commits). The facts below are the ones a rule can
+   `install.sh` downloads to a fresh file. Ships with v0.1.10.
+ - **Parked, not on `main`:** the visual-grouping patch ([PLAN-001](plan/PLAN-001-visual-grouping.md))
+   as a WIP commit on local branch `wip/visual-grouping` (unverified, never run under a PTY).
++- **On branch `feat/session-skill`, not on `main`** ([SES-006](sessions/SES-006-closing-eval.md)):
++  the `/session start · record · end` skill replacing `/rehydrate` and `/wrap-up` (`ea51e09`) and its
++  session entries (`42bb708` + the closing docs commit). Pushed as far as `ea51e09`; no PR yet.
+ 
+ ## Next up
+ 
++**First, next time:** land `feat/session-skill` — push (local is ahead of origin), open the PR, merge
++with a merge commit; Peter approves. Then the list below.
++
+ 1. **Visual grouping of the config flow + progress tracker** — [PLAN-001](plan/PLAN-001-visual-grouping.md)
+    (Peter, 2026-08-30). Start from `wip/visual-grouping`, verify under a PTY, PR, release v0.1.10.
+ 2. First real end-to-end **connect phase** on Peter's machine (web apps, grants, licenses) — expect
