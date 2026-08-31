@@ -25,7 +25,7 @@ async function uploadKey(
 }
 
 /**
- * Two fresh per-machine ed25519 keys (docs/PLAN.md decision): auth key
+ * Two fresh per-machine ed25519 keys (docs/decisions/ADR-009-github-auth-and-signing.md): auth key
  * (revoke freely) + signing key (never delete — Verified-badge continuity).
  * Public halves upload via API with machine-identifying titles; ~/.ssh/config
  * gets agent+keychain wiring. Private keys never leave the machine.

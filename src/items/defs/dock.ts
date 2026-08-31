@@ -2,7 +2,7 @@ import { defineItem, type ItemContext } from "../item.ts";
 
 const DOCKUTIL = "/opt/homebrew/bin/dockutil";
 
-/** Peter's decided Dock order (docs/PLAN.md). PWAs join once Chrome installs them. */
+/** Peter's decided Dock order (docs/plan/PRD-001-envsetup.md). PWAs join once Chrome installs them. */
 export const DOCK_APPS: { label: string; path: string }[] = [
   // Finder is pinned first by macOS itself.
   { label: "Apps", path: "/Applications" },

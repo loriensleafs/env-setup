@@ -3,7 +3,7 @@ import { configDir } from "../paths/paths.ts";
 
 /**
  * Secret store facade. Today it reads a plain JSON file; the age-encrypted
- * store (docs/PLAN.md Secrets) will decrypt into the same shape and slot in
+ * store (docs/decisions/ADR-008-secrets-age-encrypted-in-repo.md) will decrypt into the same shape and slot in
  * behind loadSecrets without item changes.
  *
  * Resolution order:

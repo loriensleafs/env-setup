@@ -33,7 +33,7 @@ import { chromePwas } from "./chrome/chrome-pwas.ts";
 import { quickActions } from "./quick-actions/quick-actions.ts";
 import { ItemRegistry } from "./registry.ts";
 
-/** Registry of everything envsetup knows how to manage (grows per docs/PLAN.md). */
+/** Registry of everything envsetup knows how to manage (catalog in docs/plan/PRD-001-envsetup.md). */
 export function buildRegistry(): ItemRegistry {
   const r = new ItemRegistry();
   // Required spine

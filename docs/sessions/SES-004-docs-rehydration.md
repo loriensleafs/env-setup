@@ -1,8 +1,8 @@
 # 2026-08-30 18:00 · Docs for rehydration — OVERVIEW, ledger → granular entries → sessions, continuous upkeep
 
 - Goal: Make a fresh session able to pick up exactly where the last one stopped: a handoff overview, a complete record of what was done (with files), and a discipline that keeps it all current.
-- Outcome: OVERVIEW.md; a git-derived change record that evolved (one line per commit → files touched → Summary/Why + a note per file → per-session files under `docs/sessions/`); `bun run session` tooling with `--check`; CLAUDE.md rehydration reading order; continuous-upkeep hard rule; PLAN.md status current.
-- Open at end: Docs restructure (PRD / DECISIONS / research; retire PLAN.md + CONFIG-COMPAT-PLAN.md) — OVERVIEW Next-up 2. Then Next-up 1 (visual grouping).
+- Outcome: OVERVIEW.md; a git-derived change record that evolved (one line per commit → files touched → Summary/Why + a note per file → per-session files); `bun run session` tooling with `--check`; CLAUDE.md rehydration reading order; continuous-upkeep hard rule; then the whole docs system — `plan/` (PRD-001, PLAN-001), `analysis/` (ANA-001…008), `decisions/` (ADR-001…017), `archive/` — with one naming convention `<TYPE>-<NNN>-<kebab-title>.md`, the living plan retired.
+- Open at end: Next-up 1 (visual grouping, PLAN-001) from `wip/visual-grouping`; first real connect-phase run.
 
 ## Narrative
 
@@ -23,6 +23,19 @@ the v0.1.9 tag) because git has no session notion; from here on, one file per co
 Also this session: the visual-grouping patch was found applied but uncommitted in the working tree
 and parked on local branch `wip/visual-grouping`; PRs #13–#16 merged with merge commits (the shas
 in these entries depend on that — never squash).
+
+Then Peter: "should there be plan and analysis directories… templates for research, PRDs and plan
+documents… there might be some skills that already exist that could help us." Six local skills
+mapped onto the need (`research`, `spec-driven-development`, `planning-and-task-breakdown`,
+`documentation-and-adrs`, `grill-with-docs`, `writing-for-agents`); Peter chose the recommended
+layout `plan/ analysis/ decisions/ sessions/` (ADR-017). The living plan was read end to end and
+carved: 17 ADRs (decisions with alternatives), PRD-001 (promise, UX requirements, item catalog with
+every chosen default, boundaries, success criteria), 8 analyses (research + empirical findings,
+each with sources / refuted / unverifiable), PLAN-001 for the parked visual-grouping work; the plan
+itself archived read-only (ARC-001) and CONFIG-COMPAT-PLAN absorbed. Then Peter: "make sure all of
+the files in docs use similar naming conventions — decisions does a good job" → `<TYPE>-<NNN>-<kebab>`
+everywhere, sessions renumbered `SES-NNN` (the script now numbers and orders by it; the H1 keeps
+the start timestamp), source comments repointed from `docs/PLAN.md` to the ADR/PRD they meant.
 
 ## Changes (one entry per commit, in order)
 
@@ -84,7 +97,7 @@ in these entries depend on that — never squash).
   - `CLAUDE.md` (+9/−4) — hard rule "Docs are kept current continuously — never deferred"; Recording section is "continuously, as you go" (after every commit) and asks for sha citations
   - `docs/LEDGER.md` (+3/−2) — "Continuously, after every commit" replaces "before merge"; OVERVIEW/PLAN updated in the same step with the sha
   - `docs/OVERVIEW.md` (+6/−2) — Status block carries the never-defer note and cites unreleased entries by sha
-  - `docs/PLAN.md` (+20/−2) — new CURRENT STATUS (2026-08-31) with ledger refs and the decisions settled since; the 2026-08-26 block demoted to a snapshot; purpose banner says update in the same commit
+  - `docs/archive/ARC-001-living-plan.md` (+20/−2) — new CURRENT STATUS (2026-08-31) with ledger refs and the decisions settled since; the 2026-08-26 block demoted to a snapshot; purpose banner says update in the same commit
 
 ### 2026-08-30 · docs: per-session change log replaces the single ledger (docs/sessions/, bun run session) · db47945
 
@@ -96,11 +109,11 @@ in these entries depend on that — never squash).
   - `README.md` (+2/−2) — pointer → docs/sessions/ newest file
   - `docs/LEDGER.md` (+0/−888) — removed — content migrated into docs/sessions/
   - `docs/OVERVIEW.md` (+13/−11) — doc-map row for docs/sessions/; Status cites the session file; resume steps use `bun run session`
-  - `docs/PLAN.md` (+6/−6) — banner + CURRENT STATUS cite docs/sessions/ instead of LEDGER
-  - `docs/sessions/2026-08-26-foundation.md` (+589/−0) — new — migrated 2026-08-26 entries; narrative points at PLAN.md's build log / UI history / session log
-  - `docs/sessions/2026-08-27-curl-sh-interactivity-and-first-bootstrap-fixes.md` (+149/−0) — new — migrated 2026-08-27 entries (v0.1.0–v0.1.4); narrative: curl|sh root cause and the first full bootstrap failures
-  - `docs/sessions/2026-08-30-docs-rehydration.md` (+87/−0) — new — this session: the post-v0.1.9 docs entries; narrative of the ledger → sessions evolution
-  - `docs/sessions/2026-08-30-real-bootstrap-runs-v0.1.5-to-v0.1.9.md` (+101/−0) — new — migrated v0.1.5–v0.1.9 entries; narrative: Peter's run-driven UX directives
+  - `docs/archive/ARC-001-living-plan.md` (+6/−6) — banner + CURRENT STATUS cite docs/sessions/ instead of LEDGER
+  - `docs/sessions/SES-001-foundation.md` (+589/−0) — new — migrated 2026-08-26 entries; narrative points at PLAN.md's build log / UI history / session log
+  - `docs/sessions/SES-002-curl-sh-interactivity-and-first-bootstrap-fixes.md` (+149/−0) — new — migrated 2026-08-27 entries (v0.1.0–v0.1.4); narrative: curl|sh root cause and the first full bootstrap failures
+  - `docs/sessions/SES-004-docs-rehydration.md` (+87/−0) — new — this session: the post-v0.1.9 docs entries; narrative of the ledger → sessions evolution
+  - `docs/sessions/SES-003-real-bootstrap-runs-v0.1.5-to-v0.1.9.md` (+101/−0) — new — migrated v0.1.5–v0.1.9 entries; narrative: Peter's run-driven UX directives
   - `docs/sessions/README.md` (+84/−0) — new — index (auto-regenerated between markers), how to read, how to keep up to date, session + entry template
   - `package.json` (+1/−1) — `session` script replaces `ledger`
   - `scripts/ledger.ts` (+0/−139) — removed (became session.ts)

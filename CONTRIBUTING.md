@@ -3,7 +3,8 @@
 envsetup is a pure-Bun macOS environment-setup CLI. This doc covers how to set up, make a
 change, and cut a release. Start with [docs/OVERVIEW.md](docs/OVERVIEW.md) (map, status, next up) and
 [docs/sessions/](docs/sessions/README.md) (what was done, session by session, with files). The always-loaded agent brief is
-[CLAUDE.md](CLAUDE.md); the design record is [docs/PLAN.md](docs/PLAN.md).
+[CLAUDE.md](CLAUDE.md); decisions are ADRs in [docs/decisions/](docs/decisions/README.md); requirements
+in [docs/plan/PRD-001-envsetup.md](docs/plan/PRD-001-envsetup.md).
 
 ## Ground rules
 
@@ -42,7 +43,9 @@ If `bun` isn't found, add it to PATH: `export PATH="$HOME/.bun/bin:$PATH"`.
    the effective config, and return `{ installed: false, differs: true }` when config is
    *present but mismatched* (vs plain `installed: false` for never-configured). `differs` is
    what makes a drifted item show as an opt-in reset in bootstrap and as `≠` in `doctor` —
-   see [docs/CONFIG-COMPAT-PLAN.md](docs/CONFIG-COMPAT-PLAN.md) for the model.
+   see [ADR-010](docs/decisions/ADR-010-reset-on-drift-config-model.md) for the model. Every
+   prompt passes `input: promptInput()` ([ADR-014](docs/decisions/ADR-014-terminal-input-in-process-dev-tty.md)).
+   A new decision with alternatives gets an ADR; a new default or item updates the PRD's catalog.
 
 3. **Keep it green.**
 

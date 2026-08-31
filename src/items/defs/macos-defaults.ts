@@ -7,7 +7,7 @@ interface DefaultsSpec {
   value: string;
 }
 
-/** Peter's decided macOS settings (docs/PLAN.md Group 5). */
+/** Peter's decided macOS settings (docs/plan/PRD-001-envsetup.md Group 5). */
 export const DEFAULTS: DefaultsSpec[] = [
   { domain: "com.apple.finder", key: "AppleShowAllFiles", type: "bool", value: "true" },
   { domain: "NSGlobalDomain", key: "AppleShowAllExtensions", type: "bool", value: "true" },

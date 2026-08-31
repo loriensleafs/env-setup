@@ -1,6 +1,6 @@
 /**
  * Peter's Chrome customization defaults, captured from his machine 2026-08-26
- * (docs/PLAN.md Chrome section). Flags live in Local State (unprotected);
+ * (docs/plan/PRD-001-envsetup.md Chrome section). Flags live in Local State (unprotected);
  * pinned toolbar actions + extension pins live in Preferences — empirically
  * verified NOT HMAC-protected (Chrome Beta launch test, 2026-08-26).
  */
