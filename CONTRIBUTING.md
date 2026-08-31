@@ -67,10 +67,12 @@ If `bun` isn't found, add it to PATH: `export PATH="$HOME/.bun/bin:$PATH"`.
    blocking only on un-auto-fixable lint or type errors. The **pre-push** hook runs the full
    check + tests.
 
-5. **Record it** (part of the PR, not after). `bun run ledger` appends an entry per new commit to
-   [docs/LEDGER.md](docs/LEDGER.md) with the files touched; fill in its `Why` line (template in
-   the ledger) and update `docs/OVERVIEW.md` "Status" / "Next up" if the picture changed. Commit
-   that as `docs(ledger): …` in the same PR (the script skips those commits). After a release tag, run `bun run ledger` once more so the new
+5. **Record it** (part of the PR, not after). `bun run ledger` appends an entry skeleton per new
+   commit to [docs/LEDGER.md](docs/LEDGER.md): `Summary` / `Why` placeholders and one line per
+   touched file (every file — code, docs, config, CI, scripts). Fill in every placeholder (template
+   in the ledger), run `bun run ledger -- --check`, and update `docs/OVERVIEW.md` "Status" /
+   "Next up" if the picture changed. Commit that as `docs(ledger): …` in the same PR (the script
+   skips those commits). After a release tag, run `bun run ledger` once more so the new
    "Since vX.Y.Z" heading lands.
 
 6. **Open a PR** (`gh pr create`). CI (`.github/workflows/ci.yml`) runs the same checks plus a

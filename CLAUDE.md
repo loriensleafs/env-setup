@@ -7,26 +7,45 @@ this file). Keep it short and high-signal.
 Bootstraps a fresh Mac (apps, runtimes, fonts, repos, macOS settings, app configs) and keeps
 it in shape with `doctor`/`sync`.
 
-## Session start / session end (do this every time)
+## Rehydrating — how to digest the docs at session start
 
-1. **Start:** read [docs/OVERVIEW.md](docs/OVERVIEW.md) (project map, "Status", "Next up"), then
-   the **last section** of [docs/LEDGER.md](docs/LEDGER.md) — what changed since the last release
-   and which files; `git show <sha>` for detail. That is how a new session rehydrates; do not
-   re-derive history from the code.
-2. **Decisions:** [docs/PLAN.md](docs/PLAN.md) is the source of truth for every design decision and
-   its rationale — read the relevant part before non-trivial work.
-3. **End (part of every PR, before merge):** `bun run ledger` appends one entry per new commit
-   (with the files touched); fill in each entry's `Why` (and `Notes` when a future reader must know
-   something), commit as `docs(ledger): …`, and update OVERVIEW "Status" / "Next up" if the
-   picture changed. Docs discipline is not optional — the next session depends on it. An entry:
+Read in this order, extract what each is for, then stop reading and work. Do **not** rebuild
+history from the code or from `git log` yourself — the ledger exists so you never have to.
 
-   ```markdown
-   ### YYYY-MM-DD · type(scope): subject · sha
+1. [docs/OVERVIEW.md](docs/OVERVIEW.md): skim the map; read **"Status"**, **"Next up"** and
+   **"Key empirical facts"** in full. Output: where the project is, what is next, what not to
+   relearn.
+2. [docs/LEDGER.md](docs/LEDGER.md), **last "Since v…" section only**: for each entry, `Summary` =
+   what changed, `Why` = the motive, the per-file lines = where and what in each file, `Notes` =
+   gotchas. Output: what is on `main` but unreleased, what is parked, what was verified and how.
+3. For the "Next up" item you take: search the ledger for its files/keywords, read those entries'
+   per-file lines and Notes; `git show <sha>` only when the exact diff matters.
+4. [docs/PLAN.md](docs/PLAN.md) / [docs/CONFIG-COMPAT-PLAN.md](docs/CONFIG-COMPAT-PLAN.md): consult
+   the section for the decision you are about to touch — not front to back. Decisions there are
+   settled; don't re-litigate them. Where PLAN's status text disagrees with the ledger, the ledger
+   is right (PLAN's status is historical).
 
-   - Files: `path/a.ts`, `path/b.ts`
-   - Why: one line — the problem or request that caused the change (name who asked if Peter did)
-   - Notes: optional — gotchas, follow-ups, what was verified and how
-   ```
+## Recording — continuously, as you go
+
+After **every commit** (not at the end of the PR): `bun run ledger` appends an entry skeleton per new commit: `Summary` / `Why` placeholders and one
+line per touched file — **every** file, whatever kind (source, tests, docs, config, CI, scripts,
+assets) — with its +/− counts. Fill in every placeholder (a short phrase per file of what changed
+in it), add `Notes` when a future reader must know something, run `bun run ledger --check`, commit
+as `docs(ledger): …`, and update OVERVIEW "Status" / "Next up" — and the PLAN.md decision
+section if a decision moved — citing the entry's sha. Never put this off; the next session
+depends on it. A filled entry:
+
+```markdown
+### YYYY-MM-DD · type(scope): subject · sha
+
+- Summary: one or two lines — what this change does as a whole
+- Why: one line — the problem or request that caused it (name who asked if it was Peter)
+- Files:
+  - `src/thing.ts` (+12/−3) — what changed in this file
+  - `docs/OVERVIEW.md` (+4/−1) — what changed in this file
+  - `.github/workflows/ci.yml` (+2/−0) — what changed in this file
+- Notes: optional — gotchas, follow-ups, what was verified and how
+```
 
 Other docs: Config model + verified compatibility research:
 [docs/CONFIG-COMPAT-PLAN.md](docs/CONFIG-COMPAT-PLAN.md). Research foundation:
@@ -44,6 +63,10 @@ workflow: [CONTRIBUTING.md](CONTRIBUTING.md).
   `secrets.json.age` (+ the user's password manager). Never put a key — even a partial/truncated
   one — in source, docs, tests, or a commit message.
 - **Tests:** `<name>.test.ts` in a `__tests__/` dir beside the file under test (`bun:test`).
+- **Docs are kept current continuously — never deferred.** OVERVIEW "Status"/"Next up",
+  PLAN.md decisions, and the LEDGER are updated *as part of the change that makes them stale*
+  (same commit or the very next `docs(ledger)` commit), not "later", not "at the end of the PR",
+  not "in the next session". Where OVERVIEW or PLAN refer to work, cite the ledger entry (sha).
 - **Before finishing code:** `bun run check` (Biome + tsc + markdownlint) must pass; `bun run
   fix` auto-fixes. Lefthook enforces this at commit/push, but don't rely on it.
 
@@ -77,7 +100,8 @@ bun run fix                # auto-fix Biome + markdown
 bun run test               # bun:test suite
 bun run compile            # standalone binary → dist/envsetup
 bun run changelog          # regenerate CHANGELOG.md (git-cliff)
-bun run ledger             # append docs/LEDGER.md entries for new commits (then fill in Why)
+bun run ledger             # append docs/LEDGER.md entry skeletons for new commits (then fill in)
+bun run ledger -- --check  # fail if entries are missing or placeholders unfilled
 ```
 
 ## Safety when running it
