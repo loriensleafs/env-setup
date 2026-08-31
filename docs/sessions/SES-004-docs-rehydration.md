@@ -119,3 +119,78 @@ the start timestamp), source comments repointed from `docs/PLAN.md` to the ADR/P
   - `scripts/ledger.ts` (+0/−139) — removed (became session.ts)
   - `scripts/session.ts` (+230/−0) — new — `--new <slug>`, append into the newest session (ordered by H1 timestamp), `--check`, release markers, index regeneration; skips docs(session)/docs(ledger) commits
 - Notes: Session order comes from the H1 timestamp, not the file name, so two sessions on one day sort correctly. `--check` treats a bare placeholder narrative line as unfilled too. The day-based split of history is an approximation of sessions — stated in the README. The first version of this entry was committed unfilled (`3bc882a`) because git's rename detection printed `docs/{LEDGER.md => sessions/…}` paths; the script now passes `--no-renames`.
+
+### 2026-08-30 · docs: the docs system — plan/ analysis/ decisions/ archive/ with one naming convention; living plan retired · 7de62b7
+
+- Summary: The docs system lands: `decisions/` (17 ADRs), `plan/` (PRD-001 + PLAN-001), `analysis/` (8 analyses), `archive/` (the retired living plan), one naming convention `<TYPE>-<NNN>-<kebab-title>.md` incl. sessions renumbered `SES-NNN`; OVERVIEW/CLAUDE.md/README/CONTRIBUTING rewired; source comments repointed.
+- Why: Peter: plan and analysis directories with templates for research/PRDs/plans, using existing skills; chose the recommended `plan/ analysis/ decisions/ sessions/` layout; then "all files in docs should follow the naming convention decisions established".
+- Files:
+  - `CLAUDE.md` (+30/−22) — Rehydrating names OVERVIEW → newest SES → PLAN/ADR/ANA for the area → PRD; Recording names which doc and skill for decisions/requirements/plans/findings; never-defer rule lists every doc type
+  - `CONTRIBUTING.md` (+5/−2) — intro points at decisions + PRD; step 2 mentions ADRs, PRD catalog, `input: promptInput()`
+  - `README.md` (+2/−2) — pointers → decisions / PRD / analysis
+  - `docs/CONFIG-COMPAT-PLAN.md` (+0/−112) — removed — model → ADR-010, research appendix → ANA-007
+  - `docs/OVERVIEW.md` (+86/−96) — rewritten: doc map by TYPE with producing skills, rules/architecture/facts link their ADR/ANA, Status cites SES-004, Next-up 2 (restructure) done and removed, resume steps use the system
+  - `docs/PLAN.md` (+0/−1301) — moved to docs/archive/ARC-001-living-plan.md
+  - `docs/RESEARCH-clack-citty-bun.md` (+0/−204) — moved to docs/analysis/ANA-001-clack-citty-bun.md
+  - `docs/analysis/ANA-001-clack-citty-bun.md` (+206/−0) — new — moved from docs/RESEARCH-clack-citty-bun.md + status banner
+  - `docs/analysis/ANA-002-install-methods.md` (+62/−0) — new — install methods per tool (from the living plan's runtimes + dependency audit)
+  - `docs/analysis/ANA-003-app-config-mechanics.md` (+98/−0) — new — app config + licensing mechanics (CleanShot/BetterDisplay/Typora/superwhisper/Raycast/Podman/editors/Ghostty/Claude Code captures)
+  - `docs/analysis/ANA-004-chrome-web-apps.md` (+56/−0) — new — Chrome web apps without policy (bundle naming, AX driver techniques)
+  - `docs/analysis/ANA-005-macos-permissions-tcc.md` (+44/−0) — new — TCC permissions cannot be pre-granted
+  - `docs/analysis/ANA-006-finder-favorites-sharedfilelist.md` (+42/−0) — new — Finder favorites via LSSharedFileList (the sentinel-pointer segfault)
+  - `docs/analysis/ANA-007-config-compatibility.md` (+84/−0) — new — config-compatibility research (CONFIG-COMPAT-PLAN appendix: defects, couplings, refuted)
+  - `docs/analysis/ANA-008-terminal-input-under-curl-sh.md` (+55/−0) — new — terminal input under curl|sh (the empirical root cause)
+  - `docs/analysis/README.md` (+68/−0) — new — index, primary-source rules, analysis template, `research` skill
+  - `docs/archive/ARC-001-living-plan.md` (+1308/−0) — PLAN.md moved here verbatim with a retired/read-only banner
+  - `docs/archive/README.md` (+14/−0) — new — what is archived and where its content went
+  - `docs/decisions/ADR-001-pure-bun-no-node.md` (+42/−0) — new — ADR: pure Bun, no Node
+  - `docs/decisions/ADR-002-distribution-curl-one-liner.md` (+45/−0) — new — ADR: distribution via curl one-liner + compiled binary
+  - `docs/decisions/ADR-003-vendored-clack.md` (+41/−0) — new — ADR: vendored clack
+  - `docs/decisions/ADR-004-repo-structure-and-tests.md` (+46/−0) — new — ADR: repo structure + sibling tests
+  - `docs/decisions/ADR-005-three-stage-workflow.md` (+59/−0) — new — ADR: three-stage workflow, nothing before confirm, auto connect, re-run converges
+  - `docs/decisions/ADR-006-everything-toggleable-requires-cascade.md` (+46/−0) — new — ADR: everything toggleable + requires-cascade
+  - `docs/decisions/ADR-007-manifest-journal-item-architecture.md` (+50/−0) — new — ADR: manifest/journal/item architecture + failure policy
+  - `docs/decisions/ADR-008-secrets-age-encrypted-in-repo.md` (+51/−0) — new — ADR: secrets age-encrypted in repo
+  - `docs/decisions/ADR-009-github-auth-and-signing.md` (+52/−0) — new — ADR: GitHub device flow, two SSH keys, signing, noreply
+  - `docs/decisions/ADR-010-reset-on-drift-config-model.md` (+55/−0) — new — ADR: reset-on-drift config model (supersedes conflict-consent)
+  - `docs/decisions/ADR-011-install-method-per-tool.md` (+44/−0) — new — ADR: install method per tool + transitive prereqs
+  - `docs/decisions/ADR-012-per-item-zsh-contributions.md` (+41/−0) — new — ADR: per-item zsh contributions
+  - `docs/decisions/ADR-013-claude-code-format-hook-installed-by-cli.md` (+40/−0) — new — ADR: Claude Code format hook installed by the CLI
+  - `docs/decisions/ADR-014-terminal-input-in-process-dev-tty.md` (+39/−0) — new — ADR: terminal input via in-process /dev/tty
+  - `docs/decisions/ADR-015-chrome-web-apps-ax-automation.md` (+38/−0) — new — ADR: Chrome web apps via AX automation
+  - `docs/decisions/ADR-016-dev-tooling.md` (+45/−0) — new — ADR: dev tooling (Biome/markdownlint/lefthook/git-cliff/CI)
+  - `docs/decisions/ADR-017-docs-system.md` (+58/−0) — new — ADR: the docs system itself
+  - `docs/decisions/README.md` (+67/−0) — new — index, lifecycle rules, ADR template, which skills produce ADRs
+  - `docs/plan/PLAN-001-visual-grouping.md` (+52/−0) — new — plan for Next-up 1 (tasks, PTY checkpoint, risks); patch on `wip/visual-grouping`
+  - `docs/plan/PRD-001-envsetup.md` (+205/−0) — new — promise, commands, UX requirements, full item catalog with chosen defaults, stack, structure, style, testing, boundaries, success criteria, non-goals, open questions
+  - `docs/plan/README.md` (+80/−0) — new — index, rules, PRD + feature-plan templates, which skills
+  - `docs/sessions/2026-08-26-foundation.md` (+0/−589) — renamed to SES-001-foundation.md
+  - `docs/sessions/2026-08-27-curl-sh-interactivity-and-first-bootstrap-fixes.md` (+0/−149) — renamed to SES-002-…
+  - `docs/sessions/2026-08-30-docs-rehydration.md` (+0/−108) — renamed to SES-004-docs-rehydration.md
+  - `docs/sessions/2026-08-30-real-bootstrap-runs-v0.1.5-to-v0.1.9.md` (+0/−101) — renamed to SES-003-…
+  - `docs/sessions/README.md` (+11/−11) — SES-NNN naming in the rules; ADR/PRD instead of PLAN.md
+  - `docs/sessions/SES-001-foundation.md` (+589/−0) — renamed from the date-named file; narrative links to ARC-001
+  - `docs/sessions/SES-002-curl-sh-interactivity-and-first-bootstrap-fixes.md` (+149/−0) — renamed from the date-named file; links updated
+  - `docs/sessions/SES-003-real-bootstrap-runs-v0.1.5-to-v0.1.9.md` (+101/−0) — renamed from the date-named file
+  - `docs/sessions/SES-004-docs-rehydration.md` (+121/−0) — renamed; Outcome/Open updated; narrative of the docs-system + naming work
+  - `scripts/session.ts` (+13/−7) — SES-NNN files: numbered `--new`, ordered by number, index label `SES-NNN · timestamp · title`
+  - `src/auth/auth-ceremony.ts` (+1/−1) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
+  - `src/auth/github-device-flow.ts` (+1/−1) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
+  - `src/items/all.ts` (+1/−1) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
+  - `src/items/chrome/chrome-defaults.ts` (+1/−1) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
+  - `src/items/chrome/chrome-pwas.ts` (+1/−1) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
+  - `src/items/claude-code/claude-settings.ts` (+1/−1) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
+  - `src/items/defs/dock.ts` (+1/−1) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
+  - `src/items/defs/git-email.ts` (+1/−1) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
+  - `src/items/defs/git-identity.ts` (+1/−1) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
+  - `src/items/defs/macos-defaults.ts` (+1/−1) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
+  - `src/items/defs/ssh-keys.ts` (+1/−1) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
+  - `src/items/editors/editor-config.ts` (+1/−1) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
+  - `src/items/ghostty/ghostty-config.ts` (+1/−1) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
+  - `src/items/ghostty/ghostty-icon.ts` (+1/−1) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
+  - `src/items/quick-actions/quick-actions.ts` (+1/−1) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
+  - `src/items/repos/repo-factory.ts` (+2/−2) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
+  - `src/paths/paths.ts` (+1/−1) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
+  - `src/secrets/age-store.ts` (+1/−1) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
+  - `src/secrets/secrets.ts` (+1/−1) — comment repointed from docs/PLAN.md to the ADR/PRD it meant (no behaviour change)
+- Notes: `AGENTS.md` is a symlink to CLAUDE.md (edits go through it). `docs/archive/` is read-only history; ADR-017 records the alternatives Peter rejected on the way (single ledger, ledger + session notes). Source files changed only in comments.
