@@ -155,7 +155,7 @@ small separate commands, merge commits). The facts below are the ones a rule can
   skills and `docs/sessions/CLAUDE.md` (`83d0881`). SES-008 closed with `/brain:session-close` — the
   first session recorded end to end on the installed plugin (brain PLAN-001 Part 3's Checkpoint).
 - **The docs delegate rehydration to `/brain:plan`** ([SES-010](sessions/SES-010-docs-delegate-rehydration-to-brain-plan.md),
-  `4fbddd4`, on `feat/visual-grouping`; acmelabs-15/brain PLAN-001 Part 5 Task 1): the door
+  done; `4fbddd4`, on `feat/visual-grouping`; acmelabs-15/brain PLAN-001 Part 5 Task 1): the door
   landed 2026-08-31, so `CLAUDE.md` § Rehydrating, README and this file say so instead of "once
   it lands"; `docs/sessions/README.md` regenerated from brain's fixed template (bare `/plan` →
   `/brain:plan`); the docs(session) commit sweeps CONTRIBUTING's leftover hedge.

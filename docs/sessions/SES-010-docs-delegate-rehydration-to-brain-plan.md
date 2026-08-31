@@ -1,9 +1,9 @@
 # 2026-08-31 10:00 · The docs delegate rehydration to /brain:plan — acmelabs-15/brain PLAN-001 Part 5 Task 1
 
 - Goal: env-setup's docs name `/brain:plan PLAN-NNN` as the way in now that it is installed (acmelabs-15/brain PLAN-001 Part 4's checkpoint): `CLAUDE.md` § Rehydrating keeps only the read order the door walks, `README.md` and `OVERVIEW.md`'s live text say the door has landed, and `docs/sessions/README.md` is regenerated from the fixed template that says `/brain:plan` rather than the bare `/plan`.
-- Status: in progress
+- Status: done
 - Plan: —
-- Outcome: _(fill in)_
+- Outcome: the docs name `/brain:plan PLAN-NNN` as the way in — one delegation commit (`4fbddd4`: `CLAUDE.md` § Rehydrating, `README.md`, `OVERVIEW.md` live text, `docs/sessions/README.md` regenerated from brain's fixed template) plus its docs(session) commit (`8ec333e`), which swept `CONTRIBUTING.md`'s leftover "once it lands". Verified by reading each touched file after the edit and grepping the live prose for the old claims; the bare `/plan` remains only in ANA-011's record. Both commits sit on `feat/visual-grouping` and ride to `main` with SES-009's PR. The plan of record is brain's — its PLAN-001 Part 5 Task 1 tick is that repo's session.
 
 ## Narrative
 
