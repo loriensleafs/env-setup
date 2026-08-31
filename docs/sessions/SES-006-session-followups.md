@@ -4,7 +4,7 @@
 - Status: open
 - Plan: —
 - Outcome: _(fill in)_
-- Open at end: plugin-kit PR #1 (github.com/acmelabs-15/plugin-kit/pull/1, branch `fix/eval-tooling` @ b0d4411) is open — Peter merges. The tightened join wording and the ADR-021 entry step are unmeasured (iteration 5 with the next skill change). SES-005 belongs to the rehydration conversation of 19:25; close it by hand if that conversation is over.
+- Open at end: plugin-kit PR #1 merged (acmelabs-15/plugin-kit `e4b1a53`) — the fixed viewer, report path, neighbour sweep and aggregator are what the next skill-creator run uses. The tightened join wording and the ADR-021 entry step are unmeasured (iteration 5 with the next skill change). SES-005 belongs to the rehydration conversation of 19:25; close it by hand if that conversation is over.
 
 ## Narrative
 
@@ -18,7 +18,7 @@ restrictions and the GitHub CLI app is not granted for acmelabs-15 (`gh api user
 is refused; branch `fix/eval-tooling` @ b0d4411 stays local.
 
 The plugin-kit push unblocked once the GitHub CLI app showed `acmelabs-15 ✓` under its Organization
-access (Peter granted it; `gh api user/orgs` then listed the org); pushed and PR #1 opened. Entry grain
+access (Peter granted it; `gh api user/orgs` then listed the org); pushed, PR #1 opened and merged (`e4b1a53`). Entry grain
 settled as ADR-021 (`77aa614`): value only, `Also:` lines, the `Session-entry: none` trailer.
 
 ## Changes (one entry per commit, in order)
