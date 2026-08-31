@@ -187,3 +187,11 @@ line: ADR location follows the project, 16 skills read CONTEXT.md before explori
 - Files:
   - `CLAUDE.md` (+2/−0) — one bullet under Working with Peter
 - Notes: The full rule (four STE rules that matter in chat, the CONTEXT.md/CONTEXT-MAP clause, structure over prose) is in ~/CLAUDE.md §1; the repo carries the one-line form. Not measured: effect on reply length or clarity.
+
+### 2026-08-30 · fix(session skill): the injection gotcha spelled a marker the harness ran · 4d575a4
+
+- Summary: The injection gotcha no longer spells the marker: the harness parsed the literal example as an injection, ran `…`, and the failure aborted every typed `/session`. The bullet now describes the marker in words and records the finding: a typed `/session` renders injections; the Skill-tool path does not.
+- Why: Peter, in a new conversation: `/session` → "Shell command failed for pattern !`…`: command not found: …".
+- Files:
+  - `.claude/skills/session/SKILL.md` (+7/−5) — first gotcha reworded; no marker text left in the body outside the three real injection lines
+- Notes: Verified: `grep -c` finds exactly the three injection lines; validator valid; the failure itself is the first evidence that the typed path renders injections (SES-006's earlier probes only covered the Skill-tool path). Not yet verified: a typed `/session start` completing in a fresh conversation after this fix — Peter's next `/session` is the check.
