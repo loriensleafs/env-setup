@@ -9,18 +9,17 @@ pointers below.
 runs the attended ceremonies, and **converges** on re-run; `doctor` is the read-only diff; `sync`
 applies the manifest without the picker. Owner: Peter Kloss (github `loriensleafs`).
 
-## Rehydrating — at session start, run `/rehydrate`
+## Rehydrating — at session start, run `/session start`
 
-The `/rehydrate` skill (`.claude/skills/rehydrate/`) is the one home of the reading order and its
-completion criterion: OVERVIEW (Status, Next up, Key facts) → the newest `SES-NNN` in full →
-[CONTEXT.md](CONTEXT.md) → the tree checked against the log → the area's PLAN / ADRs / ANAs and its
-nested `CLAUDE.md` → this conversation's session file → a brief to the user. **Every file it
-names is read in full, to the end, with no sampling** — a truncated read is continued with
-`offset`, never summarized. Do **not** rebuild
-history from the code or `git log`; the docs system exists so you never have to. Every doc is
-`<TYPE>-<NNN>-<kebab-title>.md` in its directory; each directory's `README.md` holds its rules,
-index and template; `docs/archive/` is history only. At the end of a conversation `/wrap-up` checks
-that everything the next `/rehydrate` relies on has been written.
+The `/session` skill (`.claude/skills/session/`) is the one home of the session ritual: `start`
+reads the docs system in the right order — OVERVIEW (Status, Next up, Key facts) → the newest
+`SES-NNN` in full → [CONTEXT.md](CONTEXT.md) → the tree checked against the log → the area's PLAN /
+ADRs / ANAs and its nested `CLAUDE.md` — creates this conversation's session file, and ends in a
+brief. **Every file it names is read in full, to the end, with no sampling**; a truncated read is
+continued with `offset`, never summarized. Do **not** rebuild history from the code or `git log`;
+the docs system exists so you never have to. Every doc is `<TYPE>-<NNN>-<kebab-title>.md` in its
+directory; each directory's `README.md` holds its rules, index and template; `docs/archive/` is
+history only.
 
 ## Working with Peter
 
@@ -36,38 +35,13 @@ that everything the next `/rehydrate` relies on has been written.
   Merge PRs with **merge commits** (session entries cite shas).
 - Proceed on reversible work without asking; finish the whole task; report faithfully.
 
-## Recording — continuously, as you go
+## Recording — after every commit, run `/session record`; at the end, `/session end`
 
-- **Session start:** `bun run session -- --new <slug>` creates `SES-<next>-<slug>.md` and makes
-  it current; set its title and `Goal` right away.
-- **After every commit** (not at the end of the PR, never "later"): `bun run session` appends an
-  entry skeleton per new commit — `Summary` / `Why` placeholders and one line per touched file,
-  **every** file, whatever kind, with its +/− counts. Fill every placeholder (a short phrase per
-  file), add `Notes` when a future reader must know something, `bun run session -- --check`,
-  commit as `docs(session): …`.
-- **In the same step as the change that makes them stale**, citing the session entry's sha:
-  OVERVIEW "Status" / "Next up"; a new or changed decision → a new `ADR-NNN`
-  (`documentation-and-adrs`; `grill-with-docs` to interrogate a design first); a changed
-  requirement or default → `PRD-001`; work bigger than a small fix → its `PLAN-NNN`
-  (`planning-and-task-breakdown`); a fact established against primary sources or empirically →
-  `ANA-NNN` (`research`, told to save there); a new or sharpened term → `CONTEXT.md`
-  (`domain-modeling`); a directory-specific convention → that directory's `CLAUDE.md`. Update each
-  directory's README index.
-- **Narrative as it happens:** requests, decisions, dead ends, false leads, verifications go into
-  the session's Narrative when they happen; `Outcome` / `Open at end` before the session ends.
-
-A filled session entry (full template in [docs/sessions/README.md](docs/sessions/README.md)):
-
-```markdown
-### YYYY-MM-DD · type(scope): subject · sha
-
-- Summary: one or two lines — what this change does as a whole
-- Why: one line — the problem or request that caused it (name who asked if it was Peter)
-- Files:
-  - `src/thing.ts` (+12/−3) — what changed in this file
-  - `docs/OVERVIEW.md` (+4/−1) — what changed in this file
-- Notes: optional — gotchas, follow-ups, what was verified and how
-```
+`record` appends and fills the commit's entry and updates everything the change made stale in the
+same step (OVERVIEW, ADR, PRD, plan, analysis, `CONTEXT.md`, a directory's `CLAUDE.md`), then
+commits it as `docs(session): …`; `end` checks the log, Status and the tree. The procedure lives
+in the skill, the template in `docs/sessions/README.md`. Never put it off; the next conversation's
+`start` depends on it.
 
 ## Hard rules (do not violate)
 

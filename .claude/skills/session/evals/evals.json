@@ -1,0 +1,46 @@
+{
+  "skill_name": "session",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm picking envsetup back up. Where are we, and what should I do first?",
+      "expected_output": "A brief of at most ~12 lines: released version, unreleased-on-main, parked branches, open/unverified items from the newest session, the proposed Next-up item and its first step, a 'read in full: …' line naming every file read — and a new docs/sessions/SES-NNN file with its Goal set.",
+      "files": [],
+      "expectations": []
+    },
+    {
+      "id": 2,
+      "prompt": "I just committed the fix for the stale set-favorites.swift asset (it now matches the embedded constant). Record it properly before I open the PR.",
+      "expected_output": "A docs(session) commit whose entry for that sha has Summary, Why, one filled line per touched file and Notes; OVERVIEW Next-up 5 updated (the stale-asset item removed or marked done); `bun run session -- --check` prints `session: complete`.",
+      "files": [],
+      "expectations": []
+    },
+    {
+      "id": 3,
+      "prompt": "That's it for today, I'm done. Close things out.",
+      "expected_output": "The current session's Outcome and Open at end filled, OVERVIEW Status/Next up matching reality, a clean tree on main (or every exception named), and a two-line closing note: what shipped, what to do first next time.",
+      "files": [],
+      "expectations": []
+    }
+  ],
+  "hard_negatives": [
+    {
+      "id": 101,
+      "prompt": "Write the ADR for changing the journal format to include the run's start time — context, decision, alternatives, consequences.",
+      "should_trigger": false,
+      "why": "in-domain (docs system), deliverable is an ADR — documentation-and-adrs territory"
+    },
+    {
+      "id": 102,
+      "prompt": "Add a --since <sha> flag to scripts/session.ts so it only appends commits after that sha, with a test.",
+      "should_trigger": false,
+      "why": "the tool itself — run-scripts / ordinary code change; the reviewer expected this one to leak"
+    },
+    {
+      "id": 103,
+      "prompt": "How does the session tool decide which SES file is current, and how does it number new ones?",
+      "should_trigger": false,
+      "why": "a question docs/sessions/README.md answers"
+    }
+  ]
+}
