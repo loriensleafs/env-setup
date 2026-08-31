@@ -170,3 +170,12 @@ line: ADR location follows the project, 16 skills read CONTEXT.md before explori
   - `docs/analysis/ANA-010-context-md-maintenance-in-the-reference-skills.md` (+122/−0) — the analysis: findings A–E with file:line citations to the reference at 6654f6b, refuted claim, unverifiable, four implications
   - `docs/analysis/README.md` (+1/−0) — index row for ANA-010
 - Notes: Sources verified by reading the cited files at the cited lines (setup SKILL.md, domain.md, domain-modeling SKILL.md + CONTEXT-FORMAT.md, the four delegating skills, .agents/invocation.md, docs/engineering/domain-modeling.md, the glossary's git log) plus an Explore agent's full pass; the only unverifiable claim is how often the discipline fires in other users' repos. Decision left to Peter: which of the four implications to act on (avoid-word check, the two extra CONTEXT.md sections).
+
+### 2026-08-30 · docs(analysis): ANA-010 acted on — the installed skills now follow the project's ADR location, read CONTEXT.md, route to domain-modeling · f907932
+
+- Summary: ANA-010 gains a dated "Acted on" section: the installed skills under ~/.claude/skills were edited (ADR location follows the project; 16 read CONTEXT.md before exploring; 6 route to domain-modeling; LOCAL-CHANGES.md lists them); the Narrative records the same.
+- Why: Peter asked for the reference-derived skills to read CONTEXT.md and to stop assuming docs/adr/; an analysis is never silently edited, so the outcome is a dated addition.
+- Files:
+  - `docs/analysis/ANA-010-context-md-maintenance-in-the-reference-skills.md` (+14/−0) — dated Acted-on section naming every edit made under ~/.claude/skills and the validator result
+  - `docs/sessions/SES-006-session-followups.md` (+5/−0) — Narrative: the ANA-010 answer and the global skill edits (outside this repo, no entry of their own)
+- Notes: The global edits themselves are verified by plugin-kit's validator on all 22 touched skills (valid; idea-refine's 4 warnings pre-exist) and by grep tallies (16 read rules, 5 routing sections + the grill-me pointer, no bare `docs/adr/` rule left). Not measured: whether the added lines change how those skills behave — no evals exist for them.
