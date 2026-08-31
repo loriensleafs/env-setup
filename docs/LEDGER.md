@@ -21,7 +21,7 @@ agent can open the right files or `git show <sha>` instead of re-deriving histor
 
 ## How to keep it up to date
 
-- **Every PR appends its entries before merge** — a PR is not done without them. Commit, then run
+- **Continuously, after every commit** — not at the end of the PR, never "later". Commit, then run
   `bun run ledger` (`scripts/ledger.ts`): it appends an entry skeleton per commit not yet listed —
   `Summary` / `Why` placeholders and one line per touched file with its +/− line counts. Fill in
   every `_(fill in)_`: the Summary, the Why, and for each file a short phrase of what changed in
@@ -36,7 +36,8 @@ agent can open the right files or `git show <sha>` instead of re-deriving histor
   script inserts it automatically after the tagged commit, so run it once more after tagging.
 - Never rewrite or reorder old entries; correct a mistake with a new entry. Merge PRs with merge
   commits (not squash) so the shas here stay valid.
-- Touch OVERVIEW "Status" / "Next up" in the same PR whenever the picture changed.
+- Update OVERVIEW "Status" / "Next up" (and the PLAN.md decision section, if a decision moved) in
+  the same step, citing the entry's sha, whenever the picture changed.
 
 ## Entry template
 

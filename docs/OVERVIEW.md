@@ -96,14 +96,18 @@ Owner: Peter Kloss (github loriensleafs). Public repo. Released: v0.1.9 (2026-08
 
 ## Status (2026-08-31)
 
+> Kept current continuously — every change updates this section, "Next up", the LEDGER entry
+> (cite its sha here) and the PLAN.md decision it touched, in the same step. Never deferred.
+
 - Peter's machine converged via the one-liner: full bootstrap, then re-runs, **0 failed**.
 - Released through v0.1.9. Recent: auto connect phase + finishing pass, journal-driven retry,
   config screens as one `p.group` per item, radio prompt frames like clack built-ins, ask-to-quit
   Chrome for chrome-config, ceremony-only items labelled "attended step".
 - Known issues: compiled idle-CPU spin (above); attended ceremonies have not yet been exercised
   end-to-end on a fresh machine (first full connect run pending).
-- **Unreleased on `main`** (detail: [LEDGER.md](LEDGER.md) → "Since v0.1.9"): docs only —
-  OVERVIEW, LEDGER + `scripts/ledger.ts`, contribution discipline. No code change since v0.1.9.
+- **Unreleased on `main`** (LEDGER "Since v0.1.9"): docs only — OVERVIEW (`bb46dcb`), ledger +
+  `bun run ledger` (`7439bec`, `ee5e336`), granular entries + rehydration procedure (`f772638`,
+  `f29ec58`). No code change since v0.1.9.
 - **Parked, not on `main`:** the visual-grouping patch for Next-up 1 exists as a WIP commit on the
   local branch `wip/visual-grouping` (unverified, never run under a PTY).
 

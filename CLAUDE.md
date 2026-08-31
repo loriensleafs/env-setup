@@ -25,14 +25,15 @@ history from the code or from `git log` yourself — the ledger exists so you ne
    settled; don't re-litigate them. Where PLAN's status text disagrees with the ledger, the ledger
    is right (PLAN's status is historical).
 
-## Recording — part of every PR, before merge
+## Recording — continuously, as you go
 
-`bun run ledger` appends an entry skeleton per new commit: `Summary` / `Why` placeholders and one
+After **every commit** (not at the end of the PR): `bun run ledger` appends an entry skeleton per new commit: `Summary` / `Why` placeholders and one
 line per touched file — **every** file, whatever kind (source, tests, docs, config, CI, scripts,
 assets) — with its +/− counts. Fill in every placeholder (a short phrase per file of what changed
 in it), add `Notes` when a future reader must know something, run `bun run ledger --check`, commit
-as `docs(ledger): …`, and update OVERVIEW "Status" / "Next up" if the picture changed. Docs
-discipline is not optional — the next session depends on it. A filled entry:
+as `docs(ledger): …`, and update OVERVIEW "Status" / "Next up" — and the PLAN.md decision
+section if a decision moved — citing the entry's sha. Never put this off; the next session
+depends on it. A filled entry:
 
 ```markdown
 ### YYYY-MM-DD · type(scope): subject · sha
@@ -62,6 +63,10 @@ workflow: [CONTRIBUTING.md](CONTRIBUTING.md).
   `secrets.json.age` (+ the user's password manager). Never put a key — even a partial/truncated
   one — in source, docs, tests, or a commit message.
 - **Tests:** `<name>.test.ts` in a `__tests__/` dir beside the file under test (`bun:test`).
+- **Docs are kept current continuously — never deferred.** OVERVIEW "Status"/"Next up",
+  PLAN.md decisions, and the LEDGER are updated *as part of the change that makes them stale*
+  (same commit or the very next `docs(ledger)` commit), not "later", not "at the end of the PR",
+  not "in the next session". Where OVERVIEW or PLAN refer to work, cite the ledger entry (sha).
 - **Before finishing code:** `bun run check` (Biome + tsc + markdownlint) must pass; `bun run
   fix` auto-fixes. Lefthook enforces this at commit/push, but don't rely on it.
 
