@@ -36,7 +36,7 @@ what is missing.
 
 ## Working on it
 
-Humans and agents start the same way (agents: `/session start` does it): [docs/OVERVIEW.md](docs/OVERVIEW.md) (map, status, next up)
+Humans and agents start the same way (agents: `/session start` does it; `/session entry` after every commit, `/session end` to close): [docs/OVERVIEW.md](docs/OVERVIEW.md) (map, status, next up)
 → the newest session in [docs/sessions/](docs/sessions/README.md) (what was done, with a note per
 touched file) → [CONTEXT.md](CONTEXT.md) (the words) → [docs/decisions/](docs/decisions/README.md)
 (ADRs, the current truth of every decision) · [docs/plan/PRD-001-envsetup.md](docs/plan/PRD-001-envsetup.md)

@@ -8,7 +8,7 @@
 Peter: "what Anthropic considers to be skills best practices, specifically around creating
 workflows — conditional workflows and arguments." Concretely: how a skill receives arguments, how
 a body should branch, which frontmatter a multi-step workflow that runs commands and commits
-should carry, and whether one `/session start | record | end` skill is the shape Anthropic
+should carry, and whether one `/session start | record | end` (now `entry`) skill is the shape Anthropic
 recommends.
 
 ## Sources

@@ -1,6 +1,6 @@
 ---
 name: run-scripts
-description: Drive or test scripts/session.ts, the session-log tool (bun run session: new, append, check) — its commands and their real outputs. Use when asked to run, debug, change or verify the tool itself. Not for performing the session ritual (starting, recording or ending a session), which is /session.
+description: Drive or test scripts/session.ts, the session-log tool (bun run session: new, append, check) — its commands and their real outputs. Use when asked to run, debug, change or verify the tool itself. Not for performing the session ritual (starting a session, writing its entries, ending it), which is /session.
 ---
 
 `scripts/session.ts` maintains `docs/sessions/SES-NNN-*.md` (ADR-017): `--new <slug>` starts a session file,

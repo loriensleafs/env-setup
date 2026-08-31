@@ -170,6 +170,16 @@ _Avoid_: settings (as the stored noun), options, preferences
 **Effective config**:
 What `detect()` compares against: the manifest config if present, else the defaults.
 
+**Entry**:
+One commit's block in a session file — Summary, Why, one line per touched file, Notes — written by
+`/session entry` right after the commit.
+_Avoid_: log entry, note, update, record (as the noun)
+
+**Record** (verb):
+To write the entry and update everything the commit made stale, in the same step; the practice
+the docs system depends on.
+_Avoid_: update, log, document (as the verb for this)
+
 **Reset**:
 Re-applying the effective config to an item whose values drifted; only ever by the user's explicit
 selection.

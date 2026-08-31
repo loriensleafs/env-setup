@@ -30,7 +30,7 @@ bun test                             # bun:test suite
 
 ## Making a change
 
-1. **Rehydrate, then start the session log.** `/session start` reads the docs system in order and
+1. **Rehydrate, then start the session log.** `/session start` (alias `/session-start`) reads the docs system in order and
    runs `bun run session -- --new <slug>` (creates `docs/sessions/SES-<next>-<slug>.md`); set its
    title and `Goal`. Keep its Narrative as things
    happen (requests, decisions, dead ends, what was verified and how).
@@ -86,7 +86,7 @@ bun test                             # bun:test suite
    placeholder (template in [docs/sessions/README.md](docs/sessions/README.md)); `bun run session
    -- --check`; update `docs/OVERVIEW.md` "Status" / "Next up" and any ADR / PRD / plan / analysis
    / `CONTEXT.md` / nested `CLAUDE.md` the change made stale, citing the sha; commit as
-   `docs(session): …`. `/session record` is this step as a procedure; at the end of the conversation `/session end` checks nothing was deferred.
+   `docs(session): …`. `/session entry` (alias `/session-entry`) is this step as a procedure; at the end of the conversation `/session end` checks nothing was deferred.
 
 8. **Open a PR** (`gh pr create`). CI (`.github/workflows/ci.yml`) runs the same checks plus a
    gitleaks secret scan. `gh pr checks <n> --watch` may say "no checks reported" for ~20 s after

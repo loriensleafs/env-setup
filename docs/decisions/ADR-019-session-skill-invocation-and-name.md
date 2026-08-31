@@ -1,8 +1,11 @@
-# ADR-019: One model-invoked `/session` skill (start | record | end), named for its leading word, with the gate as the guard for its side effects
+# ADR-019: One model-invoked `/session` skill (start | entry | end), named for its leading word, with the gate as the guard for its side effects
 
 ## Status
 
-Accepted
+Accepted — revised 2026-08-30: the middle mode is `entry` (the artifact it writes; `start`/`end` stay
+verbs) and three typed-only aliases `/session-start`, `/session-entry`, `/session-end` exist as
+`.claude/commands/*.md` with `disable-model-invocation: true` (zero listing cost; Peter's call for
+discoverability in the `/` menu). Earlier text below says `record`.
 
 ## Date
 
