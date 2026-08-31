@@ -11,13 +11,13 @@ secondary write-up or an assumption. Unverified beliefs are labelled unverified.
 | Doc | Question it answers | Status |
 | --- | --- | --- |
 | [ANA-001-clack-citty-bun.md](ANA-001-clack-citty-bun.md) | Is clack + citty + Zod on Bun (runtime and compiled) the right foundation? Spike-validated. | current |
-| [ANA-008-terminal-input-under-curl-sh.md](ANA-008-terminal-input-under-curl-sh.md) | Why prompts die under `curl \| sh`, and the only input path Bun can actually read. | current |
-| [ANA-007-config-compatibility.md](ANA-007-config-compatibility.md) | Which shipped defaults conflict with each other or with the OS (doc-verified), and which claims were refuted. | current (conflict *checking* is out of scope by decision) |
 | [ANA-002-install-methods.md](ANA-002-install-methods.md) | Best install method per runtime/tool on a fresh Mac, from official docs. | current |
 | [ANA-003-app-config-mechanics.md](ANA-003-app-config-mechanics.md) | How each app's settings and licenses can be applied programmatically (captured from real machines). | current; re-capture on upgrades |
 | [ANA-004-chrome-web-apps.md](ANA-004-chrome-web-apps.md) | How Chrome web apps (PWAs) can be installed and named without an enterprise policy. | current |
 | [ANA-005-macos-permissions-tcc.md](ANA-005-macos-permissions-tcc.md) | Can TCC permissions (Accessibility, Screen Recording, Mic) be pre-granted? No — and what the ceiling is. | current |
 | [ANA-006-finder-favorites-sharedfilelist.md](ANA-006-finder-favorites-sharedfilelist.md) | Setting Finder sidebar favorites on macOS 26 after `mysides`/`sfltool` died. | current |
+| [ANA-007-config-compatibility.md](ANA-007-config-compatibility.md) | Which shipped defaults conflict with each other or with the OS (doc-verified), and which claims were refuted. | current (conflict *checking* is out of scope by decision) |
+| [ANA-008-terminal-input-under-curl-sh.md](ANA-008-terminal-input-under-curl-sh.md) | Why prompts die under `curl \| sh`, and the only input path Bun can actually read. | current |
 
 ## Rules
 

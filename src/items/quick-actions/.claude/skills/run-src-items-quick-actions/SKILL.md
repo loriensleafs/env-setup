@@ -6,18 +6,11 @@ description: Run, drive, smoke and test src/items/quick-actions — the Finder r
 `src/items/quick-actions/quick-actions.ts` writes three Automator `.workflow` services
 (Copy Path, Open in Ghostty, Open in Cursor) into `~/Library/Services`, each exec-ing a Bun payload
 in `~/.config/envsetup/scripts/`. Drive it with
-`.claude/skills/run-src-items-quick-actions/driver.ts`: lists `ACTIONS`, renders `workflowXml()`
+`src/items/quick-actions/.claude/skills/run-src-items-quick-actions/driver.ts`: lists `ACTIONS`, renders `workflowXml()`
 into scratch and lints it with `plutil`, and runs `detect()` (checks the bundles exist —
 read-only). `configure()` writes the services and runs `pbs -update`; never called here.
 
-All paths are relative to the repo root.
-
-## Setup
-
-```bash
-export PATH="$HOME/.bun/bin:$PATH"
-bun install
-```
+All paths are relative to the repo root; every shell needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
 ## Run (agent path)
 

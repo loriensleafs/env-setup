@@ -6,19 +6,12 @@ description: Run, drive, smoke and test src/items/repos — the repo-clone item 
 `src/items/repos` = `repoItem()` (clones into `{devDir}/ACMElabs/` or `{devDir}/reference/`,
 private ones through `gh`) and `acmelabs-marketplace` (generates
 `.claude-plugin/marketplace.json` over the repos actually cloned). Drive it with
-`.claude/skills/run-src-items-repos/driver.ts`: lists the specs, renders the marketplace from a
+`src/items/repos/.claude/skills/run-src-items-repos/driver.ts`: lists the specs, renders the marketplace from a
 **scratch** fixture (no clones, no network), and runs `detect()` for one repo item and the
 marketplace item (directory / file comparison — read-only). `install()` clones; `configure()`
 writes the real marketplace file — never called here.
 
-All paths are relative to the repo root.
-
-## Setup
-
-```bash
-export PATH="$HOME/.bun/bin:$PATH"
-bun install
-```
+All paths are relative to the repo root; every shell needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
 ## Run (agent path)
 

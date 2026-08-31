@@ -1,4 +1,4 @@
-# docs/archive — retired documents, read-only
+# docs/archive — retired documents
 
-Read for history only; never cite as current, never edit. Something here that the live docs lack
-moves to `decisions/`, `plan/`, `analysis/` or `sessions/` with a session citation.
+Invariant: read-only history — never edited, never cited as current. Anything still needed moves
+to the live docs with a session citation. Index: `README.md`.

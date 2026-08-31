@@ -9,7 +9,7 @@ resolves to these tarballs and the reason they exist (`completeOnTab`) is still 
 
 All paths are relative to the repo root; every shell needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
-## Run
+## Run (agent path)
 
 ```bash
 tar tzf vendor/clack-core-1.4.3-main-20260815.tgz | head -5

@@ -9,7 +9,7 @@ touched file with +/− counts, release markers after tagged commits), `--check`
 
 All paths are relative to the repo root; every shell needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
-## Run
+## Run (agent path)
 
 ```bash
 bun scripts/session.ts --check      # → session: complete        (exit 1 + "missing:"/"unfilled:" lines otherwise)

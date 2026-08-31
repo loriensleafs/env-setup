@@ -10,12 +10,11 @@ drivers, both in `src/ui/.claude/skills/run-src-ui/`: `driver.ts` exercises the 
 logic; `demo-walk.exp` drives the **real interactive demo** under a PTY (`expect`; tmux is not
 installed) and records a transcript — the closest thing to a screenshot for a TUI.
 
-All paths are relative to the repo root.
+All paths are relative to the repo root; every shell needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
 ## Run (agent path) — pure logic
 
 ```bash
-export PATH="$HOME/.bun/bin:$PATH"
 bun src/ui/.claude/skills/run-src-ui/driver.ts
 ```
 

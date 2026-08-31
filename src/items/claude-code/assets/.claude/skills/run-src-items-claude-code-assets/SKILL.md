@@ -4,20 +4,14 @@ description: Run, drive and smoke src/items/claude-code/assets — the Claude Co
 ---
 
 These are the scripts envsetup deploys to `~/.claude` (stdin-JSON contracts per the Claude Code
-hook docs). Drive them with `.claude/skills/run-src-items-claude-code-assets/driver.ts`, which
+hook docs). Drive them with
+`src/items/claude-code/assets/.claude/skills/run-src-items-claude-code-assets/driver.ts`, which
 pipes fixture payloads into each script and asserts the contract: `statusline.ts` → one line;
 `hooks-subagent-statusline.ts` → one JSON row per task; `hooks-format.ts` → formats a file inside a
 scratch project; `settings.template.json` → references all four scripts. `hooks-notify.ts` is
 **not** run: it has no dry-run path and fires a real macOS notification + raises Ghostty.
 
-All paths are relative to the repo root.
-
-## Setup
-
-```bash
-export PATH="$HOME/.bun/bin:$PATH"
-bun install      # hooks-format.ts uses the repo's node_modules/.bin/biome for the fixture
-```
+All paths are relative to the repo root; every shell needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
 ## Run (agent path)
 

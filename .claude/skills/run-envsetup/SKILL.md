@@ -1,6 +1,6 @@
 ---
 name: run-envsetup
-description: Build, run, and drive the envsetup CLI. Use when asked to start, run, build, test, smoke-test, screenshot, or walk the interactive bootstrap TUI of envsetup, or to run its doctor/diff against the machine. envsetup is a macOS setup CLI that INSTALLS software — the drivers exercise only the read-only surfaces, including the whole Stage A TUI up to (never past) the confirm.
+description: Build, run, and drive the envsetup CLI. Use when asked to start, run, build, test, smoke-test, screenshot, or walk the interactive bootstrap TUI of envsetup, or to run its doctor/diff against the machine. envsetup is a macOS setup CLI that INSTALLS software — the drivers exercise only the read-only surfaces, including the whole interactive flow up to (never past) the confirm.
 ---
 
 Two drivers, both in this directory, both read-only:
@@ -13,18 +13,17 @@ Two drivers, both in this directory, both read-only:
 
 **envsetup mutates the real macOS system: bare `envsetup` past the confirm, `sync`,
 `connect`, `auth`, and the passphrase-gated `secrets` actions install software and change
-settings. Never run those to "test".** Every source directory also has its own `/run-…`
-skill (`src/**/.claude/skills/`) with a direct-invocation driver for its module.
+settings. Never run those to "test".** Directories with a real driver have their own `/run-…`
+skill (`<dir>/.claude/skills/run-*/driver.ts`) for direct invocation of that module.
 
-All paths below are relative to the repo root.
+All paths are relative to the repo root; every shell needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
 ## Prerequisites
 
 - **macOS** (item detection is macOS-specific; the `--help` surfaces run anywhere Bun runs).
-- **Bun** on PATH — every shell needs it:
+- **Bun** — verify it is on PATH:
 
 ```bash
-export PATH="$HOME/.bun/bin:$PATH"
 bun --version
 ```
 
@@ -59,9 +58,9 @@ t=re.sub(r'\x1b\[[0-9;?]*[A-Za-z]','',t);print('\n'.join(l for l in t.replace('\
 What the stripped transcript shows, in order: the scan task log collapsing to `◆ Ready in
 Ns`; `Your name (git commits)` / `GitHub username` / `Dev directory` prefilled from the prior
 manifest and accepted; the picker (`What should this machine get?`) with missing items checked
-and drifted ones shown as `applied — settings differ` unchecked; any config screens for
-selected items with a schema; the `plan` note (`N items will be installed · M already
-installed`); `Proceed? (nothing has touched the system yet)` → `No` → `nothing was changed`.
+and drifted ones shown as `applied — settings differ` unchecked; a config screen for each
+picked item that has a schema; the `plan` note (`N items will be installed · M already
+applied`); `Proceed? (nothing has touched the system yet)` → `No` → `nothing was changed`.
 
 How the driver stays safe — keep these if you extend it:
 
@@ -111,17 +110,10 @@ bun run compile                 # → dist/envsetup (65 MB, Bun embedded; 0.1 s 
 sh install.sh --help            # downloads the latest release binary to $TMPDIR/envsetup, execs it with --help
 ```
 
-## Repo tooling
-
-```bash
-bun run session -- --check      # session log complete? (docs/sessions/, see /run-scripts)
-bun docs/.claude/skills/run-docs/link-check.ts   # every relative link in docs/ resolves
-```
-
 ## Run (human path) — interactive, MUTATES THE MACHINE past the confirm
 
 ```bash
-bun run dev                     # bootstrap; answering Yes at Proceed? installs everything selected
+bun run dev                     # bootstrap; answering Yes at Proceed? installs everything picked
 ```
 
 Also mutating/attended, never for drivers: `sync`, `connect`, `auth`, `secrets` (except `--help`).
@@ -131,6 +123,8 @@ Also mutating/attended, never for drivers: `sync`, `connect`, `auth`, `secrets` 
 ```bash
 bun test                        # 111 pass, 0 fail (31 files)
 bun run check                   # Biome + tsc + markdownlint — the CI / pre-push gate
+bun run session -- --check      # session log complete? (see /run-scripts)
+bun docs/.claude/skills/run-docs/link-check.ts   # every relative link in docs/ resolves (see /run-docs)
 ```
 
 ## Gotchas
@@ -144,8 +138,8 @@ bun run check                   # Biome + tsc + markdownlint — the CI / pre-pu
   driver skips it.
 - **`Proceed?` defaults to Yes.** Typing `n` selects No immediately (clack's confirm listens
   for `y`/`n`); the driver never sends a bare Enter there.
-- **No config screens appear** when nothing selected has a schema (as on this converged machine:
-  only two missing items were checked). Select a schema item in the picker to exercise them.
+- **No config screens appear** when nothing picked has a schema (as on this converged machine:
+  only two missing items were checked). Pick a schema item in the picker to exercise them.
 - **`secrets list/show/reveal` block on a passphrase prompt**; only `secrets --help` is safe.
 - **No `timeout`, no `tmux` on this Mac.** `expect` with `set timeout` is the wrapper.
 - **Compiled binaries idle at ~160 % CPU at any clack prompt** (bun-run: 0 %) — known

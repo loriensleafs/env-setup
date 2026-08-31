@@ -4,21 +4,14 @@ description: Run, drive, smoke and test src/items/defs — the core envsetup ite
 ---
 
 `src/items/defs` is the bulk of the item registry. Drive it with
-`.claude/skills/run-src-items-defs/driver.ts`: it exercises the pure helpers (BetterDisplay menu
+`src/items/defs/.claude/skills/run-src-items-defs/driver.ts`: it exercises the pure helpers (BetterDisplay menu
 profiles, the Zod config schemas' defaults, macOS `DEFAULTS`, `DOCK_APPS`, the assembled managed
 `~/.zshrc` block + `zshGaps` against a scratch file) and then runs **every item's `detect()`**
 with the real runner — exactly what `envsetup doctor` does, read-only. It never calls
 `install()`/`configure()`, and skips `github-auth` / `ssh-keys` whose `detect()` calls the GitHub
 API.
 
-All paths are relative to the repo root.
-
-## Setup
-
-```bash
-export PATH="$HOME/.bun/bin:$PATH"
-bun install
-```
+All paths are relative to the repo root; every shell needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
 ## Run (agent path)
 
@@ -47,7 +40,8 @@ skipped detect(): github-auth, ssh-keys (GitHub API calls)
 OK
 ```
 
-`installed=false differs` = present but configured differently from our defaults (reset-on-drift).
+`installed=false differs` = Drifted (present, config differs from the effective config); plain
+`installed=false` = Missing.
 Takes ~3 s (each detect shells out: `brew list`, `defaults read`, `git config`, …).
 
 ## Direct invocation

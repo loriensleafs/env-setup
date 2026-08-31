@@ -1,14 +1,11 @@
 # Plan — what we are building and how
 
-Two kinds of document live here:
-
-- **[PRD-001-envsetup.md](PRD-001-envsetup.md)** — the product requirements: what envsetup is, for whom, the promise, the
-  UX requirements, the item catalog with its chosen defaults, boundaries, success criteria, open
-  questions. The single source for *what* and *why* at product level. One file, kept current.
-- **Feature plans** — `<feature>.md`, one per piece of work larger than a small fix: overview,
-  the decisions it relies on (link ADRs), the ordered task list with checkpoints, risks, open
-  questions, and — when the work is done — a closing status line pointing at the session and
-  release that shipped it. Current: [PLAN-001-visual-grouping.md](PLAN-001-visual-grouping.md).
+Two kinds of document: the **PRD** (`PRD-001-envsetup.md` — what envsetup is, for whom, the
+promise, the UX requirements, the item catalog with its chosen defaults, boundaries, success
+criteria; the single source for *what* and *why*, one file kept current) and **feature plans**
+(`PLAN-NNN-<feature>.md`, one per piece of work larger than a small fix: overview, the decisions it
+relies on, the ordered task list with checkpoints, risks, open questions, and a closing status line
+naming the session and release that shipped it).
 
 ## Index
 

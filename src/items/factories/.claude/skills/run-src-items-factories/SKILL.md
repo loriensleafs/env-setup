@@ -5,18 +5,11 @@ description: Run, drive, smoke and test src/items/factories — the brewFormula 
 
 `src/items/factories` builds items from specs: `brewFormula`/`brewCask` (Homebrew, with `.app`
 fallback detection and custom brew names) and `fontZip` (pinned zip → `~/Library/Fonts`). Drive it
-with `.claude/skills/run-src-items-factories/driver.ts`, which constructs one of each and runs
+with `src/items/factories/.claude/skills/run-src-items-factories/driver.ts`, which constructs one of each and runs
 `detect()` through a **mocked** `Runner` (no `brew` is executed) — the same pattern as
 `__tests__/brew.test.ts`. `fontZip.detect()` only probes a file in `~/Library/Fonts`.
 
-All paths are relative to the repo root.
-
-## Setup
-
-```bash
-export PATH="$HOME/.bun/bin:$PATH"
-bun install
-```
+All paths are relative to the repo root; every shell needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
 ## Run (agent path)
 

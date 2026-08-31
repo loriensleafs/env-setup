@@ -1,22 +1,21 @@
 ---
 name: run-src-ceremonies
-description: Run, invoke and smoke-test src/ceremonies — the attended finishing steps (connect phase) and their handler table — without executing any ceremony. Use when asked to run, test or drive the ceremonies/connect module.
+description: Run, invoke and smoke-test src/ceremonies — the ceremonies (the connect phase) and their handler table — without executing any ceremony. Use when asked to run, test or drive the ceremonies/connect module.
 ---
 
 `src/ceremonies/` holds the connect phase: `connect-phase.ts` (`pendingCeremonies` — which
-attended steps a manifest still needs, deduped; `runConnectPhase`) and `handlers.ts` (one
+ceremonies a manifest still needs, deduped by id; `runConnectPhase`) and `handlers.ts` (one
 handler per ceremony id: license pastes, sign-ins, permission grants, the Chrome web-app
 install). Drive it with `src/ceremonies/.claude/skills/run-src-ceremonies/driver.ts`: it lists
 the handler table, verifies every ceremony id declared by the real registry has a handler, and
 runs `pendingCeremonies` over fixture manifests. Handlers are looked up, **never run** — they
 open apps and prompt the user.
 
-All paths are relative to the repo root.
+All paths are relative to the repo root; every shell needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
 ## Run (agent path)
 
 ```bash
-export PATH="$HOME/.bun/bin:$PATH"
 bun src/ceremonies/.claude/skills/run-src-ceremonies/driver.ts
 ```
 
@@ -36,16 +35,14 @@ src/ceremonies driver
 PASS
 ```
 
-`pendingCeremonies` calls each selected item's `detect()` (read-only) to decide whether the
+`pendingCeremonies` calls each wanted item's `detect()` (read-only) to decide whether the
 app made it — that is why the driver runs against the real registry.
 
 ## Test
 
-```bash
-bun test src/ceremonies/__tests__   # prints only 'note: Tests need ".test" … in the filename' — the dir is empty; the driver above is the coverage
-```
+No `__tests__` directory here (2026-08-30); the driver above is the coverage.
 
 ## Gotchas
 
-- The real connect phase is `bun src/index.ts connect` — attended, mutates apps. Never run it
-  to test.
+- The connect phase runs automatically at the end of bootstrap; `bun src/index.ts connect` re-runs
+  skipped ceremonies — attended, mutates apps. Never run it to test.

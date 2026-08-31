@@ -6,19 +6,13 @@ description: Run, drive, smoke and test src/items/chrome — the Chrome config +
 `src/items/chrome` holds two envsetup items: `chrome-config` (flags, pinned toolbar actions,
 pinned extensions written into Chrome's Local State / Preferences) and `chrome-pwas` (installs
 Gmail/Calendar/Drive/Keep as Chrome apps through an embedded Accessibility Swift driver). Drive
-it with `.claude/skills/run-src-items-chrome/driver.ts`, which only reads: it lists the captured
-defaults, checks the embedded Swift matches `assets/`, and runs both items' `detect()` — the same
-thing `envsetup doctor` does. `configure()` quits/reopens Chrome and rewrites its prefs; the
+it with `src/items/chrome/.claude/skills/run-src-items-chrome/driver.ts`, which only reads: it lists
+the captured defaults, checks the embedded Swift matches `assets/install-web-app.swift` and
+typechecks it (`xcrun swiftc -typecheck`; the helper is never executed — it installs a real Chrome
+app), and runs both items' `detect()` — the same thing `envsetup doctor` does. `configure()` quits/reopens Chrome and rewrites its prefs; the
 driver never calls it.
 
-All paths are relative to the repo root.
-
-## Setup
-
-```bash
-export PATH="$HOME/.bun/bin:$PATH"
-bun install
-```
+All paths are relative to the repo root; every shell needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
 ## Run (agent path)
 
@@ -32,12 +26,13 @@ Output on this machine:
 flags: 81 · pinned actions: 11 · pinned extensions: 1
 pwas: Mail, Calendar, Drive, Notes → /Users/peterkloss/Applications/Chrome Apps.localized
 INSTALL_SWIFT === assets/install-web-app.swift ✓
+swiftc -typecheck install-web-app.swift ✓
 chrome-config.detect → installed=true
 chrome-pwas.detect → installed=false
 OK
 ```
 
-`installed=false` for chrome-pwas means the four `.app` bundles are not (all) present — the
+`installed=false` for chrome-pwas = Missing: the four `.app` bundles are not all present — the
 ceremony has not run on this machine. The driver exits non-zero if the embedded Swift drifts from
 `src/items/chrome/assets/install-web-app.swift`.
 
@@ -59,5 +54,3 @@ bun test src/items/chrome/__tests__      # 4 pass, 0 fail (2 files)
   State/Preferences, and reopens it. `chromePwas` install is a ceremony (attended, AX-driven).
 - Import paths from inside the skill dir are five levels up for `src/exec` (`../../../../../exec/run.ts`)
   and three for the item files (`../../../chrome-config.ts`).
-
-`assets/install-web-app.swift` is covered here too: the driver byte-compares it with the embedded `INSTALL_SWIFT` and runs `xcrun swiftc -typecheck` on it — it is never executed (it installs a real Chrome app).

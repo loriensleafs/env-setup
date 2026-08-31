@@ -10,12 +10,11 @@ description: Run, invoke and smoke-test the src/items framework — defineItem, 
 execution order, then the real registry inspected read-only (counts by kind, which items have
 ceremonies / config schemas). It never calls `install`/`configure`/`verify`.
 
-All paths are relative to the repo root.
+All paths are relative to the repo root; every shell needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
 ## Run (agent path)
 
 ```bash
-export PATH="$HOME/.bun/bin:$PATH"
 bun src/items/.claude/skills/run-src-items/driver.ts
 ```
 

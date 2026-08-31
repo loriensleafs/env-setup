@@ -9,12 +9,11 @@ description: Run, invoke and smoke-test src/manifest — the Zod-versioned manif
 `src/manifest/.claude/skills/run-src-manifest/driver.ts` — parse a fixture, migrate, refuse a
 newer version, and save/load round-trip on a **temp** path (never `~/.config/envsetup`).
 
-All paths are relative to the repo root.
+All paths are relative to the repo root; every shell needs `export PATH="$HOME/.bun/bin:$PATH"`.
 
 ## Run (agent path)
 
 ```bash
-export PATH="$HOME/.bun/bin:$PATH"
 bun src/manifest/.claude/skills/run-src-manifest/driver.ts
 ```
 

@@ -31,10 +31,12 @@ Reproduce the `checks` job locally (same commands the workflow runs, on this Mac
 bun install && bun run check && bun test     # → Summary: 0 issues · 111 pass, 0 fail
 ```
 
-Watch a PR's checks and merge once green (what the docs workflow in CONTRIBUTING does):
+Watch a PR's checks and merge once green with a **merge commit** (CONTRIBUTING step 8; session
+entries cite shas):
 
 ```bash
 gh pr checks <n> --watch --interval 10
+gh pr merge <n> --merge --delete-branch
 ```
 
 ## What cannot be run here
