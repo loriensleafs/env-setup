@@ -1,8 +1,8 @@
 # 2026-08-30 18:00 · Docs for rehydration — OVERVIEW, ledger → granular entries → sessions, continuous upkeep
 
 - Goal: Make a fresh session able to pick up exactly where the last one stopped: a handoff overview, a complete record of what was done (with files), and a discipline that keeps it all current.
-- Outcome: OVERVIEW.md; a git-derived change record that evolved (one line per commit → files touched → Summary/Why + a note per file → per-session files); `bun run session` tooling with `--check`; CLAUDE.md rehydration reading order; continuous-upkeep hard rule; then the whole docs system — `plan/` (PRD-001, PLAN-001), `analysis/` (ANA-001…008), `decisions/` (ADR-001…017), `archive/` — with one naming convention `<TYPE>-<NNN>-<kebab-title>.md`, the living plan retired; and a `/run-*` skill with a verified driver in every directory (56), the root one walking the real bootstrap TUI under `expect` up to the confirm.
-- Open at end: Next-up 1 (visual grouping, PLAN-001) from `wip/visual-grouping`; first real connect-phase run.
+- Outcome: OVERVIEW.md; a git-derived change record that evolved (one line per commit → files touched → Summary/Why + a note per file → per-session files); `bun run session` tooling with `--check`; CLAUDE.md rehydration reading order; continuous-upkeep hard rule; then the whole docs system — `plan/` (PRD-001, PLAN-001), `analysis/` (ANA-001…008), `decisions/` (ADR-001…017), `archive/` — with one naming convention `<TYPE>-<NNN>-<kebab-title>.md`, the living plan retired; and a `/run-*` skill with a verified driver in every directory (56), the root one walking the real bootstrap TUI under `expect` up to the confirm; then the `/session start | record | end` skill built with the skill-creator loop (validated, reviewed, two measured iterations: 95% vs 84% on the stricter set), ANA-009 (Anthropic's workflow-skill guidance, verified at source), ADR-019, and the session tool's `--session` / `--current`.
+- Open at end: Next-up 1 (visual grouping, PLAN-001) from `wip/visual-grouping`; first real connect-phase run. From the /session work: the `!` injection is verified only by the next real conversation; the hard negatives (trigger sweep) and the Haiku/Sonnet/Opus tier sweep were never run; SES-005 belongs to another conversation and stays as it is.
 
 ## Narrative
 
@@ -588,3 +588,68 @@ A blanket replace briefly rewrote Peter's quoted words in ADR-010 — restored; 
   - `docs/analysis/ANA-009-skill-workflow-best-practices.md` (+12/−7) — implication 5 reversed with the D1 reason; 9 marked done (--session/--current, validation loop); 10 stays unverified
   - `scripts/session.ts` (+22/−0) — `--current`: prints session, started/title, goal, placeholder lines with numbers
 - Notes: Committed after the iteration-2 fixtures were cloned, so those runs exercised the skill without the `--current` mention and the loop line — a one-line difference from what ships; recorded in the iteration's metadata. Models tier sweep (ANA-009 P3) remains not done.
+
+### 2026-08-30 · docs(evals): /session iteration-2 evidence — six runs vs the iteration-1 skill, gradings, timing, benchmark (95% vs 84%), analyst notes · c37d306
+
+- Summary: Iteration-2 evidence: six runs of the new skill against the iteration-1 skill on the 20-expectation set, graded, aggregated (95% vs 84%), analysed.
+- Why: The skill-creator loop's second iteration, measuring 'did the change help' rather than 'does a skill help at all'.
+- Files:
+  - `.claude/skills/session/evals/results/iteration-2/benchmark.json` (+406/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/benchmark.md` (+13/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/eval_metadata.json` (+15/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/old_skill/grading.json` (+120/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/old_skill/outputs/git-state.txt` (+32/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/old_skill/outputs/overview.diff` (+12/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/old_skill/outputs/reply.md` (+4/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/old_skill/outputs/session-file.md` (+19/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/old_skill/outputs/transcript.md` (+51/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/old_skill/timing.json` (+1/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/with_skill/grading.json` (+139/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/with_skill/outputs/git-state.txt` (+32/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/with_skill/outputs/overview.diff` (+22/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/with_skill/outputs/reply.md` (+2/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/with_skill/outputs/session-file.md` (+23/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/with_skill/outputs/transcript.md` (+28/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/end-close/with_skill/timing.json` (+1/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/notes.json` (+23/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/record-commit/eval_metadata.json` (+16/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/record-commit/old_skill/grading.json` (+143/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/record-commit/old_skill/outputs/commit.diff` (+122/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/record-commit/old_skill/outputs/git-state.txt` (+14/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/record-commit/old_skill/outputs/overview.diff` (+29/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/record-commit/old_skill/outputs/reply.md` (+18/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/record-commit/old_skill/outputs/session-file.md` (+19/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/record-commit/old_skill/outputs/transcript.md` (+68/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/record-commit/old_skill/timing.json` (+1/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/record-commit/with_skill/grading.json` (+142/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/record-commit/with_skill/outputs/commit.diff` (+144/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/record-commit/with_skill/outputs/git-state.txt` (+14/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/record-commit/with_skill/outputs/overview.diff` (+28/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/record-commit/with_skill/outputs/reply.md` (+19/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/record-commit/with_skill/outputs/session-file.md` (+45/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/record-commit/with_skill/outputs/transcript.md` (+103/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/record-commit/with_skill/timing.json` (+1/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/start-brief/eval_metadata.json` (+16/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/start-brief/old_skill/grading.json` (+152/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/start-brief/old_skill/outputs/brief.md` (+11/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/start-brief/old_skill/outputs/git-state.txt` (+29/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/start-brief/old_skill/outputs/session-file.md` (+17/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/start-brief/old_skill/outputs/transcript.md` (+84/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/start-brief/old_skill/timing.json` (+1/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/start-brief/with_skill/grading.json` (+130/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/start-brief/with_skill/outputs/brief.md` (+10/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/start-brief/with_skill/outputs/git-state.txt` (+29/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/start-brief/with_skill/outputs/session-file.md` (+16/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/start-brief/with_skill/outputs/transcript.md` (+67/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+  - `.claude/skills/session/evals/results/iteration-2/start-brief/with_skill/timing.json` (+1/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+- Notes: The delta comes from the two `end` expectations (60-word note; OVERVIEW grounded in real work); 18/20 outcomes identical; SES-005 untouched 6/6 thanks to the shared tool change; the brief overshot the 1,600-char cap in both arms.
+
+### 2026-08-30 · feat(skills): /session brief capped at ~1,200 chars with a single Question line; iteration-2 feedback and fixture notes recorded · dacbdb8
+
+- Summary: The brief template ends the reply (~1,200 chars, one optional `Question:` line); Peter's iteration-2 reviews and the fixture lessons recorded in evals.json.
+- Why: Peter: the old-skill brief 'looks fairly bad' and the old-skill end at 67% is 'not great' — the new templates fix both, and the brief's remaining overshoot was a question paragraph outside the template.
+- Files:
+  - `.claude/skills/session/SKILL.md` (+3/−1) — start step 7: template is the whole reply, ~1,200 chars, `Question:` line
+  - `.claude/skills/session/evals/evals.json` (+6/−0) — `fixture_notes`: invisible baseline swap, green seeded log, verify.txt/exit capture, hard negatives never swept
+  - `.claude/skills/session/evals/results/iteration-2/feedback.json` (+15/−0) — eval evidence (iteration-2 outputs / grading / timing / benchmark / notes / feedback)
+- Notes: Two reviews, both on the baseline arm; the with-skill runs drew no comment.

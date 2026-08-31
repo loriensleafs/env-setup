@@ -116,6 +116,10 @@ small separate commands, merge commits). The facts below are the ones a rule can
   files. Code: `doctor` reports Drifted as its own note and counts "satisfied"; picker, summary and
   outcome prose say "applied"; the deferred message no longer tells the user to run `connect`;
   `install.sh` downloads to a fresh file. Ships with v0.1.10.
+- **`/session start · record · end`** (SES-004, `ea51e09`…`dacbdb8`): the session ritual as one model-invoked skill,
+  built with the skill-creator loop — ANA-009, ADR-019, two measured iterations (evidence under
+  `.claude/skills/session/evals/results/`); the session tool takes `--session SES-NNN` and `--current`.
+  Unverified: the `!` injection in a real conversation; the trigger sweep; the model-tier sweep.
 - **Parked, not on `main`:** the visual-grouping patch ([PLAN-001](plan/PLAN-001-visual-grouping.md))
   as a WIP commit on local branch `wip/visual-grouping` (unverified, never run under a PTY).
 
