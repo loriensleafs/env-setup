@@ -12,6 +12,7 @@ import { orchestrate, type StepOutcome } from "../orchestrator/orchestrator.ts";
 import { journalPath } from "../paths/paths.ts";
 import { groupMultiselect } from "../ui/group-multi-select.ts";
 import { interactiveCapable, promptInput } from "../ui/terminal.ts";
+import { runConnectPhase } from "../ceremonies/connect-phase.ts";
 import { promptItemConfig } from "../ui/config-screens.ts";
 import type { SelectGroups } from "../ui/group-multi-select.ts";
 
@@ -44,7 +45,14 @@ function sectionFor(item: Item): string {
  *   the machine's config is untouched;
  * - plain not-installed → no hint, checked (a normal fresh install).
  */
-export function presentOption(d: DetectResult): { hint?: string; initialSelected?: false } {
+export function presentOption(
+  d: DetectResult,
+  failedLastRun = false,
+): { hint?: string; initialSelected?: false } {
+  // The journal remembers failures: an item that failed last run comes back
+  // pre-checked and labelled, even if drift detection alone would have left
+  // it as an unchecked opt-in (re-running the one command must pick it up).
+  if (failedLastRun && !d.installed) return { hint: "failed last run — retry" };
   if (d.installed) {
     return { hint: `installed${d.version ? ` ${d.version}` : ""} — needs update` };
   }
@@ -140,14 +148,14 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
         p.text({
           input: promptInput(),
           message: "Your name (git commits)",
-          initialValue: "Peter Kloss",
+          initialValue: priorManifest?.identity.name ?? "Peter Kloss",
           validate: nonEmpty("name"),
         }),
       githubUser: () =>
         p.text({
           input: promptInput(),
           message: "GitHub username",
-          initialValue: "loriensleafs",
+          initialValue: priorManifest?.identity.githubUser ?? "loriensleafs",
           validate: z
             .string()
             .trim()
@@ -158,7 +166,7 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
           input: promptInput(),
           message: "Dev directory (repos clone here — may not exist yet)",
           directory: true,
-          initialValue: `${homedir()}/Dev`,
+          initialValue: priorManifest?.locations.devDir ?? `${homedir()}/Dev`,
           validate: z
             .string()
             .trim()
@@ -204,7 +212,7 @@ export async function bootstrap(opts: BootstrapOptions = {}): Promise<void> {
       id: item.id,
       label: item.title,
       requires: requires.length > 0 ? requires : undefined,
-      ...presentOption(d),
+      ...presentOption(d, priorResume.failedSteps.has(item.id)),
     });
   }
   for (const [section, items] of Object.entries(groups)) {
@@ -297,7 +305,7 @@ function emptyManifest(): Manifest {
 
 export async function executePlan(
   manifest: Manifest,
-  opts: { resume?: boolean; selection?: string[] } = {},
+  opts: { resume?: boolean; selection?: string[]; finishing?: boolean } = {},
 ): Promise<void> {
   const registry = buildRegistry();
   const selection =
@@ -381,18 +389,29 @@ export async function executePlan(
   if (report.failed.length > 0) {
     p.log.error(`${report.failed.length} of ${order.length} items failed (${runElapsed}s)`);
     for (const f of report.failed) p.log.error(`${f.id}: ${f.error}`);
-    p.outro(
-      `${report.succeeded.length} installed, ${report.failed.length} failed — re-run to retry failures`,
-    );
   } else {
     p.log.success(`Installed ${report.succeeded.length} items in ${runElapsed}s`);
-    if (report.deferred.length > 0) {
-      p.log.info(
-        `${report.deferred.length} attended step(s) remain (${report.deferred.join(", ")}) — run ${color.bold("envsetup connect")}, then sync again`,
-      );
-      p.outro(color.green("all done here — finish with envsetup connect"));
-    } else {
-      p.outro(color.green("all done"));
-    }
   }
+  if (opts.finishing) return; // the post-connect pass ends here (no recursion)
+
+  // --- Connect phase: attended steps, automatically ------------------------
+  // The one-liner must finish the job — no second command. Run whatever
+  // ceremonies are still pending, then a short finishing pass so items that
+  // depend on what the ceremonies created (the Dock on the web-app bundles)
+  // pick them up.
+  if (interactiveCapable()) {
+    const connect = await runConnectPhase(registry, manifest);
+    if (connect.done > 0) {
+      p.log.step("Finishing up");
+      await executePlan(manifest, { finishing: true });
+    }
+  } else {
+    p.log.info("attended steps skipped (no terminal) — run `envsetup connect` from a terminal");
+  }
+
+  const failedTail =
+    report.failed.length > 0
+      ? `${report.failed.length} failed — re-run to retry failures`
+      : color.green("all done");
+  p.outro(failedTail);
 }

@@ -18,6 +18,12 @@ describe("presentOption (simplified reset-on-drift model)", () => {
     expect(p.initialSelected).toBe(false);
   });
 
+  test("failed last run: pre-checked retry, even when drifted", () => {
+    const p = presentOption({ installed: false, differs: true }, true);
+    expect(p.hint).toBe("failed last run — retry");
+    expect(p.initialSelected).toBeUndefined(); // checked
+  });
+
   test("never-configured is NOT treated as drifted", () => {
     expect(presentOption({ installed: false, differs: undefined })).toEqual({});
   });
