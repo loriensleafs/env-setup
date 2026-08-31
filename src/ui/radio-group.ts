@@ -32,14 +32,30 @@ export async function radioGroup<V extends string>(
     {
       input: opts.input,
       render() {
-        const row = opts.options
-          .map((o, i) => {
-            const dot = i === cursor ? color.green("●") : color.dim("○");
-            const label = o.label ?? o.value;
-            return `(${dot}) ${i === cursor ? label : color.dim(label)}`;
-          })
-          .join("   ");
-        return `${color.gray(S_BAR)}\n${symbol(this.state)}  ${opts.message}\n${color.cyan(S_BAR)}  ${row}\n${color.cyan(S_BAR_END)}\n`;
+        // State-aware framing that matches clack's built-in prompts, so the
+        // radio flows inside a p.group: only the ACTIVE prompt draws the
+        // closing └ bar; a submitted/cancelled one leaves the bar continuing
+        // into the next field (the earlier always-└ render sealed every
+        // answered field off into its own box).
+        const title = `${color.gray(S_BAR)}\n${symbol(this.state)}  ${opts.message}\n`;
+        const chosen = opts.options[cursor] as RadioOption<V>;
+        const chosenLabel = chosen.label ?? chosen.value;
+        switch (this.state) {
+          case "submit":
+            return `${title}${color.gray(S_BAR)}  ${color.dim(chosenLabel)}`;
+          case "cancel":
+            return `${title}${color.gray(S_BAR)}  ${color.strikethrough(color.dim(chosenLabel))}\n${color.gray(S_BAR)}`;
+          default: {
+            const row = opts.options
+              .map((o, i) => {
+                const dot = i === cursor ? color.green("●") : color.dim("○");
+                const label = o.label ?? o.value;
+                return `(${dot}) ${i === cursor ? label : color.dim(label)}`;
+              })
+              .join("   ");
+            return `${title}${color.cyan(S_BAR)}  ${row}\n${color.cyan(S_BAR_END)}\n`;
+          }
+        }
       },
     },
     false,
