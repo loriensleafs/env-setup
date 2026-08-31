@@ -1,0 +1,14 @@
+$ git status --short
+
+$ git log --oneline -5
+c99547b docs(session): SES-006 entry for e1f2f0b — set-favorites.swift re-synced; OVERVIEW, finder CLAUDE.md and the finder run skill no longer call it stale
+de69372 docs(session): start record-eval session
+e1f2f0b fix(finder): re-sync set-favorites.swift with the embedded SET_FAVORITES_SWIFT constant
+3e84241 Merge pull request #31 from loriensleafs/docs/session-pointers
+3399f95 docs(session): entries for the /session pointer sweep
+
+$ bun run session -- --check --session SES-006
+$ bun scripts/session.ts --check --session "SES-006"
+warning: SES-005-rehydration.md has 2 placeholder line(s) — not the gated session; leave it to its own conversation (pass --session to gate a different file)
+session: complete
+EXIT=0

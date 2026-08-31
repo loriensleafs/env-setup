@@ -1,0 +1,145 @@
+{
+  "expectations": [
+    {
+      "text": "commit.diff shows HEAD is a commit whose subject starts with docs(session): and the fix(finder) commit is an ancestor",
+      "passed": true,
+      "evidence": "commit.diff header: 'commit c99547b07410e609eb14a39a2a6496717f9644c6 ... docs(session): SES-006 entry for e1f2f0b — set-favorites.swift re-synced; ...'. Verified in the fixture: `git log --oneline -6` shows c99547b (HEAD) → de69372 → e1f2f0b fix(finder), and `git merge-base --is-ancestor e1f2f0b HEAD` returns true. Reflog shows only three commits since clone (e1f2f0b, de69372, c99547b) — no reset or amend."
+    },
+    {
+      "text": "session-file.md holds an entry for the fix(finder) commit whose src/items/finder/assets/set-favorites.swift line mentions --list or LSSharedFileListItemCopyResolvedURL (a specific phrase, not 'updated')",
+      "passed": true,
+      "evidence": "session-file.md, under '### 2026-08-30 · fix(finder): re-sync set-favorites.swift ... · e1f2f0b', the Files line reads: '`src/items/finder/assets/set-favorites.swift` (+21/−2) — adds the `SFLItemURLFn` typealias and the `LSSharedFileListItemCopyResolvedURL` dlsym to the guard, parses `--list` out of the arguments (making an empty path list legal only in that mode), and adds the `--list` branch that snapshots the list and prints each resolved file URL's path with flags `3` ...'. Every detail checks against `git show e1f2f0b` (typealias SFLItemURLFn, sym(\"LSSharedFileListItemCopyResolvedURL\"), `let listMode = args.first == \"--list\"`, `itemURL(item, 3, nil)`, `exit(0)`; stat 21+/2−). session-file.md is byte-identical to the committed docs/sessions/SES-006-record-eval.md (diff → IDENTICAL)."
+    },
+    {
+      "text": "session-file.md's entry Notes state how the fix's claim was verified (a driver run, a byte comparison or swiftc), and transcript.md shows that verification command was actually run",
+      "passed": true,
+      "evidence": "Notes line: 'verified, not assumed — `bun src/items/finder/.claude/skills/run-src-items-finder/driver.ts` prints `SET_FAVORITES_SWIFT === assets/set-favorites.swift ✓` ... and `swiftc -typecheck` passes on both copies; `bun test src/items/finder/__tests__` 2 pass / 0 fail; `bun run check` clean.' Transcript §9 shows the driver command run with its full output including the ✓ line and both typecheck ✓ lines; §12 shows `bun test src/items/finder/__tests__` → 2 pass; §15 shows `bun run check` clean. Grader re-ran the driver in the fixture: it prints the same ✓ line, both typechecks ✓, OK — the claim is true, not just reported."
+    },
+    {
+      "text": "git-state.txt shows `bun run session -- --check` printing session: complete and an empty git status --short",
+      "passed": true,
+      "evidence": "git-state.txt: '$ git status --short' followed by a blank line, then '$ bun run session -- --check --session SES-006' → 'warning: SES-005-rehydration.md has 2 placeholder line(s) — not the gated session ...' / 'session: complete' / 'EXIT=0'. Grader re-ran both `bun run session -- --check --session SES-006` and the bare `bun run session -- --check` in the fixture: both print `session: complete`, exit 0; `git status --short` is empty; `grep 'fill in' SES-006-record-eval.md` finds nothing."
+    },
+    {
+      "text": "overview.diff shows docs/OVERVIEW.md Next-up 5 no longer lists the stale set-favorites.swift asset (removed or marked done, citing the fix commit)",
+      "passed": true,
+      "evidence": "overview.diff removes the lines '5. **Findings from the run-skill drivers** (SES-004, `ba38081`): `src/items/finder/assets/set-favorites.swift` is stale vs the embedded `SET_FAVORITES_SWIFT` constant ...' and replaces item 5 with the hooks-format.ts finding plus 'The `set-favorites.swift` drift is fixed (`e1f2f0b`, [SES-006](sessions/SES-006-record-eval.md)), but nothing yet *keeps* the asset and the embedded `SET_FAVORITES_SWIFT` equal ...'. Marked done with the fix sha cited; the unrelated hooks-format.ts half is preserved. Also adds a Status bullet '**Also unreleased on `main`** (SES-006, `e1f2f0b`)'. Confirmed in the fixture's docs/OVERVIEW.md lines 139-144."
+    },
+    {
+      "text": "commit.diff shows src/items/finder/CLAUDE.md and src/items/finder/.claude/skills/run-src-items-finder/SKILL.md no longer say the asset is stale",
+      "passed": true,
+      "evidence": "commit.diff, src/items/finder/CLAUDE.md: removes '- `assets/set-favorites.swift` is currently **stale** against the embedded ...' and adds '**Runtime ships the embedded `SET_FAVORITES_SWIFT` constant** ... The two are byte-identical as of `e1f2f0b` (SES-006) ...'. SKILL.md: removes the gotcha '**`assets/set-favorites.swift` is stale** (found by this driver) ...' and the expected-output line 'WARNING: assets/set-favorites.swift differs ...', replacing the latter with 'SET_FAVORITES_SWIFT === assets/set-favorites.swift ✓' (which matches what the driver actually prints now). Grader grep for 'stale' in both fixture files after the commit: zero hits; no placeholder tokens either (the only `<...>` hits are the literal `swift <file>` phrase)."
+    },
+    {
+      "text": "commit.diff does not touch docs/sessions/SES-005-rehydration.md, and transcript.md shows files were staged by name (no `git add -A` / `git add .`)",
+      "passed": true,
+      "evidence": "commit.diff's `diff --git` headers list exactly five files: docs/OVERVIEW.md, docs/sessions/README.md, docs/sessions/SES-006-record-eval.md, src/items/finder/.claude/skills/run-src-items-finder/SKILL.md, src/items/finder/CLAUDE.md. Fixture `git diff HEAD~1 --stat` agrees (5 files, 74+/16−); `git log -- docs/sessions/SES-005-rehydration.md` shows its last change is 1187acc, well before this run, and the working tree has no diff on it. Transcript §16 quotes the exact invocation: 'git add docs/sessions/SES-006-record-eval.md docs/sessions/README.md docs/OVERVIEW.md src/items/finder/CLAUDE.md src/items/finder/.claude/skills/run-src-items-finder/SKILL.md' — by name, no -A or '.'. The gate's SES-005 warning was noted and the file deliberately left alone (§16, reply.md item 2)."
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "pass_rate": 1.0
+  },
+  "execution_metrics": null,
+  "timing": {
+    "executor_duration_seconds": 324.7,
+    "total_duration_seconds": 324.7,
+    "duration_ms": 324727,
+    "total_tokens": 98005
+  },
+  "claims": [
+    {
+      "claim": "The finder driver prints `SET_FAVORITES_SWIFT === assets/set-favorites.swift ✓` and both swiftc -typecheck lines pass after e1f2f0b",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Grader re-ran `bun src/items/finder/.claude/skills/run-src-items-finder/driver.ts` in the fixture: output contains the ✓ equality line, both typecheck ✓ lines and OK; working tree stayed clean."
+    },
+    {
+      "claim": "The driver printed the `WARNING: assets/set-favorites.swift differs …` line before the commit",
+      "type": "factual",
+      "verified": true,
+      "evidence": "Not re-run at e1f2f0b~1 by the executor (inferred). Indirectly confirmed: driver.ts line 27-28 prints that WARNING when the copies differ; the asset was 64 lines at e1f2f0b~1 and 83 after (git show ... | wc -l), so they did differ; the pre-fix SKILL.md expected-output block carried the WARNING line verbatim."
+    },
+    {
+      "claim": "The asset had drifted 19 lines behind the constant (64 vs 83)",
+      "type": "factual",
+      "verified": true,
+      "evidence": "git show e1f2f0b~1:src/items/finder/assets/set-favorites.swift | wc -l → 64; at e1f2f0b → 83."
+    },
+    {
+      "claim": "The drift was a SES-004 finding recorded under sha ba38081",
+      "type": "factual",
+      "verified": true,
+      "evidence": "`git log -1 ba38081` → 'feat(skills): a /run-* skill with a verified driver in every directory'; the pre-fix OVERVIEW Next up 5 cited (SES-004, `ba38081`)."
+    },
+    {
+      "claim": "The fix's diff adds the SFLItemURLFn typealias, the LSSharedFileListItemCopyResolvedURL dlsym, --list parsing and a --list branch using flags 3 that exits 0; stat +21/−2",
+      "type": "factual",
+      "verified": true,
+      "evidence": "git show e1f2f0b: '+typealias SFLItemURLFn', '+let listMode = args.first == \"--list\"', '+ let itemURL: SFLItemURLFn = sym(\"LSSharedFileListItemCopyResolvedURL\")', '+ if let u = itemURL(item, 3, nil)', '+ exit(0)'; stat '21 insertions(+), 2 deletions(-)'."
+    },
+    {
+      "claim": "bun test src/items/finder/__tests__ → 2 pass, 0 fail; bun run check clean",
+      "type": "process",
+      "verified": true,
+      "evidence": "Transcript §12 and §15 show both commands and their outputs; lefthook pre-commit at §16 also reported markdown 0 issues. Not independently re-run by the grader (the driver re-run and the live gate were the stronger oracles)."
+    },
+    {
+      "claim": "Files were staged by name; `docs(session):` commit landed as c99547b with 5 files, 74+/16−",
+      "type": "process",
+      "verified": true,
+      "evidence": "Transcript §16 quotes the named-file `git add`; fixture reflog shows a single new commit c99547b, `git diff HEAD~1 --stat` → 5 files changed, 74 insertions(+), 16 deletions(-)."
+    },
+    {
+      "claim": "SES-004 and docs/archive/ARC-001 still mention the drift and were deliberately left untouched",
+      "type": "process",
+      "verified": true,
+      "evidence": "commit.diff touches neither file; this follows docs/sessions/README.md's rule that old entries are never rewritten."
+    },
+    {
+      "claim": "Nothing was pushed and no PR was opened",
+      "type": "process",
+      "verified": true,
+      "evidence": "Transcript contains no `git push` or `gh pr` command; reflog shows only local commits."
+    },
+    {
+      "claim": "The session entry was verified rather than copied from the commit message",
+      "type": "quality",
+      "verified": true,
+      "evidence": "The per-file phrase names details absent from the commit subject (typealias name, dlsym symbol, flags 3, empty-path-list rule) that are only obtainable from the diff, and the Notes cite an oracle the run actually executed."
+    }
+  ],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [
+      "reply.md raises two items for the user: nothing enforces asset/constant equality (driver reports, does not gate), and SES-005-rehydration.md has 2 unfilled placeholders belonging to another conversation."
+    ],
+    "workarounds": [
+      "Transcript §7: a broad `grep -rn SET_FAVORITES_SWIFT .` swept in `.claude/skills/session/evals/results/**` (prior eval evidence); the executor re-ran narrowed to src/docs/scripts to avoid reading the eval answer key. No user_notes.md was written."
+    ]
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "expectation": "commit.diff does not touch docs/sessions/SES-005-rehydration.md, and transcript.md shows files were staged by name (no `git add -A` / `git add .`)",
+        "reason": "The staging half rests on the executor's self-written transcript. A run that used `git add -A` on a tree with only the intended files modified produces an identical commit.diff and could simply write 'staged by name' in its transcript. Have the harness capture the shell history (or `git status --short` before and after the add) so the invocation is machine-recorded rather than narrated."
+      },
+      {
+        "expectation": "session-file.md's entry Notes state how the fix's claim was verified (a driver run, a byte comparison or swiftc), and transcript.md shows that verification command was actually run",
+        "reason": "Same dependence on the narrated transcript. This run's claim happened to be true (grader re-ran the driver), but the expectation as written would pass a fabricated driver output. Consider requiring the executor to save the driver's stdout to outputs (e.g. driver-output.txt) so the grader compares a captured artifact, not prose."
+      },
+      {
+        "reason": "No expectation checks that the convention 'never rewrite old entries' held: docs/sessions/SES-004-docs-rehydration.md and docs/archive/ARC-001-living-plan.md still say the asset is stale, and a run that 'fixed' them would pass every expectation. Add: 'commit.diff touches no docs/sessions/SES-00[1-5]*.md and nothing under docs/archive/'."
+      },
+      {
+        "reason": "No expectation covers the top-of-file placeholders (Outcome, Open at end, Narrative). Expectation 4 catches them only indirectly through `session: complete`, and only if the tool's placeholder scan covers those lines. A direct check — 'session-file.md contains no `_(fill in)_` and its Narrative cites e1f2f0b' — would make the outcome explicit and not depend on the tool's implementation."
+      },
+      {
+        "reason": "No expectation checks docs/sessions/README.md's index line for SES-006 was regenerated from `_(fill in)_` to the goal text. It was here (commit.diff hunk on README.md), and a run that hand-edited the session file without going through `bun run session` would leave it stale."
+      }
+    ],
+    "overall": "All seven expectations pass on verified evidence, and the run's substance is strong (details in the entry came from the diff, the oracle was actually run, old entries were left alone, no push). The expectations themselves are discriminating on the output files but two of them lean on the self-narrated transcript for process facts; capturing the driver output and the git add invocation as artifacts would close that gap."
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "expectations": [
+    {
+      "text": "session-file.md has Outcome and Open at end written (no _(fill in)_ on either line) and its Narrative mentions this closing",
+      "passed": true,
+      "evidence": "session-file.md: 'Outcome: No changes needed — the review found nothing stale, so this session produced no code or doc commits beyond its own session record…' and 'Open at end: Nothing new opened. Everything already open stays open: the parked wip/visual-grouping WIP commit…'. `grep -n '_(fill in)_' docs/sessions/SES-006-closing-eval.md` in the fixture returns nothing (exit 1). The Narrative records the close itself: 'the gate `bun run session -- --check --session SES-006` run bare and its exit status read' and that the SES-005 warning 'was left untouched'. Output copy is byte-identical to the fixture file (diff → IDENTICAL). Caveat: the Narrative never uses the word 'closing'/'wrap-up'; it references the closing via the gate run and the 'no commits beyond its own session record' outcome."
+    },
+    {
+      "text": "git-state.txt shows `bun run session -- --check` printing session: complete and an empty git status --short",
+      "passed": true,
+      "evidence": "git-state.txt: '$ git status --short\\n(no output — clean)' and '$ bun run session -- --check --session SES-006 … session: complete\\nexit: 0'. Re-run in the fixture repo by the grader: `git status --short` empty; `bun run session -- --check --session SES-006` → 'session: complete', exit=0 (with the pre-existing SES-005 warning)."
+    },
+    {
+      "text": "reply.md is at most 60 words and states what shipped in the conversation and the first thing to do next time",
+      "passed": false,
+      "evidence": "reply.md is 102 words by `wc -w`, 100 words after stripping the code fence and backticks — well over the 60-word bound. The content requirements are met ('Shipped: c912990 docs(session): close SES-006 …' and 'Next time: Visual grouping (PLAN-001) — start from wip/visual-grouping, verify under a PTY, PR, release v0.1.10.'), but the reply then adds a third paragraph restating the gate result, tree state, OVERVIEW status, the skipped `gh pr list` and the SES-005 warning, which is what pushes it past the limit."
+    },
+    {
+      "text": "overview.diff is 'no change', or changes only Status/Next up with a reason in transcript.md grounded in this conversation's own work (not in fixture scaffolding commits)",
+      "passed": true,
+      "evidence": "overview.diff contains exactly 'no change'. Fixture check: `git diff HEAD~1 HEAD --stat -- docs/OVERVIEW.md` is empty and `git show --stat HEAD` lists only docs/sessions/README.md and docs/sessions/SES-006-closing-eval.md. Transcript §6: 'Status's claims … all still hold, and Next up #1 … is the first thing the next conversation should do. No edit made.'"
+    },
+    {
+      "text": "docs/sessions/SES-005-rehydration.md is untouched (git-state.txt / commit shows no change to it) and no second session file was created",
+      "passed": true,
+      "evidence": "git-state.txt `git show --stat HEAD`: '2 files changed' — README.md and SES-006-closing-eval.md only. Fixture: `git diff HEAD~1 HEAD --stat -- docs/sessions/SES-005-rehydration.md` empty; SES-005 still has 2 `_(fill in)_` lines (grep -c → 2); last commit touching it is fixture commit 1187acc. `ls docs/sessions/` shows SES-001…SES-006 only — no SES-007 or duplicate. Transcript §2 explicitly: 'the SES-005 placeholders belong to another conversation and are left untouched per the Gotcha.'"
+    },
+    {
+      "text": "transcript.md shows no push, no PR opened, no merge",
+      "passed": true,
+      "evidence": "Transcript 'Not done, deliberately': 'No push, no PR, no merge, no release — outward-facing and not asked for.' No `git push`, `gh pr create` or `git merge` appears in any step. Fixture corroborates: `git rev-parse origin/main` = 3e84241 (clone point) while main = c912990, so nothing was pushed; reflog shows only clone → two commits."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 1,
+    "total": 6,
+    "pass_rate": 0.83
+  },
+  "execution_metrics": {
+    "tool_calls": {
+      "Read": 3,
+      "Bash": 14
+    },
+    "total_tool_calls": 17,
+    "total_steps": 17,
+    "errors_encountered": 0,
+    "output_chars": 4070,
+    "transcript_chars": 6879,
+    "note": "No metrics.json in outputs_dir; tool counts reconstructed from the numbered transcript steps, chars from file sizes (output_chars excludes transcript.md)."
+  },
+  "timing": {
+    "executor_duration_seconds": 184.2,
+    "total_duration_seconds": 184.2,
+    "total_tokens": 77008,
+    "source": "../timing.json"
+  },
+  "claims": [
+    {
+      "claim": "HEAD is c912990 'docs(session): close SES-006 — docs review found nothing stale', 2 files changed, 27 insertions(+), 4 deletions(-)",
+      "type": "factual",
+      "verified": true,
+      "evidence": "`git show --stat HEAD` in the fixture repo matches exactly."
+    },
+    {
+      "claim": "Files were staged by name (git add of the two files), not `git add -A`",
+      "type": "process",
+      "verified": true,
+      "evidence": "Transcript step 13 quotes the named `git add`; the commit contains only those two files and nothing else was in the tree."
+    },
+    {
+      "claim": "The gate was run bare with its exit status read (EXIT=0)",
+      "type": "process",
+      "verified": true,
+      "evidence": "Transcript step 10 and git-state.txt show the bare command and 'exit: 0'; grader re-run gives exit=0."
+    },
+    {
+      "claim": "origin is a local path, not GitHub, so `gh pr list --state open` was skipped",
+      "type": "factual",
+      "verified": true,
+      "evidence": "`git remote -v` → origin /Users/peterkloss/Dev/env-setup (fetch/push)."
+    },
+    {
+      "claim": "`bun run md:lint` passed with 0 issues in 99 files and lefthook pre-commit ran clean",
+      "type": "process",
+      "verified": false,
+      "evidence": "Reported only in the transcript; not independently re-run by the grader. The commit landing is consistent with the pre-commit hook passing."
+    },
+    {
+      "claim": "OVERVIEW Status and Next up still match the tree, so no edit was needed",
+      "type": "quality",
+      "verified": true,
+      "evidence": "The conversation shipped only a session record; nothing in it could have changed release state or the parked branch, so leaving Status/Next up alone is the correct call. Consistent with overview.diff = 'no change'."
+    },
+    {
+      "claim": "The `## Changes` section is correctly empty because the only commit since (5f1a5da, docs(session):) is skipped by the tool by design",
+      "type": "factual",
+      "verified": true,
+      "evidence": "`bun run session -- --session SES-006` returned 'session: up to date' and the closing commit itself is docs(session):; the section is empty in the fixture file."
+    },
+    {
+      "claim": "'Nothing stale' is a reviewer's judgement over the files read, not a tool result — no link-checker, `bun run check` or `bun test` was run",
+      "type": "quality",
+      "verified": true,
+      "evidence": "Honest disclosure in both the Narrative and transcript; no such commands appear in the transcript. The session file records what was and was not verified, which is the desired behaviour."
+    }
+  ],
+  "user_notes_summary": {
+    "uncertainties": [],
+    "needs_review": [],
+    "workarounds": [],
+    "note": "No user_notes.md in outputs_dir. The transcript's 'Not done, deliberately' section serves the same purpose: no push/PR/merge, SES-005 left alone, full `bun run check`/`bun test` skipped for a docs-only change."
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "expectation": "reply.md is at most 60 words and states what shipped in the conversation and the first thing to do next time",
+        "reason": "The run failed only on length (100 words) while the two content items were present and correct. The skill's closing-note shape (Shipped/Next time block plus a status paragraph) seems to produce ~100 words by construction — worth deciding whether 60 is the intended bar for the skill (then the SKILL.md needs a hard word bound) or whether the eval should measure the Shipped/Next block alone."
+      },
+      {
+        "expectation": "session-file.md has Outcome and Open at end written (no _(fill in)_ on either line) and its Narrative mentions this closing",
+        "reason": "'mentions this closing' is not checkable by a fixed criterion — this run's Narrative never says 'close'/'wrap-up' but does describe the gate run. Sharpen to something a grader can grep: the Narrative names the gate command run with --session SES-006, or the closing commit."
+      },
+      {
+        "expectation": "transcript.md shows no push, no PR opened, no merge",
+        "reason": "The transcript is executor-authored, so absence of a push there is weak evidence. Require git-state.txt to carry `git log --oneline origin/main..main` (or `git rev-parse main origin/main`) so an unpushed commit is shown mechanically."
+      },
+      {
+        "reason": "No expectation checks the closing commit itself: that a `docs(session):` commit exists at HEAD containing only the session file and the regenerated index (stage-by-name, not `git add -A`). This run did it correctly and it went unscored; a run that leaves the session file uncommitted but a clean-looking `git status` after a stash would pass everything else."
+      },
+      {
+        "reason": "No expectation checks that the Outcome is grounded rather than invented — e.g. that it names no commit or file that is absent from `git log`. This run's Outcome was honest (and unusually good at separating 'verified' from 'not verified'), but a fabricated 'shipped X' would pass the current set."
+      }
+    ],
+    "overall": "The set discriminates well on the file-boundary rules (own session file only, SES-005 untouched, no OVERVIEW churn, no outward-facing actions) and all were verified against the fixture. The reply-length bound is the one failure and looks like a skill/eval mismatch rather than a lapse; the commit contents and Outcome grounding are the gaps worth adding."
+  }
+}

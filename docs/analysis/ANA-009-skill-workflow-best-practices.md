@@ -242,4 +242,66 @@ Conforms: one coherent unit (the session lifecycle) using the documented conditi
    placeholders. The validation loop (C3) is explicit in `record`: `NOT ready` → fill what it names
    → gate again → only then stage.
 10. **Models** (P3): the evals ran on one tier (the session model); the page asks for Haiku,
-    Sonnet and Opus — not done, recorded as unverified until a tier sweep is run.
+    Sonnet and Opus — not done at the time of writing, recorded as unverified until a tier sweep is
+    run. Run the same day: see the addendum below.
+
+## Addendum 2026-08-30 — the two sweeps implication 10 left undone, now run
+
+Both measured with plugin-kit's tooling on the description and body as committed at `3e84241`;
+evidence under `.claude/skills/session/evals/results/` (`trigger/` and `tier-sweep/`, each with a
+`notes.json`).
+
+**Trigger / description loop** (`optimize-description.ts`, claude-fable-5, 23 body-derived queries
+— 10 should-fire, 13 hard negatives including evals.json 101–103 — split 14/9, 3 runs per query,
+3 iterations). The original description won: 13/14 train, 8/9 held-out; both candidates the loop
+proposed scored 13/14 and 7/9. The description was left unchanged. The trade the candidates made
+is the finding: adding "also for questions about the ritual's rules" recovers the two misses
+(both should-fire *questions* — "the check warns about SES-004 but this conversation created
+SES-006", "I committed the entry but the append says up to date") and costs two hard negatives
+("how does the tool decide which SES file is current", "the readme is stale, update it"). This
+description sits on the recall side of that boundary by choice.
+
+**Tier sweep, triggering** (same 23 queries, full 3 runs each, no early stop):
+
+| Tier | Pass (23) | Should-fire passed (10) | Mean fire rate, should-fire | Hard negatives declined (13) |
+| --- | --- | --- | --- | --- |
+| Fable 5 | 21 | 9 | 90% | 12 |
+| Opus 5 | 22 | 9 | 83% | 13 |
+| Sonnet 5 | 19 | 6 | 53% | 13 |
+| Haiku 4.5 | 15 | 2 | 23% | 13 |
+
+No tier over-triggers (the only hard-negative fires are Fable on "make claude do the session-start
+reading automatically" 2/3 and "the readme is stale" 1/3); every Haiku and Sonnet miss is a
+should-fire query that did not fire. The two queries that name the log entry fire 3/3 on every
+tier; the ones that separate tiers never use the skill's vocabulary ("stepping away for a couple
+weeks", "was the set-favorites swift thing actually verified"). This is the capability gradient
+`description-optimization.md` predicts, measured rather than assumed: the description routes on
+the strong tiers and under-routes on Haiku, and the fix — if one is wanted — is a description that
+names the *situations* (leaving, resuming, a stray skeleton) rather than the artifacts.
+
+**Tier sweep, outcomes** (the three evals, `with_skill` arm, one run per cell on fresh clones of
+`main`, same expectations and grader as iteration 2; Fable = iteration-2's run):
+
+| Tier | start-brief | record-commit | end-close | Total | Tokens (mean) | Time (mean) |
+| --- | --- | --- | --- | --- | --- | --- |
+| Haiku 4.5 | 4/7 | 5/7 | 5/6 | 14/20 (70%) | 76,323 | 163 s |
+| Sonnet 5 | 7/7 | 7/7 | 6/6 | 20/20 (100%) | 117,839 | 291 s |
+| Opus 5 | 7/7 | 7/7 | 5/6 | 19/20 (95%) | 105,786 | 250 s |
+| Fable 5 | 6/7 | 7/7 | 6/6 | 19/20 (95%) | 104,083 | 190 s |
+
+Answering P3's three questions with one metric: *enough guidance for Haiku* — no: it ran `--new`
+twice, asserted a verification it never ran, updated one of three stale docs, and wrote an
+Outcome describing a review the transcript does not show; every one of its six failures is an
+expectation the other three tiers pass. *Clear and efficient for Sonnet* — yes on outcome (20/20),
+at the highest token cost (it read back to the release marker and the plan's ADRs). *No
+over-explaining for Opus* — the one Opus miss and the one Fable miss are the same shape, text
+appended after a literal template (a status paragraph, a question paragraph) that breaks a length
+bound; the skill's templates hold on every tier, its "nothing after it" clause does not. Three
+graders independently flagged that Outcome/Narrative/Shipped lines are not tied to transcript
+evidence by any expectation — the gap the next eval iteration should close.
+
+Implication 10 is therefore closed as measured; nothing in the skill was changed on the strength
+of it. The one plugin-kit defect met on the way — `aggregate-results.ts` reporting `output_chars`
+as tokens whenever a grader had recorded timing — was fixed by Peter in plugin-kit the same day;
+iteration 1 and 2 `benchmark.*` were regenerated (real token deltas +3,453 and +3,309, not −487
+and +4,280).

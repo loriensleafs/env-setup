@@ -70,6 +70,6 @@
     "Baseline arm: put the old SKILL.md in place WITHOUT a visible commit (overwrite the file in the clone and amend, or seed it in the initial clone state) — a 'docs(session): fixture …' commit at HEAD leaked into 2 of 3 old_skill outputs in iteration 2.",
     "Seed the fixture's log green (every commit recorded) and leave SES-005's placeholders as the other-conversation case; both arms must share the same session tool.",
     "Capture the verification command's stdout to outputs/verify.txt and the gate's exit code to git-state.txt so graders don't rely on the executor-written transcript.",
-    "Hard negatives 101–103 have never been run through the trigger sweep (description-optimization tooling); triggering is unmeasured."
+    "Hard negatives 101–103 were swept on 2026-08-30 as part of evals/trigger-eval.json (23 queries; results/trigger/): declined 3/3 on every tier. The per-tier outcome runs live in results/tier-sweep/."
   ]
 }

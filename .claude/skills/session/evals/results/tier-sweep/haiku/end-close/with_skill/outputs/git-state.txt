@@ -1,0 +1,27 @@
+=== git status --short ===
+
+=== git branch --show-current ===
+main
+
+=== git log --oneline -5 ===
+13d3077 docs(session): end closing-eval session
+3e69e91 docs(session): start closing-eval session
+3e84241 Merge pull request #31 from loriensleafs/docs/session-pointers
+3399f95 docs(session): entries for the /session pointer sweep
+f9c5ab0 docs: CONTRIBUTING step 7, docs/sessions README + CLAUDE.md, scripts/CLAUDE.md name /session as the procedure and the --session/--current flags
+
+=== git show --stat HEAD ===
+commit 13d307725ea53b81626206c723ee16e27080af5f
+Author: eval <eval@envsetup.test>
+Date:   Sun Aug 30 21:04:15 2026 -0700
+
+    docs(session): end closing-eval session
+
+ docs/sessions/README.md               | 2 +-
+ docs/sessions/SES-006-closing-eval.md | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+=== bun run session -- --check --session SES-006 ===
+$ bun scripts/session.ts --check --session "SES-006-closing-eval"
+warning: SES-005-rehydration.md has 2 placeholder line(s) — not the gated session; leave it to its own conversation (pass --session to gate a different file)
+session: complete

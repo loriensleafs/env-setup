@@ -119,7 +119,9 @@ small separate commands, merge commits). The facts below are the ones a rule can
 - **`/session start · entry · end`** (SES-004, `ea51e09`…`dacbdb8`): the session ritual as one model-invoked skill,
   built with the skill-creator loop — ANA-009, ADR-019, two measured iterations (evidence under
   `.claude/skills/session/evals/results/`); the session tool takes `--session SES-NNN` and `--current`.
-  Unverified: the `!` injection in a real conversation; the trigger sweep; the model-tier sweep.
+  Trigger and tier sweeps run (ANA-009 addendum): the description routes 9/10 on Fable and Opus,
+  6/10 Sonnet, 2/10 Haiku, over-triggers nowhere, and was left unchanged; outcomes 100% Sonnet,
+  95% Opus/Fable, 70% Haiku. Unverified: the `!` injection in a real conversation.
 - **Parked, not on `main`:** the visual-grouping patch ([PLAN-001](plan/PLAN-001-visual-grouping.md))
   as a WIP commit on local branch `wip/visual-grouping` (unverified, never run under a PTY).
 
