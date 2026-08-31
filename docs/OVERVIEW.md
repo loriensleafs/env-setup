@@ -129,6 +129,10 @@ the change that makes a doc stale updates it in the same step, citing the sessio
    bugs; ceremonies were never exercised in one pass. Write `PLAN-002` first if it grows.
 3. Persist the binary to `~/.local/bin/envsetup` so re-runs don't re-download (PRD open question).
 4. Upstream investigation of the compiled idle-CPU spin.
+5. **Findings from the run-skill drivers** (SES-004, `ba38081`): `src/items/finder/assets/set-favorites.swift`
+   is stale vs the embedded `SET_FAVORITES_SWIFT` constant (the constant has `--list`; runtime ships the
+   constant — re-sync the file or generate one from the other); `hooks-format.ts` exits 0 silently when
+   Biome's config errors (e.g. `vcs.useIgnoreFile` outside a git repo) — consider logging to stderr.
 
 ## How to resume work
 

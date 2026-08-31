@@ -12,6 +12,10 @@ esac
 URL="https://github.com/$REPO/releases/latest/download/$ASSET"
 DEST="${TMPDIR:-/tmp}/envsetup"
 echo "Downloading envsetup ($ASSET)..."
+# Always write a FRESH file: overwriting a binary that macOS already executed
+# from this path (a previous run) can get the new one SIGKILLed (exit 137) by
+# the code-signing cache. Observed on a re-run 2026-08-30; rm first = new inode.
+rm -f "$DEST"
 curl -fsSL -o "$DEST" "$URL"
 chmod +x "$DEST"
 # NOTE: no `</dev/tty` re-attach here — Bun cannot read input from a
