@@ -6,6 +6,8 @@
  *   bun run session -- --check        fail if commits are missing or placeholders unfilled
  *   … -- --session SES-006            act on THAT session file (append target / check gate)
  *                                      instead of the newest one — the conversation's own file
+ *   bun run session -- --current      print the selected session's file, Goal, and every
+ *                                      placeholder with its line number (what to fill, where)
  *
  * Append-only: every commit on the current branch (merges excluded) that no
  * session file mentions gets an entry skeleton in the CURRENT session (the
@@ -223,6 +225,26 @@ const missing = commits().filter(
   (c) =>
     !SKIP_PREFIXES.some((p) => c.subject.startsWith(p)) && !known.some((k) => c.sha.startsWith(k)),
 );
+
+if (argv[0] === "--current") {
+  // What to fill, where: the selected session, its Goal, and each placeholder
+  // line by number — so a caller edits by line instead of hunting.
+  const s = selectSession();
+  if (!s) throw new Error("no session file — start one: bun run session -- --new <slug>");
+  console.log(`session: ${s.name}`);
+  console.log(`started: ${s.started} · ${s.title}`);
+  console.log(`goal: ${s.goal || "(unset)"}`);
+  const lines = s.text.split("\n");
+  let count = 0;
+  lines.forEach((l, i) => {
+    if (l.includes(FILL)) {
+      count++;
+      console.log(`  ${String(i + 1).padStart(4)}: ${l.trim().slice(0, 110)}`);
+    }
+  });
+  console.log(count === 0 ? "placeholders: none" : `placeholders: ${count}`);
+  process.exit(0);
+}
 
 if (argv[0] === "--check") {
   // The gate is the CURRENT session (the newest file) plus every commit having an

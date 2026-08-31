@@ -219,7 +219,10 @@ Conforms: one coherent unit (the session lifecycle) using the documented conditi
    branches and model-invoked for the third. Decision recorded in ADR-019: keep model invocation
    for `start`, and make the commit steps of `record`/`end` conditional on the gate having
    passed — the gate is the guard the docs ask for.
-5. Keep `allowed-tools` out (I3's headless caveat) unless a bundled script appears.
+5. `allowed-tools` — kept **in**, narrowly, after all: D1 says an injected command whose permission
+   check would *ask* aborts the whole invocation, so the four injected commands (`git status`,
+   `git branch`, `git log`, `bun run session`) are pre-approved and nothing else. The headless caveat
+   (I3) does not bite: this skill is only ever invoked interactively.
 6. **Name** (P4): `session` is a noun, not a gerund (`managing-sessions`) or an action
    (`run-session`). The page allows noun phrases and warns only against vague or inconsistent
    names; the repo's other skills are action-named (`run-*`). Kept as `session` because the word is
@@ -232,9 +235,11 @@ Conforms: one coherent unit (the session lifecycle) using the documented conditi
    flagged that any prose passes).
 8. **Concise** (P1): cut the explanatory sentences the model already knows (why the order is
    deliberate, what a checklist is for) and keep the repo-specific facts.
-9. **Scripts solve, don't defer** (P11): the "is the newest session file mine?" judgment and the
-   "which files did this commit touch" lookup are deterministic — candidates for
-   `scripts/session.ts` (`--current` printing the current file, its Goal and its placeholders with
-   line numbers; `--check` already lists files) so the skill runs a tool instead of reasoning.
-10. **Models** (P3): the evals ran on one tier; the page asks for Haiku, Sonnet and Opus — a
-    later iteration, recorded as unverified until then.
+9. **Scripts solve, don't defer** (P11): done — `scripts/session.ts` gained `--session SES-NNN`
+   (the conversation names its own file; other sessions' placeholders are warnings, never a reason
+   to edit someone else's file) and `--current` (the selected file, its Goal, every placeholder with
+   its line number), so the skill runs a tool instead of reasoning about ownership and hunting for
+   placeholders. The validation loop (C3) is explicit in `record`: `NOT ready` → fill what it names
+   → gate again → only then stage.
+10. **Models** (P3): the evals ran on one tier (the session model); the page asks for Haiku,
+    Sonnet and Opus — not done, recorded as unverified until a tier sweep is run.

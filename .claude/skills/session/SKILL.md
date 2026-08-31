@@ -99,7 +99,8 @@ Record progress:
 ```
 
 1. `bun run session -- --session SES-NNN` appends one skeleton per commit not yet in the log
-   (`Summary` / `Why` placeholders, one line per touched file with its +/− counts). A skeleton for
+   (`Summary` / `Why` placeholders, one line per touched file with its +/− counts);
+   `bun run session -- --current --session SES-NNN` lists every placeholder with its line number. A skeleton for
    a commit you did not make is a finding: fill what `git show <sha>` supports, say in its Notes
    that it was not verified, or ask.
 2. Fill every placeholder. `Summary` = what the change does as a whole; `Why` = the problem or
@@ -131,6 +132,9 @@ Record progress:
    git add docs/sessions/SES-NNN-<slug>.md docs/sessions/README.md <other docs you touched>
    git commit -m "docs(session): <what the entry records>"
    ```
+
+   `NOT ready` names what is missing or unfilled (`bun run session -- --current --session SES-NNN`
+   lists each placeholder with its line number): fill it, run the gate again, and only then stage.
 
 **Done when** the gate printed `session: complete` for your session, the `docs(session)` commit
 exists, no placeholder is left in your file, and every stale doc is updated or named in `Open at
