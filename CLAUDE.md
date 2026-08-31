@@ -7,10 +7,19 @@ this file). Keep it short and high-signal.
 Bootstraps a fresh Mac (apps, runtimes, fonts, repos, macOS settings, app configs) and keeps
 it in shape with `doctor`/`sync`.
 
-**Start here: [docs/OVERVIEW.md](docs/OVERVIEW.md)** — the project map, status, and what's next; read it
-first in a new session. What has been done, in order: [docs/LEDGER.md](docs/LEDGER.md) — append to it
-in every behavior-changing PR. **Source of truth: [docs/PLAN.md](docs/PLAN.md)** — every design decision and its rationale
-lives there. Read it before non-trivial work. Config model + verified compatibility research:
+## Session start / session end (do this every time)
+
+1. **Start:** read [docs/OVERVIEW.md](docs/OVERVIEW.md) (project map, "Status", "Next up"), then
+   the **last section** of [docs/LEDGER.md](docs/LEDGER.md) — what changed since the last release
+   and which files; `git show <sha>` for detail. That is how a new session rehydrates; do not
+   re-derive history from the code.
+2. **Decisions:** [docs/PLAN.md](docs/PLAN.md) is the source of truth for every design decision and
+   its rationale — read the relevant part before non-trivial work.
+3. **End (part of every PR, before merge):** `bun run ledger`, fill in the `Why` line of the new
+   entries (template in LEDGER.md), and update OVERVIEW "Status" / "Next up" if the picture
+   changed. Docs discipline is not optional — the next session depends on it.
+
+Other docs: Config model + verified compatibility research:
 [docs/CONFIG-COMPAT-PLAN.md](docs/CONFIG-COMPAT-PLAN.md). Research foundation:
 [docs/RESEARCH-clack-citty-bun.md](docs/RESEARCH-clack-citty-bun.md). Contribution & release
 workflow: [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -59,6 +68,7 @@ bun run fix                # auto-fix Biome + markdown
 bun run test               # bun:test suite
 bun run compile            # standalone binary → dist/envsetup
 bun run changelog          # regenerate CHANGELOG.md (git-cliff)
+bun run ledger             # append docs/LEDGER.md entries for new commits (then fill in Why)
 ```
 
 ## Safety when running it

@@ -1,8 +1,9 @@
 # Contributing to envsetup
 
 envsetup is a pure-Bun macOS environment-setup CLI. This doc covers how to set up, make a
-change, and cut a release. The always-loaded agent brief is [CLAUDE.md](CLAUDE.md); the design
-record is [docs/PLAN.md](docs/PLAN.md).
+change, and cut a release. Start with [docs/OVERVIEW.md](docs/OVERVIEW.md) (map, status, next up) and
+[docs/LEDGER.md](docs/LEDGER.md) (what was done, with files). The always-loaded agent brief is
+[CLAUDE.md](CLAUDE.md); the design record is [docs/PLAN.md](docs/PLAN.md).
 
 ## Ground rules
 
@@ -66,13 +67,11 @@ If `bun` isn't found, add it to PATH: `export PATH="$HOME/.bun/bin:$PATH"`.
    blocking only on un-auto-fixable lint or type errors. The **pre-push** hook runs the full
    check + tests.
 
-5. **Record it.** Append the change to [docs/LEDGER.md](docs/LEDGER.md) (date · sha · subject
-   under the current "Since vX" heading) and update `docs/OVERVIEW.md` "Status"/"Next up" if the
-   picture changed. To regenerate the ledger body from history instead of hand-editing:
-
-   ```bash
-   git log --reverse --date=short --pretty='%ad %h %s' | grep -vE ' Merge (pull request|branch)'
-   ```
+5. **Record it** (part of the PR, not after). `bun run ledger` appends an entry per new commit to
+   [docs/LEDGER.md](docs/LEDGER.md) with the files touched; fill in its `Why` line (template in
+   the ledger) and update `docs/OVERVIEW.md` "Status" / "Next up" if the picture changed. Commit
+   that as `docs(ledger): …` in the same PR (the script skips those commits). After a release tag, run `bun run ledger` once more so the new
+   "Since vX.Y.Z" heading lands.
 
 6. **Open a PR** (`gh pr create`). CI (`.github/workflows/ci.yml`) runs the same checks plus a
    gitleaks secret scan. Merge once green.
