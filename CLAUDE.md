@@ -8,7 +8,8 @@ Bootstraps a fresh Mac (apps, runtimes, fonts, repos, macOS settings, app config
 it in shape with `doctor`/`sync`.
 
 **Start here: [docs/OVERVIEW.md](docs/OVERVIEW.md)** — the project map, status, and what's next; read it
-first in a new session. **Source of truth: [docs/PLAN.md](docs/PLAN.md)** — every design decision and its rationale
+first in a new session. What has been done, in order: [docs/LEDGER.md](docs/LEDGER.md) — append to it
+in every behavior-changing PR. **Source of truth: [docs/PLAN.md](docs/PLAN.md)** — every design decision and its rationale
 lives there. Read it before non-trivial work. Config model + verified compatibility research:
 [docs/CONFIG-COMPAT-PLAN.md](docs/CONFIG-COMPAT-PLAN.md). Research foundation:
 [docs/RESEARCH-clack-citty-bun.md](docs/RESEARCH-clack-citty-bun.md). Contribution & release

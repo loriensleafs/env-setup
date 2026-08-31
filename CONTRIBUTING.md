@@ -66,7 +66,15 @@ If `bun` isn't found, add it to PATH: `export PATH="$HOME/.bun/bin:$PATH"`.
    blocking only on un-auto-fixable lint or type errors. The **pre-push** hook runs the full
    check + tests.
 
-5. **Open a PR** (`gh pr create`). CI (`.github/workflows/ci.yml`) runs the same checks plus a
+5. **Record it.** Append the change to [docs/LEDGER.md](docs/LEDGER.md) (date · sha · subject
+   under the current "Since vX" heading) and update `docs/OVERVIEW.md` "Status"/"Next up" if the
+   picture changed. To regenerate the ledger body from history instead of hand-editing:
+
+   ```bash
+   git log --reverse --date=short --pretty='%ad %h %s' | grep -vE ' Merge (pull request|branch)'
+   ```
+
+6. **Open a PR** (`gh pr create`). CI (`.github/workflows/ci.yml`) runs the same checks plus a
    gitleaks secret scan. Merge once green.
 
 ## Cutting a release
