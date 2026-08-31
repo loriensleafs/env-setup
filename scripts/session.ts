@@ -4,6 +4,8 @@
  *   bun run session -- --new <slug>   start SES-<next>-<slug>.md (becomes current)
  *   bun run session                   append entry skeletons for commits no session mentions
  *   bun run session -- --check        fail if commits are missing or placeholders unfilled
+ *   … -- --session SES-006            act on THAT session file (append target / check gate)
+ *                                      instead of the newest one — the conversation's own file
  *
  * Append-only: every commit on the current branch (merges excluded) that no
  * session file mentions gets an entry skeleton in the CURRENT session (the
@@ -172,6 +174,24 @@ async function writeIndex(all: Session[]): Promise<void> {
 
 const argv = process.argv.slice(2);
 const all = await sessions();
+// --session SES-006 (or "6"): the conversation's own file. Another conversation
+// may share this checkout and own the newest file; naming yours keeps appends
+// and the gate on the right file.
+const sessionArgAt = argv.indexOf("--session");
+const sessionArg = sessionArgAt >= 0 ? argv[sessionArgAt + 1] : undefined;
+if (sessionArgAt >= 0) argv.splice(sessionArgAt, 2);
+function selectSession(): Session | undefined {
+  if (!sessionArg) return all.at(-1);
+  const want = sessionArg.replace(/\.md$/, "");
+  const found = all.find(
+    (s) =>
+      s.name.replace(/\.md$/, "") === want ||
+      String(s.seq) === want ||
+      `SES-${String(s.seq).padStart(3, "0")}` === want,
+  );
+  if (!found) throw new Error(`no session file matches --session ${sessionArg}`);
+  return found;
+}
 
 if (argv[0] === "--new") {
   const slug = (argv[1] ?? "")
@@ -190,7 +210,9 @@ if (argv[0] === "--new") {
   const title = slug.replace(/-/g, " ");
   await Bun.write(file, template(started, title));
   await writeIndex([...all, { file, name, seq, started, title, goal: FILL, text: "" }]);
-  console.log(`session: started ${name} — set the Goal line and the title.`);
+  console.log(
+    `session: started ${name} — set the Goal line and the title; pass \`--session ${name.replace(/\.md$/, "")}\` to later runs.`,
+  );
   process.exit(0);
 }
 
@@ -203,13 +225,26 @@ const missing = commits().filter(
 );
 
 if (argv[0] === "--check") {
+  // The gate is the CURRENT session (the newest file) plus every commit having an
+  // entry. Placeholders left in an OLDER session belong to another conversation
+  // (a concurrent checkout, or a session that ended abruptly): they are reported
+  // as warnings so the current session never has to edit someone else's file to
+  // go green, and never silently rewrites history to do it.
   let unfilled = 0;
+  const newest = selectSession();
   for (const s of all) {
     const n = s.text
       .split("\n")
       .filter((l) => /^\s*- |^_\(fill in\)_/.test(l) && l.includes(FILL)).length;
-    if (n > 0) console.log(`unfilled: ${s.name} has ${n} placeholder line(s)`);
-    unfilled += n;
+    if (n === 0) continue;
+    if (s === newest) {
+      console.log(`unfilled: ${s.name} has ${n} placeholder line(s)`);
+      unfilled += n;
+    } else {
+      console.log(
+        `warning: ${s.name} has ${n} placeholder line(s) — not the gated session; leave it to its own conversation (pass --session to gate a different file)`,
+      );
+    }
   }
   for (const c of missing) console.log(`missing: ${c.sha.slice(0, 7)} ${c.subject}`);
   if (missing.length > 0 || unfilled > 0) {
@@ -226,7 +261,7 @@ if (missing.length === 0) {
   console.log("session: up to date");
   process.exit(0);
 }
-const current = all.at(-1);
+const current = selectSession();
 if (!current) throw new Error("no session file — start one: bun run session -- --new <slug>");
 const tags = tagsByCommit();
 const body = missing.map((c) => render(c, tags.get(c.sha))).join("\n");

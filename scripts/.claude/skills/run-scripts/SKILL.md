@@ -15,6 +15,7 @@ All paths are relative to the repo root; every shell needs `export PATH="$HOME/.
 bun scripts/session.ts --check      # → session: complete        (exit 1 + "missing:"/"unfilled:" lines otherwise)
 bun scripts/session.ts              # → session: up to date      (else "+ <sha> <subject>" per appended skeleton)
 bun run session -- --check          # same via the package script (note the `--` before flags)
+bun run session -- --check --session SES-004   # gate a named session; other files' placeholders → warnings
 ```
 
 `bun run session -- --new <slug>` creates `docs/sessions/SES-<next>-<slug>.md` and regenerates the index —
