@@ -12,11 +12,11 @@ curl -fsSL https://raw.githubusercontent.com/loriensleafs/env-setup/main/install
 
 | Command | Does |
 | --- | --- |
-| `envsetup` | Interactive bootstrap — scan the machine, pick what to install, set it all up |
+| `envsetup` | The one command: scan the machine, pick what to install, install it, then walk through the attended steps. **Run it again anytime** — it re-detects the machine, pre-checks anything that failed last run, and only asks about what's missing. |
 | `envsetup doctor` | Diff this machine against its manifest (read-only) |
-| `envsetup sync` | Install/configure anything the manifest is missing |
+| `envsetup sync` | Non-interactive: apply the saved manifest as-is (no picker) |
 | `envsetup auth` | Sign in to GitHub (device flow) |
-| `envsetup connect` | Attended finishing steps (sign-ins, permissions, licenses) |
+| `envsetup connect` | Re-run the attended finishing steps if any were skipped |
 | `envsetup secrets` | Manage the age-encrypted secret store (`init`/`list`/`show`/`reveal`/`copy`/`set`/`unlock`) |
 
 ## How it works
