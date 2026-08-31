@@ -154,13 +154,17 @@ small separate commands, merge commits). The facts below are the ones a rule can
   § Open, `ledger`'s former-name marker) and sweeps CONTRIBUTING, `CLAUDE.md` § Commands, the run
   skills and `docs/sessions/CLAUDE.md` (`83d0881`). SES-008 closed with `/brain:session-close` — the
   first session recorded end to end on the installed plugin (brain PLAN-001 Part 3's Checkpoint).
-- **Parked, not on `main`:** the visual-grouping patch ([PLAN-001](plan/PLAN-001-visual-grouping.md))
-  as a WIP commit on local branch `wip/visual-grouping` (unverified, never run under a PTY).
+- **In progress, not on `main`:** visual grouping ([PLAN-001](plan/PLAN-001-visual-grouping.md),
+  [SES-009](sessions/SES-009-visual-grouping.md)) on branch `feat/visual-grouping` — phase markers
+  `Step n of 5` and boxed "Configure N of M" config headers (`53f28b3`, the parked wip re-applied),
+  the connect phase as step 6 when ceremonies are pending (`021ff51`). Check + test green; the PTY
+  checkpoint has not run.
 
 ## Next up
 
 1. **Visual grouping of the config flow + progress tracker** — [PLAN-001](plan/PLAN-001-visual-grouping.md)
-   (Peter, 2026-08-30). Start from `wip/visual-grouping`, verify under a PTY, PR, release v0.1.10.
+   (Peter, 2026-08-30). Part 1 tasks landed on `feat/visual-grouping` (`53f28b3`, `021ff51`);
+   remaining: verify under a PTY (part 1's checkpoint), PR, release v0.1.10.
 2. First real end-to-end **connect phase** on Peter's machine (web apps, grants, licenses) — expect
    bugs; ceremonies were never exercised in one pass. Write `PLAN-003` first if it grows.
 3. Persist the binary to `~/.local/bin/envsetup` so re-runs don't re-download (PRD open question).

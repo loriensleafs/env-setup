@@ -267,7 +267,10 @@ _Avoid_: key (alone), serial
   noun is Gate; "check" names the command only.
 - **session** / **conversation** — one Session holds many Conversations. "This session" in a
   prompt usually means the Conversation; one agent context is a Conversation.
-- **Step** is an Item's execution within a Run. The plan's unit is a Plan part, never a step.
+- **Step** is an Item's execution within a Run. The plan's unit is a Plan part, never a step. The
+  bootstrap phase markers say "Step n of 5" (and a conditional "Step 6") to the user — Peter's
+  approved wording (PLAN-001, `53f28b3`, `021ff51`); in code and docs those are the phases (scan,
+  identity, picker, config screens, review, connect).
 
 ## Open (not yet canonical — being sharpened)
 

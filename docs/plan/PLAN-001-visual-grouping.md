@@ -1,7 +1,7 @@
 # Plan: visual grouping of the config flow + overall progress tracker
 
-> Status: planned · patch parked on local branch `wip/visual-grouping` (unverified) · Peter,
-> 2026-08-30 · PRD UX requirement 4
+> Status: in progress · the patch is on branch `feat/visual-grouping` (`53f28b3`, `021ff51`;
+> PTY checkpoint pending) · Peter, 2026-08-30 · PRD UX requirement 4
 
 ## Overview
 
@@ -19,15 +19,15 @@ item a boxed header and show where the user is in the whole bootstrap.
 
 ### Part 1: implement (patch exists)
 
-> Status: planned
+> Status: in progress (session SES-009)
 
-- [ ] Task 1: `git checkout -b feat/visual-grouping wip/visual-grouping`; review the WIP commit:
+- [x] Task 1 — `53f28b3` (the parked patch re-applied onto current `main`; check + test green): `git checkout -b feat/visual-grouping wip/visual-grouping`; review the WIP commit:
   `promptItemConfig(item, stored, position?: { index; total })` renders `p.note(item.title,
   \`Configure ${index} of ${total}\`)` instead of `p.log.step(item.title)`
   (`src/ui/config-screens.ts`);`phase(n, title)` = `p.log.step(bold(\`Step ${n} of 5 · …\`))`
   before scan / identity / picker / configs (only when there are configurable items) / review
   (`src/commands/bootstrap.ts`). Acceptance:`bun run check` + `bun test` green.
-- [ ] Task 2: decide whether the connect phase counts as step 6 (recommend: yes when the run has
+- [x] Task 2 — `021ff51` (decided as recommended): decide whether the connect phase counts as step 6 (recommend: yes when the run has
   ceremonies; the marker is cheap) and add it in `executePlan` before `runConnectPhase`.
 
 - [ ] Checkpoint — verified under a PTY: drive `bun src/index.ts --defaults`-free run under the expect harness pattern in
